@@ -47,6 +47,7 @@ public final class IndexerDaoFactory {
 
     indexerMap.put(IndexerType.REDIS, RedisDao.class);
     indexerMap.put(IndexerType.RABBIT_MQ, RabbitMqDao.class);
+    indexerMap.put(IndexerType.JMS, ActiveMqDao.class);
 
     INDEXER_MAP = Collections.unmodifiableMap(indexerMap);
   }
