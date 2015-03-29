@@ -1,4 +1,5 @@
 1.0.4
+-----
 * Add support for pushing directly to Elasticsearch
 
 1.0.3
