@@ -63,7 +63,8 @@ public class AbstractLogstashIndexerDaoTest {
   }
 
   private AbstractLogstashIndexerDao getInstance() {
-    return new AbstractLogstashIndexerDao() {
+    return new AbstractLogstashIndexerDao("localhost", -1, "", "", "") {
+
       public IndexerType getIndexerType() {
         return IndexerType.REDIS;
       }

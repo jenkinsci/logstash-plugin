@@ -1,10 +1,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.PrintStream;
 import java.net.SocketException;
@@ -18,6 +15,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,13 +36,24 @@ public class ActiveMqDaoTest {
   @Mock TextMessage mockMessage;
   @Mock PrintStream mockLogger;
 
+  ActiveMqDao createDao(String host, int port, String key, String username, String password) {
+    ActiveMqDao factory = new ActiveMqDao(mockConnectionFactory, host, port, key, username, password);
+
+    if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
+      verify(mockConnectionFactory, atLeastOnce()).setUserName(username);
+      verify(mockConnectionFactory, atLeastOnce()).setPassword(password);
+    }
+
+    return factory;
+  }
+  
+  
   @Before
   public void before() throws Exception {
     int port = (int) (Math.random() * 1000);
-    dao = new ActiveMqDao("localhost", port, "logstash", "username", "password");
 
     // Note that we can't run these tests in parallel
-    dao.connectionFactory = mockConnectionFactory;
+    dao = createDao("localhost", port, "logstash", "username", "password");
 
     when(mockConnectionFactory.createConnection()).thenReturn(mockConnection);
 
@@ -72,7 +81,7 @@ public class ActiveMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullHost() throws Exception {
     try {
-      new ActiveMqDao(null, 5672, "logstash", "username", "password");
+      createDao(null, 5672, "logstash", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -82,7 +91,7 @@ public class ActiveMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyHost() throws Exception {
     try {
-      new ActiveMqDao(" ", 5672, "logstash", "username", "password");
+      createDao(" ", 5672, "logstash", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -92,7 +101,7 @@ public class ActiveMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullKey() throws Exception {
     try {
-      new ActiveMqDao("localhost", 5672, null, "username", "password");
+      createDao("localhost", 5672, null, "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "JMS queue name is required", e.getMessage());
       throw e;
@@ -102,7 +111,7 @@ public class ActiveMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyKey() throws Exception {
     try {
-      new ActiveMqDao("localhost", 5672, " ", "username", "password");
+      createDao("localhost", 5672, " ", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "JMS queue name is required", e.getMessage());
       throw e;
@@ -112,7 +121,7 @@ public class ActiveMqDaoTest {
   @Test
   public void constructorSuccess() throws Exception {
     // Unit under test
-    dao = new ActiveMqDao("localhost", 5672, "logstash", "username", "password");
+    dao = createDao("localhost", 5672, "logstash", "username", "password");
 
     // Verify results
     assertEquals("Wrong host name", "localhost", dao.host);
@@ -197,8 +206,7 @@ public class ActiveMqDaoTest {
   @Test
   public void pushSuccessNoAuth() throws Exception {
     String json = "{ 'foo': 'bar' }";
-    dao = new ActiveMqDao("localhost", 5672, "logstash", null, null);
-    dao.connectionFactory = mockConnectionFactory;
+    dao = createDao("localhost", 5672, "logstash", null, null);
 
     // Unit under test
     long result = dao.push(json, mockLogger);

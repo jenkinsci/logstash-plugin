@@ -46,32 +46,31 @@ import org.apache.commons.lang.exception.ExceptionUtils;
  * @since 1.0.4
  */
 public class ActiveMqDao extends AbstractLogstashIndexerDao {
-  //ConnectionFactory pool;
+
   ActiveMQConnectionFactory connectionFactory = null;
 
-  ActiveMqDao() { /* Required by IndexerDaoFactory */ }
-
-  // Constructor for unit testing
-  ActiveMqDao(String host, int port, String key, String username, String password) {
-    init(host, port, key, username, password);
+  //primary constructor used by indexer factory
+  public ActiveMqDao(String host, int port, String key, String username, String password) {
+    this(null, host, port, key, username, password);
   }
 
-  final void init(String host, int port, String key, String username, String password) {
-    super.init(host, port, key, username, password);
+  // Constructor for unit testing
+  ActiveMqDao(ActiveMQConnectionFactory mqConnectionFactory, String host, int port, String key, String username, String password) {
+    super(host, port, key, username, password);
 
     if (StringUtils.isBlank(key)) {
       throw new IllegalArgumentException("JMS queue name is required");
     }
 
-      // The ConnectionFactory must be a singleton
-      // We assume this is used as a singleton as well
-      // Calling this method means the configuration has changed and the pool must be re-initialized
-      connectionFactory = new ActiveMQConnectionFactory(String.format("tcp://%s:%d", host, port));
-      
-      if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
-        connectionFactory.setUserName(username);
-        connectionFactory.setPassword(password);
-      }
+    // The ConnectionFactory must be a singleton
+    // We assume this is used as a singleton as well
+    // Calling this method means the configuration has changed and the pool must be re-initialized
+    this.connectionFactory = mqConnectionFactory == null ? new ActiveMQConnectionFactory(String.format("tcp://%s:%d", host, port)): mqConnectionFactory;
+    
+    if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
+      connectionFactory.setUserName(username);
+      connectionFactory.setPassword(password);
+    }
 
   }
 

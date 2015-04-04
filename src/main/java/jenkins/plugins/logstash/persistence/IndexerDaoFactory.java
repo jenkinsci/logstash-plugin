@@ -24,6 +24,8 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +49,7 @@ public final class IndexerDaoFactory {
 
     indexerMap.put(IndexerType.REDIS, RedisDao.class);
     indexerMap.put(IndexerType.RABBIT_MQ, RabbitMqDao.class);
+    indexerMap.put(IndexerType.ELASTICSEARCH, ElasticSearchDao.class);
     indexerMap.put(IndexerType.JMS, ActiveMqDao.class);
 
     INDEXER_MAP = Collections.unmodifiableMap(indexerMap);
@@ -73,20 +76,24 @@ public final class IndexerDaoFactory {
       throw new InstantiationException("Unknown IndexerType '" + type + "'.");
     }
 
-    if (shouldRefreshInstance(type, host, port, key, password)) {
+    if (shouldRefreshInstance(type, host, port, key, username, password)) {
       try {
-        instance = (AbstractLogstashIndexerDao) INDEXER_MAP.get(type).newInstance();
+        Class<?> indexerClass = INDEXER_MAP.get(type);
+        Constructor<?> constructor = indexerClass.getConstructor(String.class, int.class, String.class, String.class, String.class);
+        instance = (AbstractLogstashIndexerDao) constructor.newInstance(host, port, key, username, password);
+      } catch (NoSuchMethodException e) {
+        throw new InstantiationException(e.getMessage());
+      } catch (InvocationTargetException e) {
+        throw new InstantiationException(e.getMessage());
       } catch (IllegalAccessException e) {
         throw new InstantiationException(e.getMessage());
       }
-
-      instance.init(host, port, key, username, password);
     }
 
     return instance;
   }
 
-  private static boolean shouldRefreshInstance(IndexerType type, String host, int port, String key, String password) {
+  private static boolean shouldRefreshInstance(IndexerType type, String host, int port, String key, String username, String password) {
     if (instance == null) {
       return true;
     }
@@ -95,6 +102,7 @@ public final class IndexerDaoFactory {
         StringUtils.equals(instance.host, host) &&
         (instance.port == port) &&
         StringUtils.equals(instance.key, key) &&
+        StringUtils.equals(instance.username, username) &&
         StringUtils.equals(instance.password, password);
     return !matches;
   }

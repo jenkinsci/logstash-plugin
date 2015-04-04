@@ -39,6 +39,7 @@ public interface LogstashIndexerDao {
   static enum IndexerType {
     REDIS,
     RABBIT_MQ,
+    ELASTICSEARCH,
     JMS
   }
 

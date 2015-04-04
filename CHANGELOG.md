@@ -1,3 +1,7 @@
+1.0.4
+-----
+* Add support for pushing directly to Elasticsearch
+
 1.0.3
 -----
 * Fix incompatibility with Jenkins core 1.577 and later

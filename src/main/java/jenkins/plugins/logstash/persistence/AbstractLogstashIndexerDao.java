@@ -37,16 +37,17 @@ import net.sf.json.JSONObject;
  * @since 1.0.0
  */
 abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
-  protected String host;
-  protected int port;
-  protected String key;
-  protected String username;
-  protected String password;
+  protected final String host;
+  protected final int port;
+  protected final String key;
+  protected final String username;
+  protected final String password;
 
-  void init(String host, int port, String key, String username, String password) {
+  AbstractLogstashIndexerDao(String host, int port, String key, String username, String password) {
     this.host = host;
     this.port = port;
     this.key = key;
+    this.username = username;
     this.password = password;
 
     if (StringUtils.isBlank(host)) {

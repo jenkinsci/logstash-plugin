@@ -11,7 +11,8 @@ public class IndexerDaoFactoryTest {
   @Test
   public void getAllInstances() throws Exception {
     for (IndexerType type : IndexerType.values()) {
-      LogstashIndexerDao dao = IndexerDaoFactory.getInstance(type, "localhost", 1234, "key", "username", "password");
+      String host = type == IndexerType.ELASTICSEARCH ? "http://localhost" : "localhost";
+      LogstashIndexerDao dao = IndexerDaoFactory.getInstance(type, host, 1234, "key", "username", "password");
 
       assertNotNull("Result was null", dao);
       assertEquals("Result implements wrong IndexerType", type, dao.getIndexerType());

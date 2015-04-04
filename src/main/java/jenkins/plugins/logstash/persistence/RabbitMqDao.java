@@ -41,17 +41,16 @@ import com.rabbitmq.client.ConnectionFactory;
  * @since 1.0.0
  */
 public class RabbitMqDao extends AbstractLogstashIndexerDao {
-  ConnectionFactory pool;
+  final ConnectionFactory pool;
 
-  RabbitMqDao() { /* Required by IndexerDaoFactory */ }
-
-  // Constructor for unit testing
-  RabbitMqDao(String host, int port, String key, String username, String password) {
-    init(host, port, key, username, password);
+  //primary constructor used by indexer factory
+  public RabbitMqDao(String host, int port, String key, String username, String password) {
+    this(null, host, port, key, username, password);
   }
 
-  final void init(String host, int port, String key, String username, String password) {
-    super.init(host, port, key, username, password);
+  // Factored for unit testing
+  RabbitMqDao(ConnectionFactory factory, String host, int port, String key, String username, String password) {
+    super(host, port, key, username, password);
 
     if (StringUtils.isBlank(key)) {
       throw new IllegalArgumentException("rabbit queue name is required");
@@ -60,7 +59,7 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
     // The ConnectionFactory must be a singleton
     // We assume this is used as a singleton as well
     // Calling this method means the configuration has changed and the pool must be re-initialized
-    pool = new ConnectionFactory();
+    pool = factory == null ? new ConnectionFactory() : factory;
     pool.setHost(host);
     pool.setPort(port);
 

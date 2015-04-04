@@ -27,13 +27,14 @@ public class RedisDaoTest {
   @Mock Jedis mockJedis;
   @Mock PrintStream mockLogger;
 
+  RedisDao createDao(String host, int port, String key, String username, String password) {
+    return new RedisDao(mockPool, host, port, key, username, password);
+  }
+
   @Before
   public void before() throws Exception {
     int port = (int) (Math.random() * 1000);
-    dao = new RedisDao("localhost", port, "logstash", "username", "password");
-
-    // Note that we can't run these tests in parallel
-    RedisDao.pool = mockPool;
+    dao = createDao("localhost", port, "logstash", "username", "password");
 
     when(mockPool.getResource()).thenReturn(mockJedis);
   }
@@ -48,7 +49,7 @@ public class RedisDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullHost() throws Exception {
     try {
-      new RedisDao(null, 6379, "logstash", "username", "password");
+      createDao(null, 6379, "logstash", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -58,7 +59,7 @@ public class RedisDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyHost() throws Exception {
     try {
-      new RedisDao(" ", 6379, "logstash", "username", "password");
+      createDao(" ", 6379, "logstash", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -68,7 +69,7 @@ public class RedisDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullKey() throws Exception {
     try {
-      new RedisDao("localhost", 6379, null, "username", "password");
+      createDao("localhost", 6379, null, "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "redis key is required", e.getMessage());
       throw e;
@@ -78,7 +79,7 @@ public class RedisDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyKey() throws Exception {
     try {
-      new RedisDao("localhost", 6379, " ", "username", "password");
+      createDao("localhost", 6379, " ", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "redis key is required", e.getMessage());
       throw e;
@@ -88,12 +89,13 @@ public class RedisDaoTest {
   @Test
   public void constructorSuccess() throws Exception {
     // Unit under test
-    dao = new RedisDao("localhost", 6379, "logstash", "username", "password");
+    dao = createDao("localhost", 6379, "logstash", "username", "password");
 
     // Verify results
     assertEquals("Wrong host name", "localhost", dao.host);
     assertEquals("Wrong port", 6379, dao.port);
     assertEquals("Wrong key", "logstash", dao.key);
+    assertEquals("Wrong name", "username", dao.username);
     assertEquals("Wrong password", "password", dao.password);
   }
 
@@ -179,8 +181,7 @@ public class RedisDaoTest {
     String json = "{ 'foo': 'bar' }";
 
     // Initialize mocks
-    dao = new RedisDao("localhost", 6379, "logstash", null, null);
-    RedisDao.pool = mockPool;
+    dao = createDao("localhost", 6379, "logstash", null, null);
     when(mockJedis.rpush("logstash", json)).thenReturn(1L);
 
     // Unit under test

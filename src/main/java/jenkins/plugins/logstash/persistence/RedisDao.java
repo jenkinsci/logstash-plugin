@@ -42,17 +42,16 @@ import redis.clients.jedis.exceptions.JedisException;
  * @since 1.0.0
  */
 public class RedisDao extends AbstractLogstashIndexerDao {
-  protected static JedisPool pool;
+  final JedisPool pool;
 
-  RedisDao() { /* Required by IndexerDaoFactory */ }
-
-  // Constructor for unit testing
-  RedisDao(String host, int port, String key, String username, String password) {
-    init(host, port, key, username, password);
+  //primary constructor used by indexer factory
+  public RedisDao(String host, int port, String key, String username, String password) {
+    this(null, host, port, key, username, password);
   }
 
-  final void init(String host, int port, String key, String username, String password) {
-    super.init(host, port, key, username, password);
+  // Factored for unit testing
+  RedisDao(JedisPool factory, String host, int port, String key, String username, String password) {
+    super(host, port, key, username, password);
 
     if (StringUtils.isBlank(key)) {
       throw new IllegalArgumentException("redis key is required");
@@ -60,8 +59,7 @@ public class RedisDao extends AbstractLogstashIndexerDao {
 
     // The JedisPool must be a singleton
     // We assume this is used as a singleton as well
-    // Calling this method means the configuration has changed and the pool must be re-initialized
-    pool = new JedisPool(new JedisPoolConfig(), host, port);
+    pool = factory == null ? new JedisPool(new JedisPoolConfig(), host, port) : factory;
   }
 
   @Override

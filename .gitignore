@@ -5,6 +5,10 @@ work
 .*.swp
 *~
 
+# IntelliJ project files
+.idea/
+*.iml
+
 # Eclipse IDE project files
 .classpath
 .project
