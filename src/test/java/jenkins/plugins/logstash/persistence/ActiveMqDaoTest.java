@@ -54,6 +54,8 @@ public class ActiveMqDaoTest {
     
     when(mockSession.createProducer(mockDestination)).thenReturn(mockProducer);
     
+    when(mockSession.createTextMessage("{ 'foo': 'bar' }")).thenReturn(mockMessage);
+    
   }
 
   @After
@@ -63,6 +65,7 @@ public class ActiveMqDaoTest {
     verifyNoMoreInteractions(mockSession);
     verifyNoMoreInteractions(mockDestination);
     verifyNoMoreInteractions(mockProducer);
+    verifyNoMoreInteractions(mockMessage);
     verifyNoMoreInteractions(mockLogger);
   }
 
@@ -91,7 +94,7 @@ public class ActiveMqDaoTest {
     try {
       new ActiveMqDao("localhost", 5672, null, "username", "password");
     } catch (IllegalArgumentException e) {
-      assertEquals("Wrong error message was thrown", "jms queue name is required", e.getMessage());
+      assertEquals("Wrong error message was thrown", "JMS queue name is required", e.getMessage());
       throw e;
     }
   }
@@ -101,7 +104,7 @@ public class ActiveMqDaoTest {
     try {
       new ActiveMqDao("localhost", 5672, " ", "username", "password");
     } catch (IllegalArgumentException e) {
-      assertEquals("Wrong error message was thrown", "jms queue name is required", e.getMessage());
+      assertEquals("Wrong error message was thrown", "JMS queue name is required", e.getMessage());
       throw e;
     }
   }
@@ -180,10 +183,11 @@ public class ActiveMqDaoTest {
     assertEquals("Unexpected return code", 1L, result);
 
     verify(mockConnectionFactory).createConnection();
+    verify(mockConnection).start();
     verify(mockConnection).createSession(false, Session.AUTO_ACKNOWLEDGE);
     verify(mockSession).createQueue("logstash");
     verify(mockSession).createProducer(mockDestination);
-    mockProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+    verify(mockProducer).setDeliveryMode(DeliveryMode.NON_PERSISTENT);
     verify(mockSession).createTextMessage(json);
     verify(mockProducer).send(mockMessage);
     verify(mockSession).close();
@@ -203,10 +207,11 @@ public class ActiveMqDaoTest {
     assertEquals("Unexpected return code", 1L, result);
 
     verify(mockConnectionFactory).createConnection();
+    verify(mockConnection).start();
     verify(mockConnection).createSession(false, Session.AUTO_ACKNOWLEDGE);
     verify(mockSession).createQueue("logstash");
     verify(mockSession).createProducer(mockDestination);
-    mockProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+    verify(mockProducer).setDeliveryMode(DeliveryMode.NON_PERSISTENT);
     verify(mockSession).createTextMessage(json);
     verify(mockProducer).send(mockMessage);
     verify(mockSession).close();

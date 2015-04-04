@@ -4,10 +4,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import hudson.EnvVars;
+import hudson.model.Environment;
+import hudson.model.EnvironmentList;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.Node;
 import hudson.model.Project;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 
@@ -42,9 +46,13 @@ public class BuildDataTest {
   @Mock Node mockNode;
   @Mock Date mockDate;
   @Mock GregorianCalendar mockCalendar;
+  @Mock Environment mockEnvironment;
 
   @Before
   public void before() throws Exception {
+    EnvVars envVars = new EnvironmentVariablesNodeProperty().getEnvVars();
+    envVars.put("sampleEnvVarKey", "sampleEnvVarValue");
+    mockEnvironment.buildEnvVars(envVars);
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("BuildDataTest");
     when(mockBuild.getFullDisplayName()).thenReturn("BuildDataTest #123456");
@@ -57,6 +65,7 @@ public class BuildDataTest {
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3"));
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
+    when(mockBuild.getEnvironments()).thenReturn(new EnvironmentList(Collections.singletonList(mockEnvironment)));
 
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
@@ -102,6 +111,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -142,6 +152,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -182,6 +193,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -223,6 +235,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -256,6 +269,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getEnvironments();
 
     verify(mockProject, times(2)).getName();
 

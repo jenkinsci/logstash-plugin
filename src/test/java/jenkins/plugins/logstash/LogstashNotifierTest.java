@@ -6,11 +6,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.model.BuildListener;
+import hudson.model.Environment;
+import hudson.model.EnvironmentList;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.Project;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.tasks.test.AbstractTestResultAction;
 
 import java.io.IOException;
@@ -57,11 +61,16 @@ public class LogstashNotifierTest {
   @Mock BuildListener mockListener;
   @Mock PrintStream mockLogger;
   @Mock LogstashIndexerDao mockDao;
+  @Mock Environment mockEnvironment;
 
   LogstashNotifier notifier;
-
+  
   @Before
   public void before() throws Exception {
+    EnvVars envVars = new EnvironmentVariablesNodeProperty().getEnvVars();
+    envVars.put("sampleEnvVarKey", "sampleEnvVarValue");
+    mockEnvironment.buildEnvVars(envVars);
+    
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("LogstashNotifierTest");
     when(mockBuild.getProject()).thenReturn(mockProject);
@@ -73,6 +82,7 @@ public class LogstashNotifierTest {
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3"));
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
+    when(mockBuild.getEnvironments()).thenReturn(new EnvironmentList(Collections.singletonList(mockEnvironment)));
 
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
@@ -88,7 +98,7 @@ public class LogstashNotifierTest {
     when(mockDao.getIndexerType()).thenReturn(IndexerType.REDIS);
     when(mockDao.getHost()).thenReturn("localhost");
     when(mockDao.getPort()).thenReturn(8080);
-
+    
     notifier = new MockLogstashNotifier(3, false, "http://my-jenkins-url", mockDao);
   }
 
@@ -125,6 +135,7 @@ public class LogstashNotifierTest {
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -196,6 +207,7 @@ public class LogstashNotifierTest {
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -238,6 +250,7 @@ public class LogstashNotifierTest {
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getEnvironments();
 
     verify(mockProject, times(2)).getName();
 
@@ -272,6 +285,7 @@ public class LogstashNotifierTest {
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -317,6 +331,7 @@ public class LogstashNotifierTest {
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
