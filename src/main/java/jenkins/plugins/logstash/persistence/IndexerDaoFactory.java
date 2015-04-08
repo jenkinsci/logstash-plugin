@@ -50,7 +50,7 @@ public final class IndexerDaoFactory {
     indexerMap.put(IndexerType.REDIS, RedisDao.class);
     indexerMap.put(IndexerType.RABBIT_MQ, RabbitMqDao.class);
     indexerMap.put(IndexerType.ELASTICSEARCH, ElasticSearchDao.class);
-    indexerMap.put(IndexerType.JMS, ActiveMqDao.class);
+    indexerMap.put(IndexerType.ACTIVE_MQ, ActiveMqDao.class);
 
     INDEXER_MAP = Collections.unmodifiableMap(indexerMap);
   }

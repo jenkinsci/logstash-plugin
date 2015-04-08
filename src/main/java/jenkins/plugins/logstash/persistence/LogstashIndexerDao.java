@@ -40,7 +40,7 @@ public interface LogstashIndexerDao {
     REDIS,
     RABBIT_MQ,
     ELASTICSEARCH,
-    JMS
+    ACTIVE_MQ
   }
 
   int getPort();

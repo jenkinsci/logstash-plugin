@@ -107,6 +107,6 @@ public class ActiveMqDao extends AbstractLogstashIndexerDao {
 
   @Override
   public IndexerType getIndexerType() {
-    return IndexerType.JMS;
+    return IndexerType.ACTIVE_MQ;
   }
 }
