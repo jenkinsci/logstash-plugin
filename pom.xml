@@ -126,10 +126,6 @@
           </excludes>
         </configuration>
       </plugin>
-      <plugin>
-          <groupId>org.jenkins-ci.tools</groupId>
-          <artifactId>maven-hpi-plugin</artifactId>
-        </plugin>
     </plugins>
   </build>
 
