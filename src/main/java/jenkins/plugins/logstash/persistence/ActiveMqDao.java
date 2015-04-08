@@ -41,7 +41,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 /**
  * ActiveMq Data Access Object.
  *
- * @author Rusty Gerard
  * @author dbs
  * @since 1.0.4
  */
