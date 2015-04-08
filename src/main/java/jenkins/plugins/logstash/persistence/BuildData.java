@@ -25,6 +25,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import hudson.model.Action;
+import hudson.model.Environment;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.Node;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -139,6 +141,18 @@ public class BuildData {
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
+
+    Map<String, String> env = new HashMap<String, String>();
+    List<Environment> environmentList = build.getEnvironments();
+    if (environmentList != null) {
+      for (Environment e : environmentList) {
+        if (e != null) {
+          e.buildEnvVars(env);
+          if(!env.isEmpty())
+            buildVariables.putAll(env);
+        }
+      }
+    }
   }
 
   @Override

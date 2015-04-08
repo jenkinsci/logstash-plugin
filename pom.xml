@@ -64,6 +64,12 @@
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
+    
+    <dependency>
+	    <groupId>org.apache.activemq</groupId>
+	    <artifactId>activemq-client</artifactId>
+	    <version>5.11.1</version>
+    </dependency>
 
     <dependency>
       <groupId>com.google.code.gson</groupId>

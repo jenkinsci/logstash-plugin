@@ -39,7 +39,8 @@ public interface LogstashIndexerDao {
   static enum IndexerType {
     REDIS,
     RABBIT_MQ,
-    ELASTICSEARCH
+    ELASTICSEARCH,
+    ACTIVE_MQ
   }
 
   int getPort();
