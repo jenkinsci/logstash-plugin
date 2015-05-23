@@ -24,13 +24,12 @@
 
 package jenkins.plugins.logstash.persistence;
 
-import java.io.IOException;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.IOException;
 
 /**
  * RabbitMQ Data Access Object.
@@ -42,12 +41,12 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
   final ConnectionFactory pool;
 
   //primary constructor used by indexer factory
-  public RabbitMqDao(String host, int port, String key, String username, String password) {
+  public RabbitMqDao(String host, String port, String key, String username, String password) {
     this(null, host, port, key, username, password);
   }
 
   // Factored for unit testing
-  RabbitMqDao(ConnectionFactory factory, String host, int port, String key, String username, String password) {
+  RabbitMqDao(ConnectionFactory factory, String host, String port, String key, String username, String password) {
     super(host, port, key, username, password);
 
     if (StringUtils.isBlank(key)) {
@@ -59,7 +58,10 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
     // Calling this method means the configuration has changed and the pool must be re-initialized
     pool = factory == null ? new ConnectionFactory() : factory;
     pool.setHost(host);
-    pool.setPort(port);
+
+    if (StringUtils.isNotBlank(port)) {
+      pool.setPort(Integer.parseInt(port));
+    }
 
     if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
       pool.setPassword(password);

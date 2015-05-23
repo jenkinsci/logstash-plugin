@@ -53,12 +53,12 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   final String auth;
 
   //primary constructor used by indexer factory
-  public ElasticSearchDao(String host, int port, String key, String username, String password) {
+  public ElasticSearchDao(String host, String port, String key, String username, String password) {
     this(null, host, port, key, username, password);
   }
 
   // Factored for unit testing
-  ElasticSearchDao(HttpClientBuilder factory, String host, int port, String key, String username, String password) {
+  ElasticSearchDao(HttpClientBuilder factory, String host, String port, String key, String username, String password) {
     super(host, port, key, username, password);
 
     if (StringUtils.isBlank(key)) {
@@ -66,11 +66,14 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     }
 
     try {
-      uri = new URIBuilder(host)
-        .setPort(port)
-        // Normalizer will remove extra starting slashes, but missing slash will cause annoying failures
-        .setPath("/" + key)
-        .build();
+      URIBuilder uriBuilder = new URIBuilder(host);
+      if (StringUtils.isNotBlank(port)) {
+        uriBuilder.setPort(Integer.parseInt(port));
+      }
+      // Normalizer will remove extra starting slashes, but missing slash will cause annoying failures
+      String path = uriBuilder.getPath() + "/" + key;
+      uriBuilder.setPath(path.replaceAll("//", "/"));
+      uri = uriBuilder.build();
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException("Could not create uri", e);
     }

@@ -1,11 +1,9 @@
 package jenkins.plugins.logstash.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.net.SocketException;
-
+import com.rabbitmq.client.AuthenticationFailureException;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
@@ -15,10 +13,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.rabbitmq.client.AuthenticationFailureException;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import java.io.IOException;
+import java.net.SocketException;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RabbitMqDaoTest {
@@ -27,10 +26,13 @@ public class RabbitMqDaoTest {
   @Mock Connection mockConnection;
   @Mock Channel mockChannel;
 
-  RabbitMqDao createDao(String host, int port, String key, String username, String password) {
+  RabbitMqDao createDao(String host, String port, String key, String username, String password) {
     RabbitMqDao factory = new RabbitMqDao(mockPool, host, port, key, username, password);
     verify(mockPool, atLeastOnce()).setHost(host);
-    verify(mockPool, atLeastOnce()).setPort(port);
+
+    if (StringUtils.isNotBlank(port)) {
+      verify(mockPool, atLeastOnce()).setPort(Integer.parseInt(port));
+    }
 
     if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
       verify(mockPool, atLeastOnce()).setUsername(username);
@@ -44,7 +46,7 @@ public class RabbitMqDaoTest {
   public void before() throws Exception {
     int port = (int) (Math.random() * 1000);
     // Note that we can't run these tests in parallel
-    dao = createDao("localhost", port, "logstash", "username", "password");
+    dao = createDao("localhost", String.valueOf(port), "logstash", "username", "password");
 
     when(mockPool.newConnection()).thenReturn(mockConnection);
 
@@ -61,7 +63,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullHost() throws Exception {
     try {
-      createDao(null, 5672, "logstash", "username", "password");
+      createDao(null, "5672", "logstash", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -71,7 +73,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyHost() throws Exception {
     try {
-      createDao(" ", 5672, "logstash", "username", "password");
+      createDao(" ", "5672", "logstash", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -81,7 +83,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullKey() throws Exception {
     try {
-      createDao("localhost", 5672, null, "username", "password");
+      createDao("localhost", "5672", null, "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "rabbit queue name is required", e.getMessage());
       throw e;
@@ -91,7 +93,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyKey() throws Exception {
     try {
-      createDao("localhost", 5672, " ", "username", "password");
+      createDao("localhost", "5672", " ", "username", "password");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "rabbit queue name is required", e.getMessage());
       throw e;
@@ -101,11 +103,11 @@ public class RabbitMqDaoTest {
   @Test
   public void constructorSuccess() throws Exception {
     // Unit under test
-    dao = createDao("localhost", 5672, "logstash", "username", "password");
+    dao = createDao("localhost", "5672", "logstash", "username", "password");
 
     // Verify results
     assertEquals("Wrong host name", "localhost", dao.host);
-    assertEquals("Wrong port", 5672, dao.port);
+    assertEquals("Wrong port", "5672", dao.port);
     assertEquals("Wrong key", "logstash", dao.key);
     assertEquals("Wrong name", "username", dao.username);
     assertEquals("Wrong password", "password", dao.password);
@@ -187,7 +189,7 @@ public class RabbitMqDaoTest {
   @Test
   public void pushSuccessNoAuth() throws Exception {
     String json = "{ 'foo': 'bar' }";
-    dao = createDao("localhost", 5672, "logstash", null, null);
+    dao = createDao("localhost", "5672", "logstash", null, null);
 
     // Unit under test
     dao.push(json);
