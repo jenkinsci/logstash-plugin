@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.json.JSONObject;
 
@@ -106,6 +107,7 @@ public class BuildData {
   protected String rootProjectDisplayName;
   protected int rootBuildNum;
   protected Map<String, String> buildVariables;
+  protected Set<String> sensitiveBuildVariables;
   protected TestData testResults = null;
 
   BuildData() {}
@@ -141,6 +143,7 @@ public class BuildData {
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
+    sensitiveBuildVariables = build.getSensitiveBuildVariables();
 
     // Get environment build variables and merge them into the buildVariables map
     Map<String, String> buildEnvVariables = new HashMap<String, String>();
@@ -157,6 +160,9 @@ public class BuildData {
           buildEnvVariables.clear();
         }
       }
+    }
+    for (String key : sensitiveBuildVariables) {
+      buildVariables.remove(key);
     }
   }
 
@@ -297,6 +303,14 @@ public class BuildData {
 
   public void setBuildVariables(Map<String, String> buildVariables) {
     this.buildVariables = buildVariables;
+  }
+
+  public Set<String> getSensitiveBuildVariables() {
+    return sensitiveBuildVariables;
+  }
+
+  public void setSensitiveBuildVariables(Set<String> sensitiveBuildVariables) {
+    this.sensitiveBuildVariables = sensitiveBuildVariables;
   }
 
   public TestData getTestResults() {

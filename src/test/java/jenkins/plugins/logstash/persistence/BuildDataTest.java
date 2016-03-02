@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import jenkins.plugins.logstash.persistence.BuildData.TestData;
 import net.sf.json.JSONObject;
@@ -41,7 +43,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class BuildDataTest {
 
-  static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"projectName\":\"PROJECT_NAME\",\"displayName\":\"DISPLAY NAME\",\"fullDisplayName\":\"FULL DISPLAY NAME\",\"description\":\"DESCRIPTION\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\",\"buildHost\":\"http://localhost:8080/jenkins\",\"buildLabel\":\"master\",\"buildNum\":123,\"buildDuration\":100,\"rootProjectName\":\"ROOT PROJECT NAME\",\"rootProjectDisplayName\":\"ROOT PROJECT DISPLAY NAME\",\"rootBuildNum\":456,\"buildVariables\":{},\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0,\"failedTests\":[]}}";
+  static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"projectName\":\"PROJECT_NAME\",\"displayName\":\"DISPLAY NAME\",\"fullDisplayName\":\"FULL DISPLAY NAME\",\"description\":\"DESCRIPTION\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\",\"buildHost\":\"http://localhost:8080/jenkins\",\"buildLabel\":\"master\",\"buildNum\":123,\"buildDuration\":100,\"rootProjectName\":\"ROOT PROJECT NAME\",\"rootProjectDisplayName\":\"ROOT PROJECT DISPLAY NAME\",\"rootBuildNum\":456,\"buildVariables\":{},\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0,\"failedTests\":[]}}";
 
   @Mock AbstractBuild mockBuild;
   @Mock AbstractTestResultAction mockTestResultAction;
@@ -63,6 +65,7 @@ public class BuildDataTest {
     when(mockBuild.getTimestamp()).thenReturn(mockCalendar);
     when(mockBuild.getRootBuild()).thenReturn(mockBuild);
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
+    when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3"));
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
@@ -113,6 +116,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
@@ -155,6 +159,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
@@ -197,6 +202,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
@@ -240,6 +246,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
@@ -275,6 +282,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
 
     verify(mockProject, times(2)).getName();
@@ -286,6 +294,7 @@ public class BuildDataTest {
   public void constructorSuccessWithEnvVars() throws Exception {
     when(mockBuild.getEnvironments()).thenReturn(new EnvironmentList(Arrays.asList(mockEnvironment)));
     when(mockBuild.getBuildVariables()).thenReturn(new HashMap<String, String>());
+    when(mockBuild.getSensitiveBuildVariables()).thenReturn(new HashSet<String>());
 
     when(mockBuild.getBuiltOn()).thenReturn(mockNode);
 
@@ -324,6 +333,7 @@ public class BuildDataTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
 
     verify(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
@@ -351,6 +361,7 @@ public class BuildDataTest {
 
   BuildData makeFullBuildData() {
     Map<String, String> buildVariables = Collections.emptyMap();
+    Set<String> sensitiveBuildVariables = Collections.emptySet();
     BuildData buildData = new BuildData();
 
     buildData.setBuildDuration(100);
@@ -358,6 +369,7 @@ public class BuildDataTest {
     buildData.setBuildLabel("master");
     buildData.setBuildNum(123);
     buildData.setBuildVariables(buildVariables);
+    buildData.setSensitiveBuildVariables(sensitiveBuildVariables);
     buildData.setDescription("DESCRIPTION");
     buildData.setDisplayName("DISPLAY NAME");
     buildData.setFullDisplayName("FULL DISPLAY NAME");

@@ -87,6 +87,7 @@ public class LogstashWriterTest {
     when(mockBuild.getTimestamp()).thenReturn(new GregorianCalendar());
     when(mockBuild.getRootBuild()).thenReturn(mockBuild);
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
+    when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
     when(mockBuild.getLog(0)).thenReturn(Arrays.asList());
@@ -139,6 +140,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(3)).getRootBuild();
     verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
 
     verify(mockTestResultAction).getTotalCount();
