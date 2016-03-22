@@ -24,11 +24,10 @@
 
 package jenkins.plugins.logstash.persistence;
 
-import java.util.List;
-
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
-import net.sf.json.JSONObject;
+import java.util.List;
 
 /**
  * Abstract data access object for Logstash indexers.
@@ -38,12 +37,12 @@ import net.sf.json.JSONObject;
  */
 abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
   protected final String host;
-  protected final int port;
+  protected final String port;
   protected final String key;
   protected final String username;
   protected final String password;
 
-  AbstractLogstashIndexerDao(String host, int port, String key, String username, String password) {
+  AbstractLogstashIndexerDao(String host, String port, String key, String username, String password) {
     this.host = host;
     this.port = port;
     this.key = key;

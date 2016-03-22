@@ -24,16 +24,15 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 /**
  * Factory for AbstractLogstashIndexerDao objects.
@@ -74,18 +73,15 @@ public final class IndexerDaoFactory {
    * @return The instance of the appropriate indexer DAO, never null
    * @throws InstantiationException
    */
-  public static synchronized LogstashIndexerDao getInstance(IndexerType type, String host, Integer port, String key, String username, String password) throws InstantiationException {
+  public static synchronized LogstashIndexerDao getInstance(IndexerType type, String host, String port, String key, String username, String password) throws InstantiationException {
     if (!INDEXER_MAP.containsKey(type)) {
       throw new InstantiationException("[logstash-plugin]: Unknown IndexerType '" + type + "'. Did you forget to configure the plugin?");
     }
 
-    // Prevent NPE
-    port = (port == null ? -1 : port.intValue());
-
     if (shouldRefreshInstance(type, host, port, key, username, password)) {
       try {
         Class<?> indexerClass = INDEXER_MAP.get(type);
-        Constructor<?> constructor = indexerClass.getConstructor(String.class, int.class, String.class, String.class, String.class);
+        Constructor<?> constructor = indexerClass.getConstructor(String.class, String.class, String.class, String.class, String.class);
         instance = (AbstractLogstashIndexerDao) constructor.newInstance(host, port, key, username, password);
       } catch (NoSuchMethodException e) {
         throw new InstantiationException(ExceptionUtils.getRootCauseMessage(e));
@@ -99,14 +95,14 @@ public final class IndexerDaoFactory {
     return instance;
   }
 
-  private static boolean shouldRefreshInstance(IndexerType type, String host, int port, String key, String username, String password) {
+  private static boolean shouldRefreshInstance(IndexerType type, String host, String port, String key, String username, String password) {
     if (instance == null) {
       return true;
     }
 
     boolean matches = (instance.getIndexerType() == type) &&
       StringUtils.equals(instance.host, host) &&
-      (instance.port == port) &&
+      StringUtils.equals(instance.port, port) &&
       StringUtils.equals(instance.key, key) &&
       StringUtils.equals(instance.username, username) &&
       StringUtils.equals(instance.password, password);

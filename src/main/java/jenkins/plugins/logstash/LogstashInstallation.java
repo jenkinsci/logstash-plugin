@@ -26,20 +26,18 @@ package jenkins.plugins.logstash;
 
 import hudson.Extension;
 import hudson.tools.ToolDescriptor;
-import hudson.tools.ToolProperty;
 import hudson.tools.ToolInstallation;
+import hudson.tools.ToolProperty;
 import hudson.util.FormValidation;
-
-import java.util.List;
-
 import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+
+import java.util.List;
 
 /**
  * POJO for storing global configurations shared between components.
@@ -63,7 +61,7 @@ public class LogstashInstallation extends ToolInstallation {
   public static final class Descriptor extends ToolDescriptor<LogstashInstallation> {
     public IndexerType type;
     public String host;
-    public Integer port = -1;
+    public String port;
     public String username;
     public String password;
     public String key;

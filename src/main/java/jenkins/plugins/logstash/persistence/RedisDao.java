@@ -24,15 +24,15 @@
 
 package jenkins.plugins.logstash.persistence;
 
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.exceptions.JedisException;
+
+import java.io.IOException;
 
 /**
  * Redis Data Access Object.
@@ -44,12 +44,12 @@ public class RedisDao extends AbstractLogstashIndexerDao {
   final JedisPool pool;
 
   //primary constructor used by indexer factory
-  public RedisDao(String host, int port, String key, String username, String password) {
+  public RedisDao(String host, String port, String key, String username, String password) {
     this(null, host, port, key, username, password);
   }
 
   // Factored for unit testing
-  RedisDao(JedisPool factory, String host, int port, String key, String username, String password) {
+  RedisDao(JedisPool factory, String host, String port, String key, String username, String password) {
     super(host, port, key, username, password);
 
     if (StringUtils.isBlank(key)) {
@@ -58,7 +58,11 @@ public class RedisDao extends AbstractLogstashIndexerDao {
 
     // The JedisPool must be a singleton
     // We assume this is used as a singleton as well
-    pool = factory == null ? new JedisPool(new JedisPoolConfig(), host, port) : factory;
+    pool = factory == null ? new JedisPool(
+        new JedisPoolConfig(),
+        host,
+        StringUtils.isNotBlank(port) ? Integer.parseInt(port) : Protocol.DEFAULT_PORT
+    ) : factory;
   }
 
   @Override

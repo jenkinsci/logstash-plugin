@@ -1,19 +1,18 @@
 package jenkins.plugins.logstash.persistence;
 
-import static net.sf.json.test.JSONAssert.assertEquals;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import net.sf.json.JSONObject;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static net.sf.json.test.JSONAssert.assertEquals;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractLogstashIndexerDaoTest {
@@ -63,7 +62,7 @@ public class AbstractLogstashIndexerDaoTest {
   }
 
   private AbstractLogstashIndexerDao getInstance() {
-    return new AbstractLogstashIndexerDao("localhost", -1, "", "", "") {
+    return new AbstractLogstashIndexerDao("localhost", null, "", "", "") {
 
       public IndexerType getIndexerType() {
         return IndexerType.REDIS;

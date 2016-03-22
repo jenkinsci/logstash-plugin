@@ -8,8 +8,7 @@
         checkUrl="'descriptorByName/LogstashInstallation/checkHost?value='+escape(this.value)" />
     </f:entry>
     <f:entry title="${%Port}" field="port">
-      <f:textbox value="${descriptor.port}" default="6379"
-        checkUrl="'descriptorByName/LogstashInstallation/checkInteger?value='+escape(this.value)" />
+      <f:textbox value="${descriptor.port}" />
     </f:entry>
     <f:entry title="${%Username}" field="username">
       <f:textbox value="${descriptor.username}" />
