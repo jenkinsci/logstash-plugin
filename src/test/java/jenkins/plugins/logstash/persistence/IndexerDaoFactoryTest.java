@@ -11,7 +11,7 @@ public class IndexerDaoFactoryTest {
   @Test
   public void getAllInstances() throws Exception {
     for (IndexerType type : IndexerType.values()) {
-      String host = type == IndexerType.ELASTICSEARCH ? "http://localhost" : "localhost";
+      String host = (type == IndexerType.ELASTICSEARCH || type == IndexerType.VALO)  ? "http://localhost" : "localhost";
       LogstashIndexerDao dao = IndexerDaoFactory.getInstance(type, host, 1234, "key", "username", "password");
 
       assertNotNull("Result was null", dao);
@@ -22,7 +22,7 @@ public class IndexerDaoFactoryTest {
   @Test
   public void successNulls() throws Exception {
     for (IndexerType type : IndexerType.values()) {
-      String host = type == IndexerType.ELASTICSEARCH ? "http://localhost" : "localhost";
+      String host = (type == IndexerType.ELASTICSEARCH || type == IndexerType.VALO) ? "http://localhost" : "localhost";
       LogstashIndexerDao dao = IndexerDaoFactory.getInstance(type, host, null, "key", null, null);
 
       assertNotNull("Result was null", dao);
