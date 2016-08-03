@@ -164,7 +164,7 @@ public class ValoDaoTest {
     String json = "{ 'foo': 'bar' }";
     dao = createDao("http://localhost", 8888, "BUILD/ci/build", "", "");
 
-    when(mockStatusLine.getStatusCode()).thenReturn(201);
+    when(mockStatusLine.getStatusCode()).thenReturn(200);
 
     // Unit under test
     dao.push(json);

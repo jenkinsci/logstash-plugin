@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -98,6 +99,16 @@ public class ValoDao extends AbstractLogstashIndexerDao {
     }
     return postRequest;
   }
+  HttpPut getHttpPut(String data) {
+    HttpPut putRequest;
+    putRequest = new HttpPut(uri);
+    StringEntity input = new StringEntity(data, ContentType.APPLICATION_JSON);
+    putRequest.setEntity(input);
+    if (auth != null) {
+      putRequest.addHeader("Authorization", "Basic " + auth);
+    }
+    return putRequest;
+  }
 
   @Override
   public void push(String data) throws IOException {
@@ -109,9 +120,10 @@ public class ValoDao extends AbstractLogstashIndexerDao {
       httpClient = clientBuilder.build();
       response = httpClient.execute(post);
 
-      if (response.getStatusLine().getStatusCode() != 201) {
+      if (response.getStatusLine().getStatusCode() != 200) {
         throw new IOException(this.getErrorMessage(response));
       }
+
     } finally {
       if (response != null) {
         response.close();
