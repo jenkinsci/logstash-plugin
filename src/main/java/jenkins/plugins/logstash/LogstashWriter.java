@@ -53,7 +53,7 @@ public class LogstashWriter {
 
   final OutputStream errorStream;
   final AbstractBuild<?, ?> build;
-  final BuildData buildData;
+  BuildData buildData;
   final String jenkinsUrl;
   final LogstashIndexerDao dao;
   private boolean connectionBroken;
@@ -81,6 +81,9 @@ public class LogstashWriter {
    *          Message, not null
    */
   public void write(String line) {
+    if (line.contains("Building remotely")) {
+      this.buildData = getBuildData();
+    }
     if (!isConnectionBroken() && StringUtils.isNotEmpty(line)) {
       this.write(Arrays.asList(line));
     }
