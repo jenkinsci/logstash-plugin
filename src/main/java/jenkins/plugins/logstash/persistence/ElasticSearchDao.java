@@ -24,22 +24,26 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Elastic Search Data Access Object.
@@ -150,4 +154,32 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   @Override
   public IndexerType getIndexerType() { return IndexerType.ELASTICSEARCH; }
+
+  @Override
+  public JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines) {
+    JSONObject payload = super.buildPayload(buildData, jenkinsUrl, logLines);
+    JSONObject buildVariables = payload.getJSONObject("data").getJSONObject("buildVariables");
+    escapeKeysIllegalCharacter(buildVariables);
+    return payload;
+  }
+
+
+  /**
+   * Escapes any ElasticSearch illegal character to '_' character in all of the keys in the JSON object specified.
+   *
+   * @param jsonObject the json object which keys to be escapated
+   */
+  private void escapeKeysIllegalCharacter(JSONObject jsonObject) {
+    Set<String> illegalKeys = new HashSet<String>();
+    for (Object keyObject : jsonObject.keySet()) {
+      String key = (String) keyObject;
+      if(key.contains(".")) {
+        illegalKeys.add(key);
+      }
+    }
+    for (String illegalKey : illegalKeys) {
+      Object value = jsonObject.remove(illegalKey);
+      jsonObject.put(illegalKey.replace('.', '_'), value);
+    }
+  }
 }

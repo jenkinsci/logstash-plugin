@@ -1,5 +1,6 @@
 package jenkins.plugins.logstash.persistence;
 
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -7,21 +8,24 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -229,5 +233,23 @@ public class ElasticSearchDaoTest {
         throw e;
     }
 
+  }
+
+
+  @Test
+  public void buildPayloadSuccessTransformPeriod() throws Exception {
+    BuildData mockBuildData = mock(BuildData.class);
+    String buildDataString = "{\"buildVariables\":{\"buildInfoConfig.propertiesFile\":\"any.value\", \"foo.bar\":\"boo.boo\"}}";
+    when(mockBuildData.toJson()).thenReturn(JSONObject.fromObject(buildDataString));
+
+    // Unit under test
+    ElasticSearchDao dao = createDao("http://localhost", 8200, "/jenkins/logstash", "", "");
+    JSONObject result = dao.buildPayload(mockBuildData, "http://localhost:8080/jenkins", new ArrayList<String>());
+
+    // Verify results
+    JSONObject buildVariables = result.getJSONObject("data").getJSONObject("buildVariables");
+    assertEquals(2, buildVariables.size());
+    assertThat((Set<String>) buildVariables.keySet(), containsInAnyOrder("buildInfoConfig_propertiesFile", "foo_bar"));
+    assertThat((Collection<String>) buildVariables.values(), containsInAnyOrder("any.value", "boo.boo"));
   }
 }
