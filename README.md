@@ -22,7 +22,7 @@ Currently supported methods of input/output:
 * ElasticSearch {REST API}
 * Redis {format => 'json_event'}
 * RabbitMQ {mechanism => PLAIN}
-* Syslog {format => cee/json, protocol => UDP}
+* Syslog {format => cee/json (based on RFC_5424, not viable for logstash syslog input), protocol => UDP}
 
 License
 =======
