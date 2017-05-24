@@ -23,6 +23,7 @@ Currently supported methods of input/output:
 * Redis {format => 'json_event'}
 * RabbitMQ {mechanism => PLAIN}
 * Syslog {format => cee/json, protocol => UDP}
+* SyslogTCP {format => cee/json, protocol => TCP}
 
 License
 =======

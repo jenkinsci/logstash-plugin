@@ -7,14 +7,14 @@ import com.cloudbees.syslog.Severity;
 import java.io.IOException;
 
 
-public class SyslogDao extends AbstractLogstashIndexerDao {
+public class SyslogTCPDao extends AbstractLogstashIndexerDao {
   final TcpSyslogMessageSender messageSender;
   
-  public SyslogDao(String host, int port, String key, String username, String password) {
+  public SyslogTCPDao(String host, int port, String key, String username, String password) {
     this(null, host, port, key, username, password);
   }
 
-  public SyslogDao(TcpSyslogMessageSender tcpSyslogMessageSender, String host, int port, String key, String username, String password) {
+  public SyslogTCPDao(TcpSyslogMessageSender tcpSyslogMessageSender, String host, int port, String key, String username, String password) {
     super(host, port, key, username, password);
     messageSender = tcpSyslogMessageSender == null ? new TcpSyslogMessageSender() : tcpSyslogMessageSender;
   }
