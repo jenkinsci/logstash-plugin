@@ -5,11 +5,11 @@
     </f:entry>
     <f:entry title="${%Host name}" field="host">
       <f:textbox value="${descriptor.host}"
-        checkUrl="'descriptorByName/LogstashInstallation/checkHost?value='+escape(this.value)" />
+        checkUrl="'${resURL}/descriptorByName/LogstashInstallation/checkHost?value='+escape(this.value)" />
     </f:entry>
     <f:entry title="${%Port}" field="port">
       <f:textbox value="${descriptor.port}" default="6379"
-        checkUrl="'descriptorByName/LogstashInstallation/checkInteger?value='+escape(this.value)" />
+        checkUrl="'${resURL}/descriptorByName/LogstashInstallation/checkInteger?value='+escape(this.value)" />
     </f:entry>
     <f:entry title="${%Username}" field="username">
       <f:textbox value="${descriptor.username}" />
@@ -19,7 +19,7 @@
     </f:entry>
     <f:entry title="${%Key}" field="key">
       <f:textbox value="${descriptor.key}" default="logstash"
-        checkUrl="'descriptorByName/LogstashInstallation/checkString?value='+escape(this.value)" />
+        checkUrl="'${resURL}/descriptorByName/LogstashInstallation/checkString?value='+escape(this.value)" />
     </f:entry>
   </f:section>
 </j:jelly>
