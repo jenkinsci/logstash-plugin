@@ -31,7 +31,6 @@ public class LogstashBuildWrapperTest {
       this.writer = writer;
     }
 
-    @Override
     LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
       // Simulate bad Writer
       if(writer.isConnectionBroken()) {

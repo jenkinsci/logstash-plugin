@@ -24,6 +24,7 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import hudson.model.Run;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -37,9 +38,22 @@ import org.apache.http.client.utils.URIBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import jenkins.plugins.logstash.util.UniqueIdHelper;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.protocol.HTTP;
 
 /**
  * Elastic Search Data Access Object.
@@ -48,7 +62,7 @@ import java.net.URISyntaxException;
  * @since 1.0.4
  */
 public class ElasticSearchDao extends AbstractLogstashIndexerDao {
-  final HttpClientBuilder clientBuilder;
+  transient HttpClientBuilder clientBuilder;
   final URI uri;
   final String auth;
 
@@ -85,7 +99,14 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
       auth = null;
     }
 
-    clientBuilder = factory == null ? HttpClientBuilder.create() : factory;
+    clientBuilder = factory;
+  }
+
+  HttpClientBuilder clientBuilder() {
+      if (clientBuilder == null) {
+          clientBuilder = HttpClientBuilder.create();
+      }
+      return clientBuilder;
   }
 
   HttpPost getHttpPost(String data) {
@@ -106,7 +127,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     HttpPost post = getHttpPost(data);
 
     try {
-      httpClient = clientBuilder.build();
+      httpClient = clientBuilder().build();
       response = httpClient.execute(post);
 
       if (response.getStatusLine().getStatusCode() != 201) {
@@ -121,6 +142,75 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
       }
     }
   }
+
+    @Override
+    public Collection<String> pullLogs(Run run, long sinceMs, long toMs) throws IOException {
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+        
+      // Determine job id
+      String jobId = UniqueIdHelper.getOrCreateId(run);
+        
+        // Prepare query
+        String query = "{\n" +
+            "  \"fields\": [\"message\",\"@timestamp\"], \n" +
+            "  \"size\": 9999, \n" + // TODO use paging https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html
+            "  \"query\": { \n" +
+            "    \"bool\": { \n" +
+            "      \"must\": [\n" +
+            "        { \"match\": { \"data.jobId\":   \"" + jobId + "\"}}, \n" +
+            "        { \"match\": { \"data.buildNum\": \"" + run.getNumber() + "\" }}  \n" +
+            "      ]\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
+        
+        
+        // Prepare request   
+        final HttpGetWithData getRequest = new HttpGetWithData(uri + "/_search");
+        final StringEntity input = new StringEntity(query, ContentType.APPLICATION_JSON);
+        getRequest.setEntity(input);
+        if (auth != null) {
+          getRequest.addHeader("Authorization", "Basic " + auth);
+        }
+        
+        try {
+            httpClient = clientBuilder().build();
+            response = httpClient.execute(getRequest);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new IOException(this.getErrorMessage(response));
+            }
+            
+            // TODO: retrieve log entries
+            final String content;
+            try(InputStream i = response.getEntity().getContent()) {
+                content = IOUtils.toString(i);
+            }
+            
+            final JSONObject json = JSONObject.fromObject(content);
+            JSONArray jsonArray = json.getJSONObject("hits").getJSONArray("hits");
+            ArrayList<String> res = new ArrayList<>(jsonArray.size());
+            for (int i=0; i<jsonArray.size(); ++i) {
+                JSONObject hit = jsonArray.getJSONObject(i);
+                String timestamp = hit.getJSONObject("fields").getJSONArray("@timestamp").getString(0);
+                String message = hit.getJSONObject("fields").getJSONArray("message").getString(0);
+                res.add(timestamp + " > " +message);
+            }
+            Collections.sort(res);
+            return res;
+            
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+            if (httpClient != null) {
+                httpClient.close();
+            }
+        }
+    }
+  
+  
 
   private String getErrorMessage(CloseableHttpResponse response) {
     ByteArrayOutputStream byteStream = null;
@@ -150,4 +240,28 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   @Override
   public IndexerType getIndexerType() { return IndexerType.ELASTICSEARCH; }
+  
+  private static class HttpGetWithData extends HttpGet implements HttpEntityEnclosingRequest {
+    private HttpEntity entity;
+
+    public HttpGetWithData(String uri) {
+        super(uri);
+    }
+
+    @Override
+    public HttpEntity getEntity() {
+        return this.entity;
+    }
+
+    @Override
+    public void setEntity(final HttpEntity entity) {
+        this.entity = entity;
+    }
+
+    @Override
+    public boolean expectContinue() {
+        final Header expect = getFirstHeader(HTTP.EXPECT_DIRECTIVE);
+        return expect != null && HTTP.EXPECT_CONTINUE.equalsIgnoreCase(expect.getValue());
+    }
+  }
 }

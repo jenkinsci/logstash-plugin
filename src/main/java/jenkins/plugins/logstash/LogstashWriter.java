@@ -24,8 +24,7 @@
 
 package jenkins.plugins.logstash;
 
-
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.IndexerDaoFactory;
@@ -52,15 +51,15 @@ import java.util.List;
 public class LogstashWriter {
 
   final OutputStream errorStream;
-  final AbstractBuild<?, ?> build;
+  final Run<?, ?> build;
   final BuildData buildData;
   final String jenkinsUrl;
   final LogstashIndexerDao dao;
   private boolean connectionBroken;
 
-  public LogstashWriter(AbstractBuild<?, ?> build, OutputStream error) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error) {
     this.errorStream = error != null ? error : System.err;
-    this.build = build;
+    this.build = run;
     this.dao = this.getDaoOrNull();
     if (this.dao == null) {
       this.jenkinsUrl = "";

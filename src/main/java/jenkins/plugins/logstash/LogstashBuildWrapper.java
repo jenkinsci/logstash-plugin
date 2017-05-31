@@ -24,6 +24,8 @@
 
 package jenkins.plugins.logstash;
 
+import jenkins.plugins.logstash.remoteLogging.RemoteLogstashWriter;
+import jenkins.plugins.logstash.remoteLogging.RemoteLogstashOutputStream;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.BuildListener;
@@ -43,14 +45,33 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
+import hudson.CloseProofOutputStream;
+import hudson.EnvVars;
+import hudson.FilePath;
+import hudson.Proc;
+import hudson.console.ConsoleLogFilter;
+import hudson.model.Job;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.remoting.Channel;
+import hudson.remoting.RemoteInputStream;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.Serializable;
+import jenkins.model.Jenkins;
+import jenkins.security.MasterToSlaveCallable;
+import jenkins.tasks.SimpleBuildWrapper;
+import org.apache.commons.io.input.NullInputStream;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
  * Build wrapper that decorates the build's logger to insert a
- * {@link LogstashNote} on each output line.
+ * {@code LogstashNote} on each output line.
  *
  * @author K Jonathan Harker
  */
-public class LogstashBuildWrapper extends BuildWrapper {
+public class LogstashBuildWrapper extends SimpleBuildWrapper {
 
   /**
    * Create a new {@link LogstashBuildWrapper}.
@@ -58,57 +79,15 @@ public class LogstashBuildWrapper extends BuildWrapper {
   @DataBoundConstructor
   public LogstashBuildWrapper() {}
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-
-    return new Environment() {};
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public OutputStream decorateLogger(AbstractBuild build, OutputStream logger) {
-    LogstashWriter logstash = getLogStashWriter(build, logger);
-
-    LogstashOutputStream los = new LogstashOutputStream(logger, logstash);
-
-    if (build.getProject() instanceof BuildableItemWithBuildWrappers) {
-      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers) build.getProject();
-      for (BuildWrapper wrapper: project.getBuildWrappersList()) {
-        if (wrapper instanceof MaskPasswordsBuildWrapper) {
-          List<VarPasswordPair> allPasswordPairs = new ArrayList<VarPasswordPair>();
-
-          MaskPasswordsBuildWrapper maskPasswordsWrapper = (MaskPasswordsBuildWrapper) wrapper;
-          List<VarPasswordPair> jobPasswordPairs = maskPasswordsWrapper.getVarPasswordPairs();
-          if (jobPasswordPairs != null) {
-            allPasswordPairs.addAll(jobPasswordPairs);
-          }
-
-          MaskPasswordsConfig config = MaskPasswordsConfig.getInstance();
-          List<VarPasswordPair> globalPasswordPairs = config.getGlobalVarPasswordPairs();
-          if (globalPasswordPairs != null) {
-            allPasswordPairs.addAll(globalPasswordPairs);
-          }
-
-          return los.maskPasswords(allPasswordPairs);
-        }
-      }
+    @Override
+    public void setUp(Context context, Run<?, ?> build, FilePath workspace, 
+            Launcher launcher, TaskListener listener, EnvVars initialEnvironment) 
+            throws IOException, InterruptedException {
+        // Do nothing
     }
-
-    return los;
-  }
-
+  
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl) super.getDescriptor();
-  }
-
-  // Method to encapsulate calls for unit-testing
-  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
-    return new LogstashWriter(build, errorStream);
   }
 
   /**
@@ -129,7 +108,7 @@ public class LogstashBuildWrapper extends BuildWrapper {
     public String getDisplayName() {
       return Messages.DisplayName();
     }
-
+    
     /**
      * {@inheritDoc}
      */

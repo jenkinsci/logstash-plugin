@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.10-SNAPSHOT">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.23">
+    <script>parallel local: {
+  node(&apos;master&apos;) {
+    sh &apos;for x in 0 1 2 3 4 5 6 7 8 9; do echo $x; sleep 1; done&apos;
+  }
+}, remote: {
+  node(&apos;remote&apos;) {
+    withCredentials([string(credentialsId: &apos;token&apos;, variable: &apos;TOKEN&apos;)]) {
+      sh &apos;echo receiving $TOKEN&apos;
+      sh &apos;for x in 0 1 2 3 4 5 6 7 8 9; do echo $x; sleep 1; done&apos;
+    }
+  }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+</flow-definition>

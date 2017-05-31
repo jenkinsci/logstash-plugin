@@ -24,6 +24,7 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -56,6 +57,30 @@ public final class IndexerDaoFactory {
     INDEXER_MAP = Collections.unmodifiableMap(indexerMap);
   }
 
+   public static class Info implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+       IndexerType type;
+       String host;
+       Integer port;
+       String key;
+       String username; 
+       String password;
+
+        public Info(IndexerType type, String host, Integer port, String key, String username, String password) {
+            this.type = type;
+            this.host = host;
+            this.port = port;
+            this.key = key;
+            this.username = username;
+            this.password = password;
+        }
+   }
+  
+   public static synchronized LogstashIndexerDao getInstance(Info info) throws InstantiationException {
+       return getInstance(info.type, info.host, info.port, info.key, info.username, info.password);
+   }
+   
   /**
    * Singleton instance accessor.
    *
