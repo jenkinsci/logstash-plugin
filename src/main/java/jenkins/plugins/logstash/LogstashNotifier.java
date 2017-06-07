@@ -26,18 +26,25 @@ package jenkins.plugins.logstash;
 
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.FilePath;
 import hudson.model.BuildListener;
+import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.model.AbstractProject;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
+import jenkins.tasks.SimpleBuildStep;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.jenkinsci.Symbol;
 
 /**
  * Post-build action to push build log to Logstash.
@@ -45,7 +52,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Rusty Gerard
  * @since 1.0.0
  */
-public class LogstashNotifier extends Notifier {
+public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   public int maxLines;
   public boolean failBuild;
@@ -65,9 +72,25 @@ public class LogstashNotifier extends Notifier {
     return !(failBuild && logstash.isConnectionBroken());
   }
 
+  @Override
+  public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher,
+    TaskListener listener) throws InterruptedException, IOException {
+    PrintStream errorPrintStream = listener.getLogger();
+    LogstashWriter logstash = getLogStashWriter(run, errorPrintStream, listener);
+    logstash.writeBuildLog(maxLines);
+
+    if (failBuild && logstash.isConnectionBroken()) {
+      run.setResult(Result.FAILURE);
+    }
+  }
+
   // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
     return new LogstashWriter(build, errorStream);
+  }
+
+  LogstashWriter getLogStashWriter(Run<?, ?> run, OutputStream errorStream, TaskListener listener) {
+    return new LogstashWriter(run, errorStream, listener);
   }
 
   public BuildStepMonitor getRequiredMonitorService() {
@@ -80,7 +103,7 @@ public class LogstashNotifier extends Notifier {
     return (Descriptor) super.getDescriptor();
   }
 
-  @Extension
+  @Extension @Symbol("logstashSend")
   public static class Descriptor extends BuildStepDescriptor<Publisher> {
 
     @Override
