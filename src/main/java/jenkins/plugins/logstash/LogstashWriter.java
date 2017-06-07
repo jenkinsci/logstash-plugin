@@ -26,6 +26,8 @@ package jenkins.plugins.logstash;
 
 
 import hudson.model.AbstractBuild;
+import hudson.model.TaskListener;
+import hudson.model.Run;
 import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.IndexerDaoFactory;
@@ -52,7 +54,8 @@ import java.util.List;
 public class LogstashWriter {
 
   final OutputStream errorStream;
-  final AbstractBuild<?, ?> build;
+  final Run<?, ?> build;
+  final TaskListener listener;
   final BuildData buildData;
   final String jenkinsUrl;
   final LogstashIndexerDao dao;
@@ -61,6 +64,7 @@ public class LogstashWriter {
   public LogstashWriter(AbstractBuild<?, ?> build, OutputStream error) {
     this.errorStream = error != null ? error : System.err;
     this.build = build;
+    this.listener = null;
     this.dao = this.getDaoOrNull();
     if (this.dao == null) {
       this.jenkinsUrl = "";
@@ -69,7 +73,20 @@ public class LogstashWriter {
       this.jenkinsUrl = getJenkinsUrl();
       this.buildData = getBuildData();
     }
+  }
 
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener) {
+    this.errorStream = error != null ? error : System.err;
+    this.build = run;
+    this.listener = listener;
+    this.dao = this.getDaoOrNull();
+    if (this.dao == null) {
+      this.jenkinsUrl = "";
+      this.buildData = null;
+    } else {
+      this.jenkinsUrl = getJenkinsUrl();
+      this.buildData = getBuildData();
+    }
   }
 
   /**
@@ -131,7 +148,11 @@ public class LogstashWriter {
   }
 
   BuildData getBuildData() {
-    return new BuildData(build, new Date());
+    if (build instanceof AbstractBuild) {
+      return new BuildData((AbstractBuild) build, new Date());
+    } else {
+      return new BuildData(build, new Date(), listener);
+    }
   }
 
   String getJenkinsUrl() {

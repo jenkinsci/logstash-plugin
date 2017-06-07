@@ -28,6 +28,8 @@ import hudson.model.Action;
 import hudson.model.Environment;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
+import hudson.model.TaskListener;
+import hudson.model.Run;
 import hudson.model.Node;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
@@ -42,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.IOException;
 
 import net.sf.json.JSONObject;
 
@@ -112,6 +115,7 @@ public class BuildData {
 
   BuildData() {}
 
+  // Freestyle project build
   public BuildData(AbstractBuild<?, ?> build, Date currentTime) {
     result = build.getResult() == null ? null : build.getResult().toString();
     id = build.getId();
@@ -164,6 +168,37 @@ public class BuildData {
     for (String key : sensitiveBuildVariables) {
       buildVariables.remove(key);
     }
+  }
+
+  // Pipeline project build
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener) {
+      result = build.getResult() == null ? null : build.getResult().toString();
+      id = build.getId();
+      projectName = build.getParent().getName();
+      displayName = build.getDisplayName();
+      fullDisplayName = build.getFullDisplayName();
+      description = build.getDescription();
+      url = build.getUrl();
+
+      Action testResultAction = build.getAction(AbstractTestResultAction.class);
+      if (testResultAction != null) {
+        testResults = new TestData(testResultAction);
+      }
+
+      buildNum = build.getNumber();
+      // build.getDuration() is always 0 in Notifiers
+      buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
+      timestamp = DATE_FORMATTER.format(build.getTimestamp().getTime());
+      rootProjectName = projectName;
+      rootProjectDisplayName = displayName;
+      rootBuildNum = buildNum;
+      try {
+        buildVariables = build.getEnvironment(listener);
+      } catch (IOException e) {
+        buildVariables = new HashMap<String, String>();
+      } catch (InterruptedException e) {
+        buildVariables = new HashMap<String, String>();
+      }
   }
 
   @Override
