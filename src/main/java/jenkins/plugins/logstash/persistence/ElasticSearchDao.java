@@ -24,6 +24,8 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import static com.google.common.collect.Ranges.closedOpen;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -41,6 +43,8 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.google.common.collect.Range;
+
 /**
  * Elastic Search Data Access Object.
  *
@@ -51,6 +55,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   final HttpClientBuilder clientBuilder;
   final URI uri;
   final String auth;
+  final Range<Integer> successCodes = closedOpen(200,300);
 
   //primary constructor used by indexer factory
   public ElasticSearchDao(String host, int port, String key, String username, String password) {
@@ -109,7 +114,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
       httpClient = clientBuilder.build();
       response = httpClient.execute(post);
 
-      if (response.getStatusLine().getStatusCode() != 201) {
+      if (!successCodes.contains(response.getStatusLine().getStatusCode())) {
         throw new IOException(this.getErrorMessage(response));
       }
     } finally {
