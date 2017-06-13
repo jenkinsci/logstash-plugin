@@ -31,6 +31,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.TaskListener;
 import hudson.model.Run;
 import hudson.model.Node;
+import hudson.model.Executor;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 
@@ -117,18 +118,7 @@ public class BuildData {
 
   // Freestyle project build
   public BuildData(AbstractBuild<?, ?> build, Date currentTime) {
-    result = build.getResult() == null ? null : build.getResult().toString();
-    id = build.getId();
-    projectName = build.getProject().getName();
-    displayName = build.getDisplayName();
-    fullDisplayName = build.getFullDisplayName();
-    description = build.getDescription();
-    url = build.getUrl();
-
-    Action testResultAction = build.getAction(AbstractTestResultAction.class);
-    if (testResultAction != null) {
-      testResults = new TestData(testResultAction);
-    }
+    initData(build, currentTime);
 
     Node node = build.getBuiltOn();
     if (node == null) {
@@ -139,10 +129,7 @@ public class BuildData {
       buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
     }
 
-    buildNum = build.getNumber();
     // build.getDuration() is always 0 in Notifiers
-    buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
-    timestamp = DATE_FORMATTER.format(build.getTimestamp().getTime());
     rootProjectName = build.getRootBuild().getProject().getName();
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
@@ -172,33 +159,43 @@ public class BuildData {
 
   // Pipeline project build
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener) {
-      result = build.getResult() == null ? null : build.getResult().toString();
-      id = build.getId();
-      projectName = build.getParent().getName();
-      displayName = build.getDisplayName();
-      fullDisplayName = build.getFullDisplayName();
-      description = build.getDescription();
-      url = build.getUrl();
+    initData(build, currentTime);
 
-      Action testResultAction = build.getAction(AbstractTestResultAction.class);
-      if (testResultAction != null) {
-        testResults = new TestData(testResultAction);
-      }
+    Executor executor = build.getExecutor();
+    if (executor == null) {
+      buildHost = "master";
+    } else {
+      buildHost = StringUtils.isBlank(executor.getDisplayName()) ? "master" : executor.getDisplayName();
+    }
 
-      buildNum = build.getNumber();
-      // build.getDuration() is always 0 in Notifiers
-      buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
-      timestamp = DATE_FORMATTER.format(build.getTimestamp().getTime());
-      rootProjectName = projectName;
-      rootProjectDisplayName = displayName;
-      rootBuildNum = buildNum;
-      try {
-        buildVariables = build.getEnvironment(listener);
-      } catch (IOException e) {
-        buildVariables = new HashMap<String, String>();
-      } catch (InterruptedException e) {
-        buildVariables = new HashMap<String, String>();
-      }
+    rootProjectName = projectName;
+    rootProjectDisplayName = displayName;
+    rootBuildNum = buildNum;
+
+    try {
+      buildVariables = build.getEnvironment(listener);
+    } catch (Exception e) {
+      buildVariables = new HashMap<String, String>();
+    }
+  }
+
+  private void initData(Run<?, ?> build, Date currentTime) {
+    result = build.getResult() == null ? null : build.getResult().toString();
+    id = build.getId();
+    projectName = build.getParent().getName();
+    displayName = build.getDisplayName();
+    fullDisplayName = build.getFullDisplayName();
+    description = build.getDescription();
+    url = build.getUrl();
+    buildNum = build.getNumber();
+
+    Action testResultAction = build.getAction(AbstractTestResultAction.class);
+    if (testResultAction != null) {
+      testResults = new TestData(testResultAction);
+    }
+
+    buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
+    timestamp = DATE_FORMATTER.format(build.getTimestamp().getTime());
   }
 
   @Override

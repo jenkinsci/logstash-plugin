@@ -6,6 +6,10 @@ import static org.mockito.Mockito.*;
 import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.TaskListener;
+import hudson.model.Run;
+import hudson.model.Result;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 
@@ -38,7 +42,7 @@ public class LogstashNotifierTest {
     }
 
     @Override
-    LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
+    LogstashWriter getLogStashWriter(Run<?, ?> run, OutputStream errorStream, TaskListener listener) {
       // Simulate bad Writer
       if(writer.isConnectionBroken()) {
         try {
@@ -50,6 +54,24 @@ public class LogstashNotifierTest {
     }
   }
 
+  static class MockRun<P extends AbstractProject<P,R>, R extends AbstractBuild<P,R>> extends Run<P,R> {
+    Result result;
+
+    MockRun(P job) throws IOException {
+      super(job);
+    }
+
+    @Override
+    public void setResult(Result r) {
+      result = r;
+    }
+
+    @Override
+    public Result getResult() {
+      return result;
+    }
+  }
+
   @Mock AbstractBuild<?, ?> mockBuild;
   @Mock LogstashWriter mockWriter;
   @Mock Launcher mockLauncher;
@@ -58,7 +80,7 @@ public class LogstashNotifierTest {
   ByteArrayOutputStream errorBuffer;
   PrintStream errorStream;
   LogstashNotifier notifier;
-
+  MockRun mockRun;
 
   @Before
   public void before() throws Exception {
@@ -66,6 +88,7 @@ public class LogstashNotifierTest {
     errorStream = new PrintStream(errorBuffer, true);
 
     when(mockBuild.getLog(anyInt())).thenReturn(Arrays.asList("line 1", "line 2", "line 3"));
+    mockRun = new MockRun(mock(AbstractProject.class));
 
     when(mockListener.getLogger()).thenReturn(errorStream);
 
@@ -102,6 +125,21 @@ public class LogstashNotifierTest {
   }
 
   @Test
+  public void performStepSuccess() throws Exception {
+    // Unit under test
+    notifier.perform(mockRun, null, mockLauncher, mockListener);
+
+    // Verify results
+    assertEquals("Result not null", null, mockRun.getResult());
+
+    verify(mockListener).getLogger();
+    verify(mockWriter).writeBuildLog(3);
+    verify(mockWriter).isConnectionBroken();
+
+    assertEquals("Errors were written", "", errorBuffer.toString());
+  }
+
+  @Test
   public void performBadWriterDoNotFailBuild() throws Exception {
     // Initialize mocks
     when(mockWriter.isConnectionBroken()).thenReturn(true);
@@ -113,6 +151,26 @@ public class LogstashNotifierTest {
 
     // Verify results
     assertTrue("Build should not be marked as failure", result);
+
+    verify(mockListener).getLogger();
+    verify(mockWriter).writeBuildLog(3);
+    verify(mockWriter).isConnectionBroken();
+
+    assertEquals("Error was not written", "Mocked Constructor failure", errorBuffer.toString());
+  }
+
+  @Test
+  public void performStepBadWriterDoNotFailBuild() throws Exception {
+    // Initialize mocks
+    when(mockWriter.isConnectionBroken()).thenReturn(true);
+
+    notifier = new MockLogstashNotifier(3, false, mockWriter);
+
+    // Unit under test
+    notifier.perform(mockRun, null, mockLauncher, mockListener);
+
+    // Verify results
+    assertEquals("Result not null", null, mockRun.getResult());
 
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(3);
@@ -134,6 +192,25 @@ public class LogstashNotifierTest {
 
     // Verify results
     assertFalse("Build should be marked as failure", result);
+
+    verify(mockListener).getLogger();
+    verify(mockWriter).writeBuildLog(3);
+    verify(mockWriter, times(2)).isConnectionBroken();
+    assertEquals("Error was not written", "Mocked Constructor failure", errorBuffer.toString());
+  }
+
+  @Test
+  public void performStepBadWriterDoFailBuild() throws Exception {
+    // Initialize mocks
+    when(mockWriter.isConnectionBroken()).thenReturn(true);
+
+    notifier = new MockLogstashNotifier(3, true, mockWriter);
+
+    // Unit under test
+    notifier.perform(mockRun, null, mockLauncher, mockListener);
+
+    // Verify results
+    assertEquals("Result is not FAILURE", Result.FAILURE, mockRun.getResult());
 
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(3);
