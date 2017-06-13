@@ -65,30 +65,25 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   @Override
   public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
-    PrintStream errorPrintStream = listener.getLogger();
-    LogstashWriter logstash = getLogStashWriter(build, errorPrintStream);
-    logstash.writeBuildLog(maxLines);
-
-    return !(failBuild && logstash.isConnectionBroken());
+    return perform(build, listener);
   }
 
   @Override
   public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher,
     TaskListener listener) throws InterruptedException, IOException {
-    PrintStream errorPrintStream = listener.getLogger();
-    LogstashWriter logstash = getLogStashWriter(run, errorPrintStream, listener);
-    logstash.writeBuildLog(maxLines);
-
-    if (failBuild && logstash.isConnectionBroken()) {
+    if (!perform(run, listener)) {
       run.setResult(Result.FAILURE);
     }
   }
 
-  // Method to encapsulate calls for unit-testing
-  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
-    return new LogstashWriter(build, errorStream);
+  private boolean perform(Run<?, ?> run, TaskListener listener) {
+    PrintStream errorPrintStream = listener.getLogger();
+    LogstashWriter logstash = getLogStashWriter(run, errorPrintStream, listener);
+    logstash.writeBuildLog(maxLines);
+    return !(failBuild && logstash.isConnectionBroken());
   }
 
+  // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(Run<?, ?> run, OutputStream errorStream, TaskListener listener) {
     return new LogstashWriter(run, errorStream, listener);
   }

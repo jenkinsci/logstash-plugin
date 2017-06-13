@@ -35,7 +35,7 @@ public class LogstashWriterTest {
                                              final String url,
                                              final LogstashIndexerDao indexer,
                                              final BuildData data) {
-    return new LogstashWriter(testBuild, error) {
+    return new LogstashWriter(testBuild, error, null) {
       @Override
       LogstashIndexerDao getDao() throws InstantiationException {
         if (indexer == null) {
