@@ -43,7 +43,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(MockitoJUnitRunner.class)
 public class BuildDataTest {
 
-  static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"projectName\":\"PROJECT_NAME\",\"displayName\":\"DISPLAY NAME\",\"fullDisplayName\":\"FULL DISPLAY NAME\",\"description\":\"DESCRIPTION\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\",\"buildHost\":\"http://localhost:8080/jenkins\",\"buildLabel\":\"master\",\"buildNum\":123,\"buildDuration\":100,\"rootProjectName\":\"ROOT PROJECT NAME\",\"rootProjectDisplayName\":\"ROOT PROJECT DISPLAY NAME\",\"rootBuildNum\":456,\"buildVariables\":{},\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0,\"failedTests\":[]}}";
+  static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"projectName\":\"PROJECT_NAME\",\"displayName\":\"DISPLAY NAME\",\"fullDisplayName\":\"FULL DISPLAY NAME\",\"description\":\"DESCRIPTION\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\",\"buildHost\":\"http://localhost:8080/jenkins\",\"buildLabel\":\"master\",\"buildNum\":123,\"buildDuration\":100,\"rootProjectName\":\"ROOT PROJECT NAME\",\"rootProjectDisplayName\":\"ROOT PROJECT DISPLAY NAME\",\"rootBuildNum\":456,\"buildVariables\":{},\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0,\"failedTests\":[], \"failedTestsWithErrorDetail\":{}}}";
 
   @Mock AbstractBuild mockBuild;
   @Mock AbstractTestResultAction mockTestResultAction;
@@ -122,7 +122,7 @@ public class BuildDataTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
-    verify(mockTestResultAction, times(2)).getFailedTests();
+    verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
 
@@ -165,7 +165,7 @@ public class BuildDataTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
-    verify(mockTestResultAction, times(2)).getFailedTests();
+    verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
 
@@ -208,7 +208,7 @@ public class BuildDataTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
-    verify(mockTestResultAction, times(2)).getFailedTests();
+    verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
 
@@ -219,6 +219,7 @@ public class BuildDataTest {
   public void constructorSuccessTestFailures() {
     TestResult mockTestResult = Mockito.mock(hudson.tasks.test.TestResult.class);
     when(mockTestResult.getSafeName()).thenReturn("Mock Test");
+    when(mockTestResult.getErrorDetails()).thenReturn("ErrorDetails Test");
 
     when(mockTestResultAction.getTotalCount()).thenReturn(123);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
@@ -252,7 +253,7 @@ public class BuildDataTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
-    verify(mockTestResultAction, times(2)).getFailedTests();
+    verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
 
@@ -341,7 +342,7 @@ public class BuildDataTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
-    verify(mockTestResultAction, times(2)).getFailedTests();
+    verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
 
