@@ -146,7 +146,7 @@ public class LogstashWriterTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
-    verify(mockTestResultAction, times(2)).getFailedTests();
+    verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
 

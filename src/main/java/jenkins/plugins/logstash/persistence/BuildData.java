@@ -67,6 +67,7 @@ public class BuildData {
   public static class TestData {
     int totalCount, skipCount, failCount;
     List<String> failedTests;
+    Map<String, String> failedTestsWithErrorDetail;
 
     public TestData() {
       this(null);
@@ -81,6 +82,7 @@ public class BuildData {
       if (testResultAction == null) {
         totalCount = skipCount = failCount = 0;
         failedTests = Collections.emptyList();
+        failedTestsWithErrorDetail = Collections.emptyMap();
         return;
       }
 
@@ -88,9 +90,16 @@ public class BuildData {
       skipCount = testResultAction.getSkipCount();
       failCount = testResultAction.getFailCount();
 
-      failedTests = new ArrayList<String>(testResultAction.getFailedTests().size());
-      for (TestResult result : testResultAction.getFailedTests()) {
+      List<? extends TestResult> failedTestsResults = testResultAction.getFailedTests();
+
+      failedTests = new ArrayList<String>(failedTestsResults.size());
+      for (TestResult result : failedTestsResults) {
         failedTests.add(result.getFullName());
+      }
+
+      failedTestsWithErrorDetail = new HashMap<String, String>();
+      for (TestResult result : failedTestsResults) {
+        failedTestsWithErrorDetail.put(result.getFullName(), result.getErrorDetails());
       }
     }
   }
