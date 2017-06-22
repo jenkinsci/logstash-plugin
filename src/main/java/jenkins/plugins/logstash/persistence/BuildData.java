@@ -173,6 +173,7 @@ public class BuildData {
     rootBuildNum = buildNum;
 
     try {
+      // TODO: sensitive variables are not filtered, c.f. https://stackoverflow.com/questions/30916085
       buildVariables = build.getEnvironment(listener);
     } catch (Exception e) {
       buildVariables = new HashMap<String, String>();
