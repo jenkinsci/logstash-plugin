@@ -29,13 +29,13 @@ Pipeline
 
 Logstash plugin can be used as a publisher in pipeline jobs:
 
-```
-        node('master') {
-              sh'''
-              echo 'Hello, world!'
-              '''
-              logstashSend failBuild: true, maxLines: 1000
-        }
+```Groovy
+ node('master') {
+        sh'''
+        echo 'Hello, world!'
+        '''
+        logstashSend failBuild: true, maxLines: 1000
+ }
 ```
 
 
