@@ -24,6 +24,21 @@ Currently supported methods of input/output:
 * RabbitMQ {mechanism => PLAIN}
 * Syslog {format => cee/json ([RFC-5424](https://tools.ietf.org/html/rfc5424), not viable for logstash syslog input), protocol => UDP}
 
+Pipeline
+========
+
+Logstash plugin can be used as a publisher in pipeline jobs:
+
+```Groovy
+ node('master') {
+        sh'''
+        echo 'Hello, world!'
+        '''
+        logstashSend failBuild: true, maxLines: 1000
+ }
+```
+
+
 License
 =======
 
