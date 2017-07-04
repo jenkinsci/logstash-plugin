@@ -65,7 +65,7 @@ public class BuildData {
   public transient static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
   public static class TestData {
-    int totalCount, skipCount, failCount;
+    int totalCount, skipCount, failCount, passCount;
     List<Map<String, String>> failedTestsWithErrorDetail;
     List<String> failedTests;
 
@@ -89,6 +89,7 @@ public class BuildData {
       totalCount = testResultAction.getTotalCount();
       skipCount = testResultAction.getSkipCount();
       failCount = testResultAction.getFailCount();
+      passCount = totalCount - skipCount - failCount;
 
       List<? extends TestResult> failedTestsResults = testResultAction.getFailedTests();
 
