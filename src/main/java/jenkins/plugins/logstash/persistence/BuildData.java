@@ -66,8 +66,12 @@ public class BuildData {
 
   public static class TestData {
     int totalCount, skipCount, failCount, passCount;
-    List<Map<String, String>> failedTestsWithErrorDetail;
+    List<FailedTest> failedTestsWithErrorDetail;
     List<String> failedTests;
+
+    public static class FailedTest {
+      String fullName, errorDetails;
+    }
 
     public TestData() {
       this(null);
@@ -98,12 +102,19 @@ public class BuildData {
         failedTests.add(result.getFullName());
       }
 
-      failedTestsWithErrorDetail = new ArrayList<Map<String, String>>();
+      // failedTestsWithErrorDetail = new ArrayList<Map<String, String>>();
+      // for (TestResult result : failedTestsResults) {
+      //   Map<String, String> caseDetail = new HashMap();
+      //   caseDetail.put("TestCase", result.getFullName());
+      //   caseDetail.put("ErrorDetail", result.getErrorDetails());
+      //   failedTestsWithErrorDetail.add(caseDetail);
+      // }
+      failedTestsWithErrorDetail = new ArrayList<FailedTest>();
       for (TestResult result : failedTestsResults) {
-        Map<String, String> caseDetail = new HashMap();
-        caseDetail.put("TestCase", result.getFullName());
-        caseDetail.put("ErrorDetail", result.getErrorDetails());
-        failedTestsWithErrorDetail.add(caseDetail);
+          FailedTest failedTest = new FailedTest();
+          failedTest.fullName = result.getFullName();
+          failedTest.errorDetails = result.getErrorDetails();
+          failedTestsWithErrorDetail.add(failedTest);
       }
     }
   }

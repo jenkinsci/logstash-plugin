@@ -62,8 +62,8 @@ public class BuildDataTest {
     when(mockBuild.getProject()).thenReturn(mockProject);
     when(mockBuild.getNumber()).thenReturn(123456);
     when(mockBuild.getDuration()).thenReturn(0L);
-    when(mockBuild.getTimestamp()).thenReturn(mockCalendar);
-    when(mockBuild.getRootBuild()).thenReturn(mockBuild);
+    when(mockBuild.getTimestamp()).thenReturn(mockCalendar)
+;    when(mockBuild.getRootBuild()).thenReturn(mockBuild);
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
@@ -220,6 +220,7 @@ public class BuildDataTest {
   public void constructorSuccessTestFailures() {
     TestResult mockTestResult = Mockito.mock(hudson.tasks.test.TestResult.class);
     when(mockTestResult.getSafeName()).thenReturn("Mock Test");
+    when(mockTestResult.getFullName()).thenReturn("Mock Full Test");
     when(mockTestResult.getErrorDetails()).thenReturn("ErrorDetails Test");
 
     when(mockTestResultAction.getTotalCount()).thenReturn(123);
@@ -233,6 +234,9 @@ public class BuildDataTest {
     Assert.assertEquals("Incorrect test results", 123, buildData.testResults.totalCount);
     Assert.assertEquals("Incorrect test results", 0, buildData.testResults.skipCount);
     Assert.assertEquals("Incorrect test results", 1, buildData.testResults.failCount);
+    Assert.assertEquals("Incorrect test details count", 1, buildData.testResults.failedTestsWithErrorDetail.size());
+    Assert.assertEquals("Incorrect failed test error details", "ErrorDetails Test", buildData.testResults.failedTestsWithErrorDetail.get(0).errorDetails);
+    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", buildData.testResults.failedTestsWithErrorDetail.get(0).fullName);
 
     // Verify the rest of the results
     verify(mockBuild).getId();
