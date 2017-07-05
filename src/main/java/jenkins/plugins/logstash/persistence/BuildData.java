@@ -96,19 +96,11 @@ public class BuildData {
       passCount = totalCount - skipCount - failCount;
 
       List<? extends TestResult> failedTestsResults = testResultAction.getFailedTests();
-
       failedTests = new ArrayList<String>(failedTestsResults.size());
       for (TestResult result : failedTestsResults) {
         failedTests.add(result.getFullName());
       }
 
-      // failedTestsWithErrorDetail = new ArrayList<Map<String, String>>();
-      // for (TestResult result : failedTestsResults) {
-      //   Map<String, String> caseDetail = new HashMap();
-      //   caseDetail.put("TestCase", result.getFullName());
-      //   caseDetail.put("ErrorDetail", result.getErrorDetails());
-      //   failedTestsWithErrorDetail.add(caseDetail);
-      // }
       failedTestsWithErrorDetail = new ArrayList<FailedTest>();
       for (TestResult result : failedTestsResults) {
           FailedTest failedTest = new FailedTest();
