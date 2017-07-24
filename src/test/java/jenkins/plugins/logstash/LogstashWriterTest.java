@@ -3,6 +3,7 @@ package jenkins.plugins.logstash;
 import hudson.model.AbstractBuild;
 import hudson.model.Project;
 import hudson.model.Result;
+import hudson.model.TaskListener;
 import hudson.tasks.test.AbstractTestResultAction;
 import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
@@ -142,6 +143,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(null);
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();

@@ -5,12 +5,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import hudson.model.Environment;
-import hudson.model.EnvironmentList;
-import hudson.model.Result;
-import hudson.model.AbstractBuild;
-import hudson.model.Node;
-import hudson.model.Project;
+
+import hudson.model.*;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 
@@ -52,6 +48,8 @@ public class BuildDataTest {
   @Mock Environment mockEnvironment;
   @Mock Date mockDate;
   @Mock GregorianCalendar mockCalendar;
+  @Mock TaskListener mockListener;
+
 
   @Before
   public void before() throws Exception {
@@ -94,7 +92,7 @@ public class BuildDataTest {
     when(mockBuild.getBuiltOn()).thenReturn(null);
 
     // Unit under test
-    BuildData buildData = new BuildData(mockBuild, mockDate);
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
     // build.getDuration() is always 0 in Notifiers
     Assert.assertEquals("Incorrect buildDuration", 60L, buildData.getBuildDuration());
@@ -118,6 +116,7 @@ public class BuildDataTest {
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(mockListener);
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -137,7 +136,7 @@ public class BuildDataTest {
     when(mockNode.getLabelString()).thenReturn("");
 
     // Unit under test
-    BuildData buildData = new BuildData(mockBuild, mockDate);
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
     // build.getDuration() is always 0 in Notifiers
     Assert.assertEquals("Incorrect buildDuration", 60L, buildData.getBuildDuration());
@@ -161,6 +160,7 @@ public class BuildDataTest {
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(mockListener);
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -180,7 +180,7 @@ public class BuildDataTest {
     when(mockNode.getLabelString()).thenReturn("Test Slave");
 
     // Unit under test
-    BuildData buildData = new BuildData(mockBuild, mockDate);
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
     // build.getDuration() is always 0 in Notifiers
     Assert.assertEquals("Incorrect buildDuration", 60L, buildData.getBuildDuration());
@@ -204,6 +204,7 @@ public class BuildDataTest {
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(mockListener);
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -216,7 +217,7 @@ public class BuildDataTest {
   }
 
   @Test
-  public void constructorSuccessTestFailures() {
+  public void constructorSuccessTestFailures() throws Exception {
     TestResult mockTestResult = Mockito.mock(hudson.tasks.test.TestResult.class);
     when(mockTestResult.getSafeName()).thenReturn("Mock Test");
 
@@ -226,7 +227,7 @@ public class BuildDataTest {
     when(mockTestResultAction.getFailedTests()).thenReturn(Arrays.asList(mockTestResult));
 
     // Unit under test
-    BuildData buildData = new BuildData(mockBuild, mockDate);
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
     Assert.assertEquals("Incorrect test results", 123, buildData.testResults.totalCount);
     Assert.assertEquals("Incorrect test results", 0, buildData.testResults.skipCount);
@@ -248,6 +249,7 @@ public class BuildDataTest {
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(mockListener);
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -260,11 +262,11 @@ public class BuildDataTest {
   }
 
   @Test
-  public void constructorSuccessNoTests() {
+  public void constructorSuccessNoTests() throws Exception {
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(null);
 
     // Unit under test
-    BuildData buildData = new BuildData(mockBuild, mockDate);
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
     Assert.assertEquals("Incorrect test results", null, buildData.testResults);
 
@@ -284,6 +286,7 @@ public class BuildDataTest {
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(mockListener);
 
     verify(mockProject, times(2)).getName();
 
@@ -314,7 +317,7 @@ public class BuildDataTest {
     }).when(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
 
     // Unit under test
-    BuildData buildData = new BuildData(mockBuild, mockDate);
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
     // Verify results
     Assert.assertEquals("Wrong number of environment variables", 1, buildData.getBuildVariables().size());
@@ -335,6 +338,7 @@ public class BuildDataTest {
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(mockListener);
 
     verify(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
 

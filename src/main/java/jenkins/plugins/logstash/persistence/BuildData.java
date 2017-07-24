@@ -117,7 +117,7 @@ public class BuildData {
   BuildData() {}
 
   // Freestyle project build
-  public BuildData(AbstractBuild<?, ?> build, Date currentTime) {
+  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
     initData(build, currentTime);
 
     Node node = build.getBuiltOn();
@@ -151,6 +151,11 @@ public class BuildData {
           buildEnvVariables.clear();
         }
       }
+    }
+    try {
+      buildVariables.putAll(build.getEnvironment(listener));
+    } catch (Exception e) {
+      // no base build env vars to merge
     }
     for (String key : sensitiveBuildVariables) {
       buildVariables.remove(key);

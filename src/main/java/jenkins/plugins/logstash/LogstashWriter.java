@@ -135,7 +135,7 @@ public class LogstashWriter {
 
   BuildData getBuildData() {
     if (build instanceof AbstractBuild) {
-      return new BuildData((AbstractBuild) build, new Date());
+      return new BuildData((AbstractBuild) build, new Date(), listener);
     } else {
       return new BuildData(build, new Date(), listener);
     }
