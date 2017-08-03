@@ -40,7 +40,8 @@ public interface LogstashIndexerDao {
     REDIS,
     RABBIT_MQ,
     ELASTICSEARCH,
-    SYSLOG
+    SYSLOG,
+    LOGSTASH
   }
   
   static enum SyslogFormat {
