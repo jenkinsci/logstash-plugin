@@ -6,7 +6,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import hudson.model.*;
+import hudson.model.EnvironmentList;
+import hudson.model.Result;
+import hudson.model.AbstractBuild;
+import hudson.model.Node;
+import hudson.model.Project;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 
