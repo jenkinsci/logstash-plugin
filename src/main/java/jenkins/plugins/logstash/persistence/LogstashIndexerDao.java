@@ -42,7 +42,16 @@ public interface LogstashIndexerDao {
     ELASTICSEARCH,
     SYSLOG
   }
+  
+  static enum SyslogFormat {
+	RFC5424,
+	RFC3164
+  }
 
+  static enum SyslogProtocol {
+	UDP
+  }
+  
   String getDescription();
 
   IndexerType getIndexerType();

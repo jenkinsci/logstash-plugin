@@ -1,0 +1,11 @@
+input {
+  syslog {
+    port => 5555
+  }
+}
+
+output {
+  file {
+    path => "/tmp/logs/syslog-test.log"
+  }
+}

@@ -1,3 +1,33 @@
+env:
+  global:
+    - LOGSTASH_DOCKER_IMAGE="logstash/logstash"
+    - LOGSTASH_DOCKER_REGISTRY="docker.elastic.co"
+    - LOGSTASH_DOCKER_VERSION="5.4.1"
+    - LOGSTASH_DOCKER_ENV="XPACK_MONITORING_ENABLED=false"
+    - LOGSTASH_PIPELINE_DIR="src/test/resources/logstash/pipeline"
+    - LOGSTASH_LOGS_DIR="target/logs"
+    - LOGSTASH_LOGFILE="syslog-test.log"
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - "mvn clean package --quiet"
+  - "mkdir -p ${TRAVIS_BUILD_DIR}/${LOGSTASH_LOGS_DIR}"
+  - "touch ${TRAVIS_BUILD_DIR}/${LOGSTASH_LOGS_DIR}/${LOGSTASH_LOGFILE}"
+  - "sudo chown 1000 ${TRAVIS_BUILD_DIR}/${LOGSTASH_LOGS_DIR}/${LOGSTASH_LOGFILE}"
+  - "sudo chmod g+w ${TRAVIS_BUILD_DIR}/${LOGSTASH_LOGS_DIR}/${LOGSTASH_LOGFILE}"
+  - "docker pull ${LOGSTASH_DOCKER_REGISTRY}/${LOGSTASH_DOCKER_IMAGE}:${LOGSTASH_DOCKER_VERSION}"
+  - docker run -d
+    -v ${TRAVIS_BUILD_DIR}/${LOGSTASH_PIPELINE_DIR}:/usr/share/logstash/pipeline
+    -v ${TRAVIS_BUILD_DIR}/${LOGSTASH_LOGS_DIR}:/tmp/logs
+    -p 127.0.0.1:514:5555
+    -p 127.0.0.1:514:5555/udp
+    -e ${LOGSTASH_DOCKER_ENV}
+    ${LOGSTASH_DOCKER_REGISTRY}/${LOGSTASH_DOCKER_IMAGE}:${LOGSTASH_DOCKER_VERSION}
+
 language: java
 dist: trusty
 jdk:
@@ -8,4 +38,4 @@ branches:
   except:
     - /^test.*/i
 
-install: 'mvn clean package --quiet'
+script: "mvn verify -DskipIntegrationTests=false"
