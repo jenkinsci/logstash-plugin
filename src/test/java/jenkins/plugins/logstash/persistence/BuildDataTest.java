@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import hudson.model.Environment;
 import hudson.model.EnvironmentList;
 import hudson.model.Result;
+import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
 import hudson.model.Node;
 import hudson.model.Project;
