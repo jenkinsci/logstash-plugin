@@ -5,7 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
+import hudson.model.Environment;
 import hudson.model.EnvironmentList;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
