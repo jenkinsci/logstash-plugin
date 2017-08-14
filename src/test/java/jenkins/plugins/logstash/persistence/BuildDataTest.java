@@ -62,8 +62,8 @@ public class BuildDataTest {
     when(mockBuild.getProject()).thenReturn(mockProject);
     when(mockBuild.getNumber()).thenReturn(123456);
     when(mockBuild.getDuration()).thenReturn(0L);
-    when(mockBuild.getTimestamp()).thenReturn(mockCalendar)
-;    when(mockBuild.getRootBuild()).thenReturn(mockBuild);
+    when(mockBuild.getTimestamp()).thenReturn(mockCalendar);
+    when(mockBuild.getRootBuild()).thenReturn(mockBuild);
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
