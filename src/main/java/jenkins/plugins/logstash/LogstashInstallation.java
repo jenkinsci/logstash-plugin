@@ -34,6 +34,8 @@ import java.util.List;
 
 import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
+import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogFormat;
+import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogProtocol;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -62,6 +64,8 @@ public class LogstashInstallation extends ToolInstallation {
   @Extension
   public static final class Descriptor extends ToolDescriptor<LogstashInstallation> {
     public IndexerType type;
+    public SyslogFormat syslogFormat;
+    public SyslogProtocol syslogProtocol;
     public String host;
     public Integer port = -1;
     public String username;

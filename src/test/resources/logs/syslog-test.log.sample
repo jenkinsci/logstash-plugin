@@ -1,0 +1,1 @@
+{"severity":6,"@timestamp":"2017-06-06T01:40:28.000Z","@version":"1","host":"172.17.0.1","program":"jenkins:","message":" @cee: { 'junit': 'SyslogDaoTest' }","priority":14,"logsource":"localhost","facility":1,"severity_label":"Informational","timestamp":"Jun 06 01:40:28","facility_label":"user-level"}

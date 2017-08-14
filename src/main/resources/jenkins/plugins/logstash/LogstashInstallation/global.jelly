@@ -21,5 +21,13 @@
       <f:textbox value="${descriptor.key}" default="logstash"
         checkUrl="'${resURL}/descriptorByName/LogstashInstallation/checkString?value='+escape(this.value)" />
     </f:entry>
+    <f:advanced>
+      <f:entry title="${%Syslog format}" field="syslogFormat">
+        <f:enum value="${descriptor.syslogFormat}">${it.name()}</f:enum>
+      </f:entry>
+      <f:entry title="${%Syslog protocol}" field="syslogProtocol">
+        <f:enum value="${descriptor.syslogProtocol}">${it.name()}</f:enum>
+      </f:entry>
+    </f:advanced>
   </f:section>
 </j:jelly>
