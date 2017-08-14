@@ -45,7 +45,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.WARNING;
+
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 import net.sf.json.JSONObject;
 
@@ -63,7 +69,7 @@ import com.google.gson.GsonBuilder;
 public class BuildData {
   // ISO 8601 date format
   public transient static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
+  private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
     int totalCount, skipCount, failCount;
     List<String> failedTests;
@@ -180,7 +186,8 @@ public class BuildData {
     try {
       // TODO: sensitive variables are not filtered, c.f. https://stackoverflow.com/questions/30916085
       buildVariables = build.getEnvironment(listener);
-    } catch (Exception e) {
+    } catch (IOException | InterruptedException e) {
+      LOGGER.log(WARNING,"Unable to get environment for " + build.getDisplayName(),e);
       buildVariables = new HashMap<String, String>();
     }
   }
