@@ -76,7 +76,13 @@ public class BuildData {
     List<String> failedTests;
 
     public static class FailedTest {
-      String fullName, errorDetails;
+      final String fullName, errorDetails;
+
+		public FailedTest(String fullName, String errorDetails) {
+			super();
+			this.fullName = fullName;
+			this.errorDetails = errorDetails;
+		}
     }
 
     public TestData() {
@@ -100,19 +106,12 @@ public class BuildData {
       skipCount = testResultAction.getSkipCount();
       failCount = testResultAction.getFailCount();
       passCount = totalCount - skipCount - failCount;
-
-      List<? extends TestResult> failedTestsResults = testResultAction.getFailedTests();
-      failedTests = new ArrayList<String>(failedTestsResults.size());
-      for (TestResult result : failedTestsResults) {
-        failedTests.add(result.getFullName());
-      }
-
+ 
+      failedTests = new ArrayList<String>();
       failedTestsWithErrorDetail = new ArrayList<FailedTest>();
-      for (TestResult result : failedTestsResults) {
-          FailedTest failedTest = new FailedTest();
-          failedTest.fullName = result.getFullName();
-          failedTest.errorDetails = result.getErrorDetails();
-          failedTestsWithErrorDetail.add(failedTest);
+      for (TestResult result : testResultAction.getFailedTests()) {
+    	  failedTests.add(result.getFullName());  
+          failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(),result.getErrorDetails()));
       }
     }
   }
