@@ -343,6 +343,7 @@ public class BuildDataTest {
     Assert.assertEquals("Wrong number of environment variables", 2, buildData.getBuildVariables().size());
     Assert.assertEquals("Missing environment variable '" + envVarKey + "'", envVarVal, buildData.getBuildVariables().get(envVarKey));
     Assert.assertEquals("Missing environment variable '" + buildVarKey + "'", buildVarVal, buildData.getBuildVariables().get(buildVarKey));
+    Assert.assertNull("Found sensitive environment variable '" + sensitiveVarKey + "'", buildData.getBuildVariables().get(sensitiveVarKey));
 
     verify(mockBuild).getId();
     verify(mockBuild, times(2)).getResult();
