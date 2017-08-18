@@ -1,5 +1,6 @@
 package jenkins.plugins.logstash;
 
+import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.Project;
 import hudson.model.Result;
@@ -73,6 +74,7 @@ public class LogstashWriterTest {
   @Mock Project mockProject;
 
   @Mock BuildData mockBuildData;
+  @Mock TaskListener mockListener;
 
   @Captor ArgumentCaptor<List<String>> logLinesCaptor;
 
@@ -94,6 +96,7 @@ public class LogstashWriterTest {
     when(mockBuild.getLog(0)).thenReturn(Arrays.asList());
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "Log truncated..."));
     when(mockBuild.getLog(Integer.MAX_VALUE)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "line 4"));
+    when(mockBuild.getEnvironment(null)).thenReturn(new EnvVars());
 
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);

@@ -5,6 +5,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import hudson.EnvVars;
 import hudson.model.Environment;
 import hudson.model.EnvironmentList;
 import hudson.model.Result;
@@ -72,6 +74,7 @@ public class BuildDataTest {
     when(mockBuild.getEnvironments()).thenReturn(null);
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3"));
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
+    when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars());
 
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
@@ -308,7 +311,6 @@ public class BuildDataTest {
   public void constructorSuccessWithEnvVars() throws Exception {
     when(mockBuild.getEnvironments()).thenReturn(new EnvironmentList(Arrays.asList(mockEnvironment)));
     when(mockBuild.getBuildVariables()).thenReturn(new HashMap<String, String>());
-    when(mockBuild.getSensitiveBuildVariables()).thenReturn(new HashSet<String>());
 
     when(mockBuild.getBuiltOn()).thenReturn(mockNode);
 
@@ -317,22 +319,91 @@ public class BuildDataTest {
 
     final String envVarKey = "EnvVarKey";
     final String envVarVal = "EnvVarVal";
+    final String buildVarKey = "BuildVarKey";
+    final String buildVarVal = "BuildVarVal";
+    final String sensitiveVarKey = "SensitiveVarKey";
+
     doAnswer(new Answer<Void>() {
       @SuppressWarnings("unchecked")
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
         Map<String, String> output = (Map<String, String>) invocation.getArguments()[0];
         output.put(envVarKey, envVarVal);
+        output.put(sensitiveVarKey, "privateKey");
         return null;
       }
     }).when(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
+    when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars(buildVarKey, buildVarVal));
+    when(mockBuild.getSensitiveBuildVariables()).thenReturn(new HashSet<>(Arrays.asList(sensitiveVarKey)));
+
+    // Unit under test
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+    // Verify results
+    Assert.assertEquals("Wrong number of environment variables", 2, buildData.getBuildVariables().size());
+    Assert.assertEquals("Missing environment variable '" + envVarKey + "'", envVarVal, buildData.getBuildVariables().get(envVarKey));
+    Assert.assertEquals("Missing environment variable '" + buildVarKey + "'", buildVarVal, buildData.getBuildVariables().get(buildVarKey));
+
+    verify(mockBuild).getId();
+    verify(mockBuild, times(2)).getResult();
+    verify(mockBuild, times(2)).getParent();
+    verify(mockBuild, times(2)).getDisplayName();
+    verify(mockBuild).getFullDisplayName();
+    verify(mockBuild).getDescription();
+    verify(mockBuild).getUrl();
+    verify(mockBuild).getAction(AbstractTestResultAction.class);
+    verify(mockBuild).getBuiltOn();
+    verify(mockBuild, times(2)).getNumber();
+    verify(mockBuild).getTimestamp();
+    verify(mockBuild, times(3)).getRootBuild();
+    verify(mockBuild).getBuildVariables();
+    verify(mockBuild).getSensitiveBuildVariables();
+    verify(mockBuild).getEnvironments();
+    verify(mockBuild).getEnvironment(mockListener);
+
+    verify(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
+
+    verify(mockTestResultAction).getTotalCount();
+    verify(mockTestResultAction).getSkipCount();
+    verify(mockTestResultAction).getFailCount();
+    verify(mockTestResultAction, times(1)).getFailedTests();
+
+    verify(mockProject, times(2)).getName();
+
+    verify(mockDate).getTime();
+  }
+
+  @Test // JENKINS-41324
+  public void constructorSuccessWithChangedEnvVars() throws Exception {
+    when(mockBuild.getEnvironments()).thenReturn(new EnvironmentList(Arrays.asList(mockEnvironment)));
+    when(mockBuild.getBuildVariables()).thenReturn(new HashMap<String, String>());
+    when(mockBuild.getSensitiveBuildVariables()).thenReturn(new HashSet<String>());
+
+    when(mockBuild.getBuiltOn()).thenReturn(mockNode);
+
+    when(mockNode.getDisplayName()).thenReturn("Jenkins");
+    when(mockNode.getLabelString()).thenReturn("");
+
+    final String varKey = "modifiedVarKey";
+    final String envVarVal = "initialValue";
+    final String buildVarVal = "changedValue";
+    doAnswer(new Answer<Void>() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public Void answer(InvocationOnMock invocation) throws Throwable {
+        Map<String, String> output = (Map<String, String>) invocation.getArguments()[0];
+        output.put(varKey, envVarVal);
+        return null;
+      }
+    }).when(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
+    when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars(varKey, buildVarVal));
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
     // Verify results
     Assert.assertEquals("Wrong number of environment variables", 1, buildData.getBuildVariables().size());
-    Assert.assertEquals("Missing environment variable '" + envVarKey + "'", envVarVal, buildData.getBuildVariables().get(envVarKey));
+    Assert.assertEquals("Missing environment variable '" + varKey + "'", buildVarVal, buildData.getBuildVariables().get(varKey));
 
     verify(mockBuild).getId();
     verify(mockBuild, times(2)).getResult();
