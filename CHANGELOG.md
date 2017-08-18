@@ -1,3 +1,12 @@
+1.3.0
+-----
+* Add test error details for failed test cases (#30)
+* Log exceptions in BuildData (#35)
+* Syslog persistence integration test with docker and travis. (#27)
+* Change logstash notifier to fit pipeline jobs (#28)
+* Update ElasticSearchDao to support LogStash
+* Updating the global.jelly to take work for Jenkins 2.0 and work for Jenkins with set URL and without
+
 1.2.0
 -----
 * Respect Mask Password plugin configuration

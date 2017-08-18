@@ -71,8 +71,19 @@ public class BuildData {
   public transient static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
-    int totalCount, skipCount, failCount;
+    int totalCount, skipCount, failCount, passCount;
+    List<FailedTest> failedTestsWithErrorDetail;
     List<String> failedTests;
+
+    public static class FailedTest {
+      final String fullName, errorDetails;
+
+		public FailedTest(String fullName, String errorDetails) {
+			super();
+			this.fullName = fullName;
+			this.errorDetails = errorDetails;
+		}
+    }
 
     public TestData() {
       this(null);
@@ -87,16 +98,20 @@ public class BuildData {
       if (testResultAction == null) {
         totalCount = skipCount = failCount = 0;
         failedTests = Collections.emptyList();
+        failedTestsWithErrorDetail = Collections.emptyList();
         return;
       }
 
       totalCount = testResultAction.getTotalCount();
       skipCount = testResultAction.getSkipCount();
       failCount = testResultAction.getFailCount();
-
-      failedTests = new ArrayList<String>(testResultAction.getFailedTests().size());
+      passCount = totalCount - skipCount - failCount;
+ 
+      failedTests = new ArrayList<String>();
+      failedTestsWithErrorDetail = new ArrayList<FailedTest>();
       for (TestResult result : testResultAction.getFailedTests()) {
-        failedTests.add(result.getFullName());
+    	  failedTests.add(result.getFullName());  
+          failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(),result.getErrorDetails()));
       }
     }
   }

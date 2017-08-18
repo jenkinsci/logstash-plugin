@@ -1,6 +1,9 @@
 Jenkins Logstash Plugin
 =======================
 
+Travis: [![Build Status](https://travis-ci.org/jenkinsci/logstash-plugin.svg?branch=master)](https://travis-ci.org/jenkinsci/logstash-plugin)
+Jenkins: [![Build Status](https://ci.jenkins.io/job/Plugins/job/logstash-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/logstash-plugin/job/master/)
+
 This plugin adds support for sending a job's console log to Logstash indexers such as ElasticSearch, RabbitMQ, or Redis.
 
 * see [Jenkins wiki](https://wiki.jenkins-ci.org/display/JENKINS/Logstash+Plugin) for detailed feature descriptions
