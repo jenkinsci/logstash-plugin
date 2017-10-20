@@ -36,8 +36,8 @@ public class LogstashNotifierTest {
   static class MockLogstashNotifier extends LogstashNotifier {
     LogstashWriter writer;
 
-    MockLogstashNotifier(int maxLines, boolean failBuild, LogstashWriter writer) {
-      super(maxLines, failBuild);
+    MockLogstashNotifier(int maxLines, boolean failBuild, LogstashWriter writer, String customData) {
+      super(maxLines, failBuild, customData);
       this.writer = writer;
     }
 
@@ -95,7 +95,7 @@ public class LogstashNotifierTest {
     when(mockWriter.isConnectionBroken()).thenReturn(false);
     Mockito.doNothing().when(mockWriter).writeBuildLog(anyInt());
 
-    notifier = new MockLogstashNotifier(3, false, mockWriter);
+    notifier = new MockLogstashNotifier(3, false, mockWriter, "{\"key\":\"value\"}");
   }
 
   @After
@@ -143,7 +143,7 @@ public class LogstashNotifierTest {
     // Initialize mocks
     when(mockWriter.isConnectionBroken()).thenReturn(true);
 
-    notifier = new MockLogstashNotifier(3, false, mockWriter);
+    notifier = new MockLogstashNotifier(3, false, mockWriter, "{}");
 
     // Unit under test
     boolean result = notifier.perform(mockBuild, mockLauncher, mockListener);
@@ -163,7 +163,7 @@ public class LogstashNotifierTest {
     // Initialize mocks
     when(mockWriter.isConnectionBroken()).thenReturn(true);
 
-    notifier = new MockLogstashNotifier(3, false, mockWriter);
+    notifier = new MockLogstashNotifier(3, false, mockWriter,"{}");
 
     // Unit under test
     notifier.perform(mockRun, null, mockLauncher, mockListener);
@@ -183,7 +183,7 @@ public class LogstashNotifierTest {
     // Initialize mocks
     when(mockWriter.isConnectionBroken()).thenReturn(true);
 
-    notifier = new MockLogstashNotifier(3, true, mockWriter);
+    notifier = new MockLogstashNotifier(3, true, mockWriter, "{}");
 
     // Unit under test
     boolean result = notifier.perform(mockBuild, mockLauncher, mockListener);
@@ -203,7 +203,7 @@ public class LogstashNotifierTest {
     // Initialize mocks
     when(mockWriter.isConnectionBroken()).thenReturn(true);
 
-    notifier = new MockLogstashNotifier(3, true, mockWriter);
+    notifier = new MockLogstashNotifier(3, true, mockWriter, "{}");
 
     // Unit under test
     notifier.perform(mockRun, null, mockLauncher, mockListener);
@@ -234,7 +234,7 @@ public class LogstashNotifierTest {
       }
     }).when(mockWriter).writeBuildLog(anyInt());
 
-    notifier = new MockLogstashNotifier(3, true, mockWriter);
+    notifier = new MockLogstashNotifier(3, true, mockWriter, "{}");
     assertEquals("Errors were written", "", errorBuffer.toString());
 
     // Unit under test
@@ -257,7 +257,7 @@ public class LogstashNotifierTest {
 
     Mockito.doNothing().when(mockWriter).writeBuildLog(anyInt());
 
-    notifier = new MockLogstashNotifier(-1, true, mockWriter);
+    notifier = new MockLogstashNotifier(-1, true, mockWriter, "{}");
 
     // Unit under test
     boolean result = notifier.perform(mockBuild, mockLauncher, mockListener);
@@ -279,7 +279,7 @@ public class LogstashNotifierTest {
 
     Mockito.doNothing().when(mockWriter).writeBuildLog(anyInt());
 
-    notifier = new MockLogstashNotifier(0, true, mockWriter);
+    notifier = new MockLogstashNotifier(0, true, mockWriter, "{}");
 
     // Unit under test
     boolean result = notifier.perform(mockBuild, mockLauncher, mockListener);
@@ -296,7 +296,7 @@ public class LogstashNotifierTest {
 
   @Test
   public void getRequiredMonitorService() throws Exception {
-    Notifier notifier = new LogstashNotifier(1, false);
+    Notifier notifier = new LogstashNotifier(1, false, "{}");
 
     // Unit under test
     BuildStepMonitor synchronizationMonitor = notifier.getRequiredMonitorService();

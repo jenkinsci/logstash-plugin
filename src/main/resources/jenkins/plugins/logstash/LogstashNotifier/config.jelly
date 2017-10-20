@@ -3,6 +3,9 @@
     <f:entry title="${%Max lines}" field="maxLines">
       <f:number default="1000" value="${instance.maxLines}" checkUrl="'descriptorByName/LogstashInstallation/checkInteger?value='+escape(this.value)" />
     </f:entry>
+    <f:entry title="${%Custom Data}" field="customData">
+      <f:textbox default="{}" />
+    </f:entry>
     <f:entry title="${%Can fail build}" field="failBuild">
       <f:checkbox checked="${instance.failBuild}" />
     </f:entry>

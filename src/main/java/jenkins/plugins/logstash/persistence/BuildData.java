@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.WARNING;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -120,6 +121,7 @@ public class BuildData {
   protected String displayName;
   protected String fullDisplayName;
   protected String description;
+  protected JSONObject custom;
   protected String url;
   protected String buildHost;
   protected String buildLabel;
@@ -135,7 +137,7 @@ public class BuildData {
   protected TestData testResults = null;
 
   // Freestyle project build
-  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
+  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener, String customData) {
     initData(build, currentTime);
 
     Node node = build.getBuiltOn();
@@ -171,6 +173,14 @@ public class BuildData {
         }
       }
     }
+
+    // Parse JSON string. If fails add error message and continue
+    try{
+      custom = JSONObject.fromObject(customData);
+    }catch (JSONException e){
+      custom = JSONObject.fromObject("{\"error\":\"custom data json parse failed\"}");
+    }
+
     try {
       buildVariables.putAll(build.getEnvironment(listener));
     } catch (Exception e) {
@@ -183,7 +193,7 @@ public class BuildData {
   }
 
   // Pipeline project build
-  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener) {
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String customData) {
     initData(build, currentTime);
 
     Executor executor = build.getExecutor();
@@ -197,6 +207,13 @@ public class BuildData {
     rootFullProjectName = fullProjectName;
     rootProjectDisplayName = displayName;
     rootBuildNum = buildNum;
+
+    // Parse JSON string. If fails add error message and continue
+    try{
+      custom = JSONObject.fromObject(customData);
+    }catch (JSONException e){
+      custom = JSONObject.fromObject("{\"error\":\"custom data json parse failed\"}");
+    }
 
     try {
       // TODO: sensitive variables are not filtered, c.f. https://stackoverflow.com/questions/30916085
