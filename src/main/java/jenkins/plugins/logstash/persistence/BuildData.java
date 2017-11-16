@@ -59,6 +59,7 @@ import org.apache.commons.lang.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+
 /**
  * POJO for mapping build info to JSON.
  *
@@ -118,6 +119,7 @@ public class BuildData {
   protected String id;
   protected String result;
   protected String projectName;
+  protected String fullProjectName;
   protected String displayName;
   protected String fullDisplayName;
   protected String description;
@@ -128,6 +130,7 @@ public class BuildData {
   protected long buildDuration;
   protected transient String timestamp; // This belongs in the root object
   protected String rootProjectName;
+  protected String rootFullProjectName;
   protected String rootProjectDisplayName;
   protected int rootBuildNum;
   protected Map<String, String> buildVariables;
@@ -151,6 +154,7 @@ public class BuildData {
 
     // build.getDuration() is always 0 in Notifiers
     rootProjectName = build.getRootBuild().getProject().getName();
+    rootFullProjectName = build.getRootBuild().getProject().getFullName();
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
@@ -195,6 +199,7 @@ public class BuildData {
     }
 
     rootProjectName = projectName;
+    rootFullProjectName = fullProjectName;
     rootProjectDisplayName = displayName;
     rootBuildNum = buildNum;
 
@@ -211,6 +216,7 @@ public class BuildData {
     result = build.getResult() == null ? null : build.getResult().toString();
     id = build.getId();
     projectName = build.getParent().getName();
+    fullProjectName = build.getParent().getFullName();
     displayName = build.getDisplayName();
     fullDisplayName = build.getFullDisplayName();
     description = build.getDescription();
@@ -259,6 +265,14 @@ public class BuildData {
 
   public void setProjectName(String projectName) {
     this.projectName = projectName;
+  }
+
+  public String getFullProjectName() {
+    return fullProjectName;
+  }
+
+  public void setFullProjectName(String fullProjectName) {
+    this.fullProjectName = fullProjectName;
   }
 
   public String getDisplayName() {
@@ -339,6 +353,14 @@ public class BuildData {
 
   public void setRootProjectName(String rootProjectName) {
     this.rootProjectName = rootProjectName;
+  }
+
+  public String getRootFullProjectName() {
+    return rootFullProjectName;
+  }
+
+  public void setRootFullProjectName(String rootFullProjectName) {
+    this.rootFullProjectName = rootFullProjectName;
   }
 
   public String getRootProjectDisplayName() {

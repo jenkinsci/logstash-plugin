@@ -84,9 +84,9 @@ public class LogstashWriterTest {
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("LogstashNotifierTest");
     when(mockBuild.getProject()).thenReturn(mockProject);
+    when(mockBuild.getParent()).thenReturn(mockProject);
     when(mockBuild.getBuiltOn()).thenReturn(null);
     when(mockBuild.getNumber()).thenReturn(123456);
-    when(mockBuild.getDuration()).thenReturn(0L);
     when(mockBuild.getTimestamp()).thenReturn(new GregorianCalendar());
     when(mockBuild.getRootBuild()).thenReturn(mockBuild);
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
@@ -104,6 +104,7 @@ public class LogstashWriterTest {
     when(mockTestResultAction.getFailedTests()).thenReturn(Collections.emptyList());
 
     when(mockProject.getName()).thenReturn("LogstashWriterTest");
+    when(mockProject.getFullName()).thenReturn("parent/LogstashWriterTest");
 
     when(mockDao.buildPayload(Matchers.any(BuildData.class), Matchers.anyString(), Matchers.anyListOf(String.class)))
       .thenReturn(JSONObject.fromObject("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}"));
@@ -134,6 +135,8 @@ public class LogstashWriterTest {
     verify(mockBuild).getId();
     verify(mockBuild, times(2)).getResult();
     verify(mockBuild, times(2)).getParent();
+    verify(mockBuild, times(2)).getProject();
+    verify(mockBuild, times(1)).getStartTimeInMillis();
     verify(mockBuild, times(2)).getDisplayName();
     verify(mockBuild).getFullDisplayName();
     verify(mockBuild).getDescription();
@@ -142,7 +145,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getBuiltOn();
     verify(mockBuild, times(2)).getNumber();
     verify(mockBuild).getTimestamp();
-    verify(mockBuild, times(3)).getRootBuild();
+    verify(mockBuild, times(4)).getRootBuild();
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
@@ -154,6 +157,7 @@ public class LogstashWriterTest {
     verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
+    verify(mockProject, times(2)).getFullName();
 
     // Verify results
     assertEquals("Results don't match", "", errorBuffer.toString());

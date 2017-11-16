@@ -87,7 +87,6 @@ public class LogstashNotifierTest {
     errorBuffer = new ByteArrayOutputStream();
     errorStream = new PrintStream(errorBuffer, true);
 
-    when(mockBuild.getLog(anyInt())).thenReturn(Arrays.asList("line 1", "line 2", "line 3"));
     mockRun = new MockRun(mock(AbstractProject.class));
 
     when(mockListener.getLogger()).thenReturn(errorStream);
