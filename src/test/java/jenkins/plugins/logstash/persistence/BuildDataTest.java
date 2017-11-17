@@ -45,7 +45,7 @@ import net.sf.json.test.JSONAssert;
 @RunWith(MockitoJUnitRunner.class)
 public class BuildDataTest {
 
-  static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"projectName\":\"PROJECT_NAME\",\"displayName\":\"DISPLAY NAME\",\"fullDisplayName\":\"FULL DISPLAY NAME\",\"description\":\"DESCRIPTION\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\",\"buildHost\":\"http://localhost:8080/jenkins\",\"buildLabel\":\"master\",\"buildNum\":123,\"buildDuration\":100,\"rootProjectName\":\"ROOT PROJECT NAME\",\"rootProjectDisplayName\":\"ROOT PROJECT DISPLAY NAME\",\"rootBuildNum\":456,\"buildVariables\":{},\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0, \"passCount\":0,\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}}";
+  static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"fullProjectName\":\"full/PROJECT_NAME\",\"projectName\":\"PROJECT_NAME\",\"displayName\":\"DISPLAY NAME\",\"fullDisplayName\":\"FULL DISPLAY NAME\",\"description\":\"DESCRIPTION\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\",\"buildHost\":\"http://localhost:8080/jenkins\",\"buildLabel\":\"master\",\"buildNum\":123,\"buildDuration\":100,\"rootProjectName\":\"ROOT PROJECT NAME\",\"rootFullProjectName\":\"full/ROOT PROJECT NAME\",\"rootProjectDisplayName\":\"ROOT PROJECT DISPLAY NAME\",\"rootBuildNum\":456,\"buildVariables\":{},\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0, \"passCount\":0,\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}}";
 
   @Mock AbstractBuild mockBuild;
   @Mock AbstractTestResultAction mockTestResultAction;
@@ -334,10 +334,12 @@ public class BuildDataTest {
     buildData.setFullDisplayName("FULL DISPLAY NAME");
     buildData.setId("TEST_JOB_123");
     buildData.setProjectName("PROJECT_NAME");
+    buildData.setFullProjectName("full/PROJECT_NAME");
     buildData.setResult(Result.SUCCESS);
     buildData.setRootBuildNum(456);
     buildData.setRootProjectDisplayName("ROOT PROJECT DISPLAY NAME");
     buildData.setRootProjectName("ROOT PROJECT NAME");
+    buildData.setRootFullProjectName("full/ROOT PROJECT NAME");
     buildData.timestamp = "2000-02-01T00:00:00-0800";
     buildData.setUrl("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
     buildData.setTestResults(new TestData());
