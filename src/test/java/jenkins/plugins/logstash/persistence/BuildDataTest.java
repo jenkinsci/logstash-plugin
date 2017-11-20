@@ -80,6 +80,7 @@ public class BuildDataTest {
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
     when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars());
     when(mockBuild.getRootBuild()).thenReturn(mockRootBuild);
+
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
     when(mockTestResultAction.getFailCount()).thenReturn(0);
@@ -87,9 +88,11 @@ public class BuildDataTest {
 
     when(mockProject.getName()).thenReturn("BuildDataTest");
     when(mockProject.getFullName()).thenReturn("parent/BuildDataTest");
+
     when(mockRootBuild.getProject()).thenReturn(mockRootProject);
     when(mockRootBuild.getNumber()).thenReturn(456);
     when(mockRootBuild.getDisplayName()).thenReturn("Root BuildData Test");
+
     when(mockRootProject.getName()).thenReturn("RootBuildDataTest");
     when(mockRootProject.getFullName()).thenReturn("parent/RootBuildDataTest");
 
@@ -105,7 +108,6 @@ public class BuildDataTest {
     verifyNoMoreInteractions(mockDate);
     verifyNoMoreInteractions(mockRootBuild);
     verifyNoMoreInteractions(mockRootProject);
-
   }
 
   private void verifyMocks() throws Exception

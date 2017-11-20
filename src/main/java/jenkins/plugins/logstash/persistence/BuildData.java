@@ -24,6 +24,7 @@
 
 package jenkins.plugins.logstash.persistence;
 
+
 import hudson.model.Action;
 import hudson.model.Environment;
 import hudson.model.Result;
@@ -48,16 +49,15 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
-
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 
 
 /**
@@ -106,11 +106,11 @@ public class BuildData {
       skipCount = testResultAction.getSkipCount();
       failCount = testResultAction.getFailCount();
       passCount = totalCount - skipCount - failCount;
- 
+
       failedTests = new ArrayList<String>();
       failedTestsWithErrorDetail = new ArrayList<FailedTest>();
       for (TestResult result : testResultAction.getFailedTests()) {
-    	  failedTests.add(result.getFullName());  
+          failedTests.add(result.getFullName());
           failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(),result.getErrorDetails()));
       }
     }
@@ -136,8 +136,6 @@ public class BuildData {
   protected Map<String, String> buildVariables;
   protected Set<String> sensitiveBuildVariables;
   protected TestData testResults = null;
-
-  BuildData() {}
 
   // Freestyle project build
   public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
