@@ -24,7 +24,6 @@
 
 package jenkins.plugins.logstash.persistence;
 
-
 import hudson.model.Action;
 import hudson.model.Environment;
 import hudson.model.Result;
@@ -57,8 +56,6 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-
 
 /**
  * POJO for mapping build info to JSON.

@@ -346,4 +346,32 @@ public class BuildDataTest {
       verifyMocks();
       verifyTestResultActions();
   }
+
+  @Test
+  public void fullName() throws Exception
+  {
+      when(mockBuild.getId()).thenReturn("TEST_JOB_123");
+      when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
+
+      BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+      Assert.assertEquals(buildData.getFullProjectName(), "parent/BuildDataTest");
+
+      verifyMocks();
+      verifyTestResultActions();
+  }
+
+  @Test
+  public void rootProjectFullName() throws Exception
+  {
+      when(mockBuild.getId()).thenReturn("TEST_JOB_123");
+      when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
+
+      BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+      Assert.assertEquals(buildData.getRootFullProjectName(), "parent/RootBuildDataTest");
+
+      verifyMocks();
+      verifyTestResultActions();
+  }
 }
