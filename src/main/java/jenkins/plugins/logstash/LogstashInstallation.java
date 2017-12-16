@@ -71,6 +71,7 @@ public class LogstashInstallation extends ToolInstallation {
     public String username;
     public String password;
     public String key;
+    public String mimeType;
 
     public Descriptor() {
       super();
@@ -123,6 +124,16 @@ public class LogstashInstallation extends ToolInstallation {
       }
 
       return FormValidation.ok();
+    }
+    public FormValidation doCheckMimeType(@QueryParameter("value") String value) {
+      if (StringUtils.isBlank(value)) {
+            return FormValidation.error(Messages.ValueIsRequired());
+        }
+      // Mime type validation as per RFC-4288.
+      if (!value.matches("^[\\w#&+_$.\\-\\^]+/[\\w#&+_$.\\-\\^]+$")) {
+        return FormValidation.error(Messages.ProvideValidMimeType());
+      }
+        return FormValidation.ok();
     }
   }
 }

@@ -22,6 +22,10 @@
         checkUrl="'${resURL}/descriptorByName/LogstashInstallation/checkString?value='+escape(this.value)" />
     </f:entry>
     <f:advanced>
+      <f:entry title="${%MIME type}" field="mimeType">
+      <f:textbox value="${descriptor.mimeType}" default="application/json"
+        checkUrl="'${resURL}/descriptorByName/LogstashInstallation/checkMimeType?value='+escape(this.value)" />
+      </f:entry>
       <f:entry title="${%Syslog format}" field="syslogFormat">
         <f:enum value="${descriptor.syslogFormat}">${it.name()}</f:enum>
       </f:entry>

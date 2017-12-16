@@ -42,8 +42,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 import com.google.common.collect.Range;
+
+import jenkins.model.Jenkins;
+import jenkins.plugins.logstash.LogstashInstallation;
+import jenkins.plugins.logstash.LogstashInstallation.Descriptor;
 
 /**
  * Elastic Search Data Access Object.
@@ -94,9 +99,16 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   }
 
   HttpPost getHttpPost(String data) {
-    HttpPost postRequest;
-    postRequest = new HttpPost(uri);
-    StringEntity input = new StringEntity(data, ContentType.APPLICATION_JSON);
+    HttpPost postRequest = new HttpPost(uri);
+    // char encoding is set to UTF_8 since this request posts a JSON string
+    StringEntity input = new StringEntity(data, StandardCharsets.UTF_8);
+    try {
+      Descriptor logstashPluginConfig = (Descriptor) Jenkins.getInstance().getDescriptor(LogstashInstallation.class);
+      input.setContentType(logstashPluginConfig.mimeType);
+    } catch (NullPointerException e){
+        input.setContentType(ContentType.APPLICATION_JSON.toString());
+    }
+    
     postRequest.setEntity(input);
     if (auth != null) {
       postRequest.addHeader("Authorization", "Basic " + auth);
