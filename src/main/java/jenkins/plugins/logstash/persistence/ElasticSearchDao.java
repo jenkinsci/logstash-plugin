@@ -43,6 +43,7 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 import com.google.common.collect.Range;
 
@@ -61,7 +62,8 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   final URI uri;
   final String auth;
   final Range<Integer> successCodes = closedOpen(200,300);
-
+  private final static Logger log = Logger.getLogger(ElasticSearchDao.class.getName());
+  
   //primary constructor used by indexer factory
   public ElasticSearchDao(String host, int port, String key, String username, String password) {
     this(null, host, port, key, username, password);
@@ -99,16 +101,22 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   }
 
   HttpPost getHttpPost(String data) {
+    String mimeType = null;
+    try {
+      Descriptor logstashPluginConfig = (Descriptor) Jenkins.getInstance().getDescriptor(LogstashInstallation.class);
+      mimeType = logstashPluginConfig.mimeType;
+    } catch (NullPointerException e) {
+      log.warning("Unable to read mimetype from jenkins logstash plugin configuration");
+    }
+    return getHttpPost(data, mimeType);
+  }
+  // Re-factored for unit-testing
+  HttpPost getHttpPost(String data, String mimeType) {
     HttpPost postRequest = new HttpPost(uri);
     // char encoding is set to UTF_8 since this request posts a JSON string
     StringEntity input = new StringEntity(data, StandardCharsets.UTF_8);
-    try {
-      Descriptor logstashPluginConfig = (Descriptor) Jenkins.getInstance().getDescriptor(LogstashInstallation.class);
-      input.setContentType(logstashPluginConfig.mimeType);
-    } catch (NullPointerException e){
-        input.setContentType(ContentType.APPLICATION_JSON.toString());
-    }
-    
+    mimeType = (mimeType != null) ? mimeType : ContentType.APPLICATION_JSON.toString();
+    input.setContentType(mimeType);
     postRequest.setEntity(input);
     if (auth != null) {
       postRequest.addHeader("Authorization", "Basic " + auth);
