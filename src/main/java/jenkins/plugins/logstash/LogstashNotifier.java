@@ -56,11 +56,13 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   public int maxLines;
   public boolean failBuild;
+  public String customData;
 
   @DataBoundConstructor
-  public LogstashNotifier(int maxLines, boolean failBuild) {
+  public LogstashNotifier(int maxLines, boolean failBuild, String customData) {
     this.maxLines = maxLines;
     this.failBuild = failBuild;
+    this.customData = customData;
   }
 
   @Override
@@ -85,7 +87,7 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(Run<?, ?> run, OutputStream errorStream, TaskListener listener) {
-    return new LogstashWriter(run, errorStream, listener);
+    return new LogstashWriter(run, errorStream, listener, customData);
   }
 
   public BuildStepMonitor getRequiredMonitorService() {

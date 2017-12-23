@@ -61,7 +61,7 @@ public class LogstashWriter {
   final LogstashIndexerDao dao;
   private boolean connectionBroken;
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, String customData) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
     this.listener = listener;
@@ -71,7 +71,7 @@ public class LogstashWriter {
       this.buildData = null;
     } else {
       this.jenkinsUrl = getJenkinsUrl();
-      this.buildData = getBuildData();
+      this.buildData = getBuildData(customData);
     }
   }
 
@@ -133,11 +133,12 @@ public class LogstashWriter {
     return IndexerDaoFactory.getInstance(descriptor.type, descriptor.host, descriptor.port, descriptor.key, descriptor.username, descriptor.password);
   }
 
-  BuildData getBuildData() {
+  BuildData getBuildData(String customData) {
+
     if (build instanceof AbstractBuild) {
-      return new BuildData((AbstractBuild) build, new Date(), listener);
+      return new BuildData((AbstractBuild) build, new Date(), listener, customData);
     } else {
-      return new BuildData(build, new Date(), listener);
+      return new BuildData(build, new Date(), listener, customData);
     }
   }
 
