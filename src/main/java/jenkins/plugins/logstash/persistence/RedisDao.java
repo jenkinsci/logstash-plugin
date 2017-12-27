@@ -41,16 +41,22 @@ import redis.clients.jedis.exceptions.JedisException;
  * @since 1.0.0
  */
 public class RedisDao extends AbstractLogstashIndexerDao {
-  final JedisPool pool;
+  private final JedisPool pool;
+
+  private String password;
+  private String key;
 
   //primary constructor used by indexer factory
-  public RedisDao(String host, int port, String key, String username, String password) {
-    this(null, host, port, key, username, password);
+  public RedisDao(String host, int port, String key, String password) {
+    this(null, host, port, key, password);
   }
 
   // Factored for unit testing
-  RedisDao(JedisPool factory, String host, int port, String key, String username, String password) {
-    super(host, port, key, username, password);
+  RedisDao(JedisPool factory, String host, int port, String key, String password) {
+    super(host, port);
+
+    this.key = key;
+    this.password = password;
 
     if (StringUtils.isBlank(key)) {
       throw new IllegalArgumentException("redis key is required");
@@ -59,6 +65,16 @@ public class RedisDao extends AbstractLogstashIndexerDao {
     // The JedisPool must be a singleton
     // We assume this is used as a singleton as well
     pool = factory == null ? new JedisPool(new JedisPoolConfig(), host, port) : factory;
+  }
+
+  public String getPassword()
+  {
+    return password;
+  }
+
+  public String getKey()
+  {
+    return key;
   }
 
   @Override
@@ -89,10 +105,5 @@ public class RedisDao extends AbstractLogstashIndexerDao {
         }
       }
     }
-  }
-
-  @Override
-  public IndexerType getIndexerType() {
-    return IndexerType.REDIS;
   }
 }

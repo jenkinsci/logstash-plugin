@@ -85,9 +85,10 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(Run<?, ?> run, OutputStream errorStream, TaskListener listener) {
-    return new LogstashWriter(run, errorStream, listener);
+    return new LogstashWriter(run, errorStream, listener, run.getCharset());
   }
 
+  @Override
   public BuildStepMonitor getRequiredMonitorService() {
     // We don't call Run#getPreviousBuild() so no external synchronization between builds is required
     return BuildStepMonitor.NONE;
@@ -106,6 +107,7 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
       return true;
     }
 
+    @Override
     public String getDisplayName() {
       return Messages.DisplayName();
     }

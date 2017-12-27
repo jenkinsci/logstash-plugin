@@ -239,12 +239,12 @@ public class BuildDataTest {
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
-    Assert.assertEquals("Incorrect test results", 123, buildData.testResults.totalCount);
-    Assert.assertEquals("Incorrect test results", 0, buildData.testResults.skipCount);
-    Assert.assertEquals("Incorrect test results", 1, buildData.testResults.failCount);
-    Assert.assertEquals("Incorrect test details count", 1, buildData.testResults.failedTestsWithErrorDetail.size());
-    Assert.assertEquals("Incorrect failed test error details", "ErrorDetails Test", buildData.testResults.failedTestsWithErrorDetail.get(0).errorDetails);
-    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", buildData.testResults.failedTestsWithErrorDetail.get(0).fullName);
+    Assert.assertEquals("Incorrect test results", 123, buildData.testResults.getTotalCount());
+    Assert.assertEquals("Incorrect test results", 0, buildData.testResults.getSkipCount());
+    Assert.assertEquals("Incorrect test results", 1, buildData.testResults.getFailCount());
+    Assert.assertEquals("Incorrect test details count", 1, buildData.testResults.getFailedTestsWithErrorDetail().size());
+    Assert.assertEquals("Incorrect failed test error details", "ErrorDetails Test", buildData.testResults.getFailedTestsWithErrorDetail().get(0).getErrorDetails());
+    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", buildData.testResults.getFailedTestsWithErrorDetail().get(0).getFullName());
 
     verifyMocks();
     verifyTestResultActions();

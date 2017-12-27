@@ -10,7 +10,6 @@ import hudson.model.TaskListener;
 import hudson.tasks.test.AbstractTestResultAction;
 import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
-import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
 import net.sf.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -39,19 +39,15 @@ public class LogstashWriterTest {
                                              final String url,
                                              final LogstashIndexerDao indexer,
                                              final BuildData data) {
-    return new LogstashWriter(testBuild, error, null) {
+    return new LogstashWriter(testBuild, error, null, testBuild.getCharset()) {
       @Override
-      LogstashIndexerDao getDao() throws InstantiationException {
-        if (indexer == null) {
-          throw new InstantiationException("DoaTestInstantiationException");
-        }
-
+      LogstashIndexerDao getIndexerDao() {
         return indexer;
       }
 
       @Override
       BuildData getBuildData() {
-        assertNotNull("BuildData should never be requested for missing dao.", this.dao);
+        assertNotNull("BuildData should never be requested for missing dao.", this.getDao());
 
         // For testing, providing null data means use the actual method
         if (data == null) {
@@ -100,6 +96,7 @@ public class LogstashWriterTest {
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "Log truncated..."));
     when(mockBuild.getEnvironment(null)).thenReturn(new EnvVars());
     when(mockBuild.getExecutor()).thenReturn(mockExecutor);
+    when(mockBuild.getCharset()).thenReturn(Charset.defaultCharset());
     when(mockExecutor.getOwner()).thenReturn(mockComputer);
     when(mockComputer.getNode()).thenReturn(null);
 
@@ -116,7 +113,6 @@ public class LogstashWriterTest {
       .thenReturn(JSONObject.fromObject("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}"));
 
     Mockito.doNothing().when(mockDao).push(Matchers.anyString());
-    when(mockDao.getIndexerType()).thenReturn(IndexerType.REDIS);
     when(mockDao.getDescription()).thenReturn("localhost:8080");
 
     errorBuffer = new ByteArrayOutputStream();
@@ -156,6 +152,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
     verify(mockBuild).getEnvironment(null);
+    verify(mockBuild).getCharset();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -171,8 +168,7 @@ public class LogstashWriterTest {
 
   @Test
   public void constructorSuccessNoDao() throws Exception {
-    String exMessage = "InstantiationException: DoaTestInstantiationException\n" +
-      "[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n";
+    String exMessage = "[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n";
 
     // Unit under test
     LogstashWriter writer = createLogstashWriter(mockBuild, errorBuffer, "http://my-jenkins-url", null, null);
@@ -180,6 +176,7 @@ public class LogstashWriterTest {
     // Verify results
     assertEquals("Results don't match", exMessage, errorBuffer.toString());
     assertTrue("Connection not broken", writer.isConnectionBroken());
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -196,6 +193,7 @@ public class LogstashWriterTest {
     // Verify results
     assertEquals("Results don't match", "", errorBuffer.toString());
     assertTrue("Connection not broken", writer.isConnectionBroken());
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -211,6 +209,7 @@ public class LogstashWriterTest {
     // Verify results
     assertEquals("Results don't match", "", errorBuffer.toString());
     assertTrue("Connection not broken", writer.isConnectionBroken());
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -228,6 +227,7 @@ public class LogstashWriterTest {
 
     verify(mockDao).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -242,6 +242,7 @@ public class LogstashWriterTest {
     // No error output
     assertEquals("Results don't match", "", errorBuffer.toString());
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getCharset();
 
     verify(mockDao).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
@@ -254,7 +255,7 @@ public class LogstashWriterTest {
 
 
     String msg = "test";
-    String exMessage = "[logstash-plugin]: Failed to send log data to REDIS:localhost:8080.\n" +
+    String exMessage = "[logstash-plugin]: Failed to send log data: localhost:8080.\n" +
       "[logstash-plugin]: No Further logs will be sent to localhost:8080.\n" +
       "java.io.IOException: BOOM!";
 
@@ -287,8 +288,8 @@ public class LogstashWriterTest {
     //Verify calls were made to the dao logging twice, not three times.
     verify(mockDao, times(2)).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
     verify(mockDao, times(2)).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
-    verify(mockDao).getIndexerType();
     verify(mockDao, times(2)).getDescription();
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -304,6 +305,7 @@ public class LogstashWriterTest {
 
     // Verify results
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getCharset();
 
     List<String> expectedErrorLines =  Arrays.asList(
       "[logstash-plugin]: Unable to serialize log data.",

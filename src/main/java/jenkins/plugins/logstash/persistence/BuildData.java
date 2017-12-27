@@ -53,6 +53,7 @@ import java.lang.invoke.MethodHandles;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.FastDateFormat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -65,21 +66,31 @@ import com.google.gson.GsonBuilder;
  */
 public class BuildData {
   // ISO 8601 date format
-  public transient static final DateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+  public transient static final FastDateFormat DATE_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSSZ", null, null);
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
-    int totalCount, skipCount, failCount, passCount;
-    List<FailedTest> failedTestsWithErrorDetail;
-    List<String> failedTests;
+    private int totalCount, skipCount, failCount, passCount;
+    private List<FailedTest> failedTestsWithErrorDetail;
+    private List<String> failedTests;
 
     public static class FailedTest {
-      final String fullName, errorDetails;
+      private final String fullName, errorDetails;
 
-		public FailedTest(String fullName, String errorDetails) {
-			super();
-			this.fullName = fullName;
-			this.errorDetails = errorDetails;
-		}
+      public FailedTest(String fullName, String errorDetails) {
+        super();
+        this.fullName = fullName;
+        this.errorDetails = errorDetails;
+      }
+
+      public String getFullName()
+      {
+        return fullName;
+      }
+
+      public String getErrorDetails()
+      {
+        return errorDetails;
+      }
     }
 
     public TestData() {
@@ -111,6 +122,36 @@ public class BuildData {
           failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(),result.getErrorDetails()));
       }
     }
+
+    public int getTotalCount()
+    {
+        return totalCount;
+    }
+
+    public int getSkipCount()
+    {
+        return skipCount;
+    }
+
+    public int getFailCount()
+    {
+        return failCount;
+    }
+
+    public int getPassCount()
+    {
+        return passCount;
+    }
+
+    public List<FailedTest> getFailedTestsWithErrorDetail()
+    {
+        return failedTestsWithErrorDetail;
+    }
+
+    public List<String> getFailedTests()
+    {
+        return failedTests;
+    }
   }
 
   protected String id;
@@ -138,13 +179,22 @@ public class BuildData {
   public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
     initData(build, currentTime);
 
-    Node node = build.getExecutor().getOwner().getNode();
-    if (node == null) {
-      buildHost = "master";
-      buildLabel = "master";
-    } else {
-      buildHost = StringUtils.isBlank(node.getDisplayName()) ? "master" : node.getDisplayName();
-      buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
+    Executor executor = build.getExecutor();
+    if (executor == null)
+    {
+        buildHost = "master";
+        buildLabel = "master";
+    }
+    else
+    {
+        Node node = executor.getOwner().getNode();
+        if (node == null) {
+          buildHost = "master";
+          buildLabel = "master";
+        } else {
+          buildHost = StringUtils.isBlank(node.getDisplayName()) ? "master" : node.getDisplayName();
+          buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
+        }
     }
 
     // build.getDuration() is always 0 in Notifiers
@@ -186,13 +236,22 @@ public class BuildData {
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener) {
     initData(build, currentTime);
 
-    Node node = build.getExecutor().getOwner().getNode();
-    if (node == null) {
-      buildHost = "master";
-      buildLabel = "master";
-    } else {
-      buildHost = StringUtils.isBlank(node.getDisplayName()) ? "master" : node.getDisplayName();
-      buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
+    Executor executor = build.getExecutor();
+    if (executor == null)
+    {
+        buildHost = "master";
+        buildLabel = "master";
+    }
+    else
+    {
+        Node node = executor.getOwner().getNode();
+        if (node == null) {
+          buildHost = "master";
+          buildLabel = "master";
+        } else {
+          buildHost = StringUtils.isBlank(node.getDisplayName()) ? "master" : node.getDisplayName();
+          buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
+        }
     }
 
     rootProjectName = projectName;
@@ -210,7 +269,16 @@ public class BuildData {
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {
-    result = build.getResult() == null ? null : build.getResult().toString();
+    Result result = build.getResult();
+    if (build.getResult() == null)
+    {
+      this.result = null;
+    }
+    else
+    {
+      this.result = result.toString();
+    }
+    //result = build.getResult() == null ? null : build.getResult().toString();
     id = build.getId();
     projectName = build.getParent().getName();
     fullProjectName = build.getParent().getFullName();

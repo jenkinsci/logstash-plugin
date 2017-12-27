@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -109,13 +109,13 @@ public class ElasticSearchDaoTest {
     dao = createDao("https://localhost", 8200, "logstash", "username", "password");
 
     // Verify results
-    assertEquals("Wrong host name", "https://localhost", dao.host);
-    assertEquals("Wrong port", 8200, dao.port);
-    assertEquals("Wrong key", "logstash", dao.key);
-    assertEquals("Wrong name", "username", dao.username);
-    assertEquals("Wrong password", "password", dao.password);
-    assertEquals("Wrong auth", "dXNlcm5hbWU6cGFzc3dvcmQ=", dao.auth);
-    assertEquals("Wrong uri", new URI("https://localhost:8200/logstash"), dao.uri);
+    assertEquals("Wrong host name", "https://localhost", dao.getHost());
+    assertEquals("Wrong port", 8200, dao.getPort());
+    assertEquals("Wrong key", "logstash", dao.getKey());
+    assertEquals("Wrong name", "username", dao.getUsername());
+    assertEquals("Wrong password", "password", dao.getPassword());
+    assertEquals("Wrong auth", "dXNlcm5hbWU6cGFzc3dvcmQ=", dao.getAuth());
+    assertEquals("Wrong uri", new URI("https://localhost:8200/logstash"), dao.getUri());
   }
 
   @Test
@@ -124,13 +124,13 @@ public class ElasticSearchDaoTest {
     dao = createDao("http://localhost", 8200, "jenkins/logstash", "", "password");
 
     // Verify results
-    assertEquals("Wrong host name", "http://localhost", dao.host);
-    assertEquals("Wrong port", 8200, dao.port);
-    assertEquals("Wrong key", "jenkins/logstash", dao.key);
-    assertEquals("Wrong name", "", dao.username);
-    assertEquals("Wrong password", "password", dao.password);
-    assertEquals("Wrong auth", null, dao.auth);
-    assertEquals("Wrong uri", new URI("http://localhost:8200/jenkins/logstash"), dao.uri);
+    assertEquals("Wrong host name", "http://localhost", dao.getHost());
+    assertEquals("Wrong port", 8200, dao.getPort());
+    assertEquals("Wrong key", "jenkins/logstash", dao.getKey());
+    assertEquals("Wrong name", "", dao.getUsername());
+    assertEquals("Wrong password", "password", dao.getPassword());
+    assertEquals("Wrong auth", null, dao.getAuth());
+    assertEquals("Wrong uri", new URI("http://localhost:8200/jenkins/logstash"), dao.getUri());
   }
 
   @Test
@@ -139,13 +139,13 @@ public class ElasticSearchDaoTest {
     dao = createDao("http://localhost", 8200, "/jenkins//logstash/", "userlongername", null);
 
     // Verify results
-    assertEquals("Wrong host name", "http://localhost", dao.host);
-    assertEquals("Wrong port", 8200, dao.port);
-    assertEquals("Wrong key", "/jenkins//logstash/", dao.key);
-    assertEquals("Wrong name", "userlongername", dao.username);
-    assertEquals("Wrong password", null, dao.password);
-    assertEquals("Wrong auth", "dXNlcmxvbmdlcm5hbWU6", dao.auth);
-    assertEquals("Wrong uri", new URI("http://localhost:8200/jenkins//logstash/"), dao.uri);
+    assertEquals("Wrong host name", "http://localhost", dao.getHost());
+    assertEquals("Wrong port", 8200, dao.getPort());
+    assertEquals("Wrong key", "/jenkins//logstash/", dao.getKey());
+    assertEquals("Wrong name", "userlongername", dao.getUsername());
+    assertEquals("Wrong password", null, dao.getPassword());
+    assertEquals("Wrong auth", "dXNlcmxvbmdlcm5hbWU6", dao.getAuth());
+    assertEquals("Wrong uri", new URI("http://localhost:8200/jenkins//logstash/"), dao.getUri());
   }
 
   @Test

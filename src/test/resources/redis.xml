@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jenkins.plugins.logstash.LogstashConfiguration plugin="logstash@1.4.0-SNAPSHOT">
+  <logstashIndexer class="jenkins.plugins.logstash.configuration.Redis">
+    <host>localhost</host>
+    <port>6379</port>
+    <key>logstash</key>
+    <password>{AQAAABAAAAAQAwaAxyveddM0PF+kR0dYFAymdth9PpitQnvJW0SR6JU=}</password>
+  </logstashIndexer>
+  <dataMigrated>true</dataMigrated>
+</jenkins.plugins.logstash.LogstashConfiguration>

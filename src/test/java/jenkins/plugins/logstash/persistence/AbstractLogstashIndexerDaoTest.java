@@ -4,6 +4,7 @@ import static net.sf.json.test.JSONAssert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -13,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractLogstashIndexerDaoTest {
@@ -66,13 +67,9 @@ public class AbstractLogstashIndexerDaoTest {
   }
 
   private AbstractLogstashIndexerDao getInstance() {
-    return new AbstractLogstashIndexerDao("localhost", -1, "", "", "") {
-
-      public IndexerType getIndexerType() {
-        return IndexerType.REDIS;
-      }
-
-      public void push(String data) throws IOException {}
+    return new AbstractLogstashIndexerDao("localhost", -1) {
+      @Override
+    public void push(String data) throws IOException {}
     };
   }
 }

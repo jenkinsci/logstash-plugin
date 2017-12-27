@@ -40,8 +40,10 @@ import org.apache.http.client.utils.URIBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 import com.google.common.collect.Range;
 
@@ -52,10 +54,14 @@ import com.google.common.collect.Range;
  * @since 1.0.4
  */
 public class ElasticSearchDao extends AbstractLogstashIndexerDao {
-  final HttpClientBuilder clientBuilder;
-  final URI uri;
-  final String auth;
-  final Range<Integer> successCodes = closedOpen(200,300);
+  private final HttpClientBuilder clientBuilder;
+  private final URI uri;
+  private final String auth;
+  private final Range<Integer> successCodes = closedOpen(200,300);
+
+  private String key;
+  private String username;
+  private String password;
 
   //primary constructor used by indexer factory
   public ElasticSearchDao(String host, int port, String key, String username, String password) {
@@ -64,7 +70,11 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   // Factored for unit testing
   ElasticSearchDao(HttpClientBuilder factory, String host, int port, String key, String username, String password) {
-    super(host, port, key, username, password);
+    super(host, port);
+
+    this.key = key;
+    this.username = username;
+    this.password = password;
 
     if (StringUtils.isBlank(key)) {
       throw new IllegalArgumentException("elastic index name is required");
@@ -85,7 +95,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     }
 
     if (StringUtils.isNotBlank(username)) {
-      auth = Base64.encodeBase64String((username + ":" + StringUtils.defaultString(password)).getBytes());
+      auth = Base64.encodeBase64String((username + ":" + StringUtils.defaultString(password)).getBytes(Charset.defaultCharset()));
     } else {
       auth = null;
     }
@@ -93,7 +103,32 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     clientBuilder = factory == null ? HttpClientBuilder.create() : factory;
   }
 
-  HttpPost getHttpPost(String data) {
+  public URI getUri()
+  {
+    return uri;
+  }
+
+  public String getKey()
+  {
+    return key;
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
+  public String getPassword()
+  {
+      return password;
+  }
+
+  String getAuth()
+  {
+    return auth;
+  }
+
+  protected HttpPost getHttpPost(String data) {
     HttpPost postRequest;
     postRequest = new HttpPost(uri);
     StringEntity input = new StringEntity(data, ContentType.APPLICATION_JSON);
@@ -132,7 +167,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     PrintStream stream = null;
     try {
       byteStream = new ByteArrayOutputStream();
-      stream = new PrintStream(byteStream);
+      stream = new PrintStream(byteStream, true, "UTF-8");
 
       try {
         stream.print("HTTP error code: ");
@@ -145,14 +180,15 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
         stream.println(ExceptionUtils.getStackTrace(e));
       }
       stream.flush();
-      return byteStream.toString();
+      return byteStream.toString("UTF-8");
+    }
+    catch (UnsupportedEncodingException e)
+    {
+      return ExceptionUtils.getStackTrace(e);
     } finally {
       if (stream != null) {
         stream.close();
       }
     }
   }
-
-  @Override
-  public IndexerType getIndexerType() { return IndexerType.ELASTICSEARCH; }
 }

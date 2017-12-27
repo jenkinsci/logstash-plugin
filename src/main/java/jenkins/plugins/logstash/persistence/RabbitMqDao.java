@@ -39,7 +39,11 @@ import com.rabbitmq.client.ConnectionFactory;
  * @since 1.0.0
  */
 public class RabbitMqDao extends AbstractLogstashIndexerDao {
-  final ConnectionFactory pool;
+  private final ConnectionFactory pool;
+
+  private String queue;
+  private String username;
+  private String password;
 
   //primary constructor used by indexer factory
   public RabbitMqDao(String host, int port, String key, String username, String password) {
@@ -47,10 +51,14 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
   }
 
   // Factored for unit testing
-  RabbitMqDao(ConnectionFactory factory, String host, int port, String key, String username, String password) {
-    super(host, port, key, username, password);
+  RabbitMqDao(ConnectionFactory factory, String host, int port, String queue, String username, String password) {
+    super(host, port);
 
-    if (StringUtils.isBlank(key)) {
+    this.queue = queue;
+    this.username = username;
+    this.password = password;
+
+    if (StringUtils.isBlank(queue)) {
       throw new IllegalArgumentException("rabbit queue name is required");
     }
 
@@ -67,6 +75,22 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
     }
   }
 
+  public String getQueue()
+  {
+    return queue;
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
+  public String getPassword()
+  {
+      return password;
+  }
+
+
   @Override
   public void push(String data) throws IOException {
     Connection connection = null;
@@ -77,26 +101,21 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
 
       // Ensure the queue exists
       try {
-        channel.queueDeclarePassive(key);
+        channel.queueDeclarePassive(queue);
       } catch (IOException e) {
         // The queue does not exist and the channel has been closed
         finalizeChannel(channel);
 
         // Create the queue
         channel = connection.createChannel();
-        channel.queueDeclare(key, true, false, false, null);
+        channel.queueDeclare(queue, true, false, false, null);
       }
 
-      channel.basicPublish("", key, null, data.getBytes());
+      channel.basicPublish("", queue, null, data.getBytes(getCharset()));
     } finally {
       finalizeChannel(channel);
       finalizeConnection(connection);
     }
-  }
-
-  @Override
-  public IndexerType getIndexerType() {
-    return IndexerType.RABBIT_MQ;
   }
 
   private void finalizeConnection(Connection connection) {

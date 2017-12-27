@@ -63,66 +63,72 @@ public class LogstashInstallation extends ToolInstallation {
 
   @Extension
   public static final class Descriptor extends ToolDescriptor<LogstashInstallation> {
-    public IndexerType type;
-    public SyslogFormat syslogFormat;
-    public SyslogProtocol syslogProtocol;
-    public String host;
-    public Integer port = -1;
-    public String username;
-    public String password;
-    public String key;
+    private transient IndexerType type;
+    private transient SyslogFormat syslogFormat;
+    private transient SyslogProtocol syslogProtocol;
+    private transient String host;
+    private transient Integer port = -1;
+    private transient String username;
+    private transient String password;
+    private transient String key;
 
     public Descriptor() {
       super();
       load();
     }
 
-    @Override
-    public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-      req.bindJSON(this, formData.getJSONObject("logstash"));
-      save();
-      return super.configure(req, formData);
+
+    public IndexerType getType()
+    {
+      return type;
     }
 
-    @Override
-    public ToolInstallation newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-      req.bindJSON(this, formData.getJSONObject("logstash"));
-      save();
-      return super.newInstance(req, formData);
+
+    public SyslogFormat getSyslogFormat()
+    {
+      return syslogFormat;
     }
+
+
+    public SyslogProtocol getSyslogProtocol()
+    {
+      return syslogProtocol;
+    }
+
+
+    public String getHost()
+    {
+      return host;
+    }
+
+
+    public Integer getPort()
+    {
+      return port;
+    }
+
+
+    public String getUsername()
+    {
+      return username;
+    }
+
+
+    public String getPassword()
+    {
+      return password;
+    }
+
+
+    public String getKey()
+    {
+      return key;
+    }
+
 
     @Override
     public String getDisplayName() {
       return Messages.DisplayName();
-    }
-
-    /*
-     * Form validation methods
-     */
-    public FormValidation doCheckInteger(@QueryParameter("value") String value) {
-      try {
-        Integer.parseInt(value);
-      } catch (NumberFormatException e) {
-        return FormValidation.error(Messages.ValueIsInt());
-      }
-
-      return FormValidation.ok();
-    }
-
-    public FormValidation doCheckHost(@QueryParameter("value") String value) {
-      if (StringUtils.isBlank(value)) {
-        return FormValidation.warning(Messages.PleaseProvideHost());
-      }
-
-      return FormValidation.ok();
-    }
-
-    public FormValidation doCheckString(@QueryParameter("value") String value) {
-      if (StringUtils.isBlank(value)) {
-        return FormValidation.error(Messages.ValueIsRequired());
-      }
-
-      return FormValidation.ok();
     }
   }
 }

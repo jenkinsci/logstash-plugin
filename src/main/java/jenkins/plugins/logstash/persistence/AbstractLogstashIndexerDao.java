@@ -24,6 +24,7 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.List;
 
@@ -38,20 +39,16 @@ import net.sf.json.JSONObject;
  * @since 1.0.0
  */
 public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
-  protected final String host;
-  protected final int port;
-  protected final String key;
-  protected final String username;
-  protected final String password;
+  private final String host;
+  private final int port;
+  private Charset charset;
 
-  public AbstractLogstashIndexerDao(String host, int port, String key, String username, String password) {
+  public AbstractLogstashIndexerDao(String host, int port)
+  {
     this.host = host;
     this.port = port;
-    this.key = key;
-    this.username = username;
-    this.password = password;
-
-    if (StringUtils.isBlank(host)) {
+    if (StringUtils.isBlank(host))
+    {
       throw new IllegalArgumentException("host name is required");
     }
   }
@@ -68,6 +65,27 @@ public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
     payload.put("@version", 1);
 
     return payload;
+  }
+
+  public Charset getCharset()
+  {
+    return charset;
+  }
+
+  @Override
+  public void setCharset(Charset charset)
+  {
+    this.charset = charset;
+  }
+
+  public String getHost()
+  {
+    return host;
+  }
+
+  public int getPort()
+  {
+    return port;
   }
 
   @Override

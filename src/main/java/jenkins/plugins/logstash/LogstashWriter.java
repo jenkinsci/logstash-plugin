@@ -30,7 +30,6 @@ import hudson.model.TaskListener;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.persistence.BuildData;
-import jenkins.plugins.logstash.persistence.IndexerDaoFactory;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +37,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -53,18 +53,20 @@ import java.util.List;
  */
 public class LogstashWriter {
 
-  final OutputStream errorStream;
-  final Run<?, ?> build;
-  final TaskListener listener;
-  final BuildData buildData;
-  final String jenkinsUrl;
-  final LogstashIndexerDao dao;
+  private final OutputStream errorStream;
+  private final Run<?, ?> build;
+  private final TaskListener listener;
+  private final BuildData buildData;
+  private final String jenkinsUrl;
+  private final LogstashIndexerDao dao;
   private boolean connectionBroken;
+  private Charset charset;
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
     this.listener = listener;
+    this.charset = charset;
     this.dao = this.getDaoOrNull();
     if (this.dao == null) {
       this.jenkinsUrl = "";
@@ -128,9 +130,13 @@ public class LogstashWriter {
   }
 
   // Method to encapsulate calls for unit-testing
-  LogstashIndexerDao getDao() throws InstantiationException {
-    LogstashInstallation.Descriptor descriptor = LogstashInstallation.getLogstashDescriptor();
-    return IndexerDaoFactory.getInstance(descriptor.type, descriptor.host, descriptor.port, descriptor.key, descriptor.username, descriptor.password);
+  LogstashIndexerDao getIndexerDao() {
+    return LogstashConfiguration.getInstance().getIndexerInstance();
+  }
+
+  LogstashIndexerDao getDao()
+  {
+      return dao;
   }
 
   BuildData getBuildData() {
@@ -153,7 +159,7 @@ public class LogstashWriter {
     try {
       dao.push(payload.toString());
     } catch (IOException e) {
-      String msg = "[logstash-plugin]: Failed to send log data to " + dao.getIndexerType() + ":" + dao.getDescription() + ".\n" +
+      String msg = "[logstash-plugin]: Failed to send log data: " + dao.getDescription() + ".\n" +
         "[logstash-plugin]: No Further logs will be sent to " + dao.getDescription() + ".\n" +
         ExceptionUtils.getStackTrace(e);
       logErrorMessage(msg);
@@ -168,8 +174,13 @@ public class LogstashWriter {
    */
   private LogstashIndexerDao getDaoOrNull() {
     try {
-      return getDao();
-    } catch (InstantiationException e) {
+      LogstashIndexerDao dao = getIndexerDao();
+      if (dao == null)
+      {
+        logErrorMessage("[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n");
+      }
+      return dao;
+    } catch (IllegalArgumentException e) {
       String msg =  ExceptionUtils.getMessage(e) + "\n" +
         "[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n";
 
@@ -184,11 +195,16 @@ public class LogstashWriter {
   private void logErrorMessage(String msg) {
     try {
       connectionBroken = true;
-      errorStream.write(msg.getBytes());
+      errorStream.write(msg.getBytes(charset));
       errorStream.flush();
     } catch (IOException ex) {
       // This should never happen, but if it does we just have to let it go.
       ex.printStackTrace();
     }
+  }
+
+  public Charset getCharset()
+  {
+      return charset;
   }
 }
