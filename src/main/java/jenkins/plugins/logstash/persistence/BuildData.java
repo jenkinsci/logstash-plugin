@@ -138,7 +138,7 @@ public class BuildData {
   public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
     initData(build, currentTime);
 
-    Node node = build.getBuiltOn();
+    Node node = build.getExecutor().getOwner().getNode();
     if (node == null) {
       buildHost = "master";
       buildLabel = "master";
@@ -186,11 +186,13 @@ public class BuildData {
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener) {
     initData(build, currentTime);
 
-    Executor executor = build.getExecutor();
-    if (executor == null) {
+    Node node = build.getExecutor().getOwner().getNode();
+    if (node == null) {
       buildHost = "master";
+      buildLabel = "master";
     } else {
-      buildHost = StringUtils.isBlank(executor.getDisplayName()) ? "master" : executor.getDisplayName();
+      buildHost = StringUtils.isBlank(node.getDisplayName()) ? "master" : node.getDisplayName();
+      buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
     }
 
     rootProjectName = projectName;

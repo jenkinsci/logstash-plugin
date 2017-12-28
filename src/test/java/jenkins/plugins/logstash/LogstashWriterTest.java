@@ -2,6 +2,8 @@ package jenkins.plugins.logstash;
 
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
+import hudson.model.Computer;
+import hudson.model.Executor;
 import hudson.model.Project;
 import hudson.model.Result;
 import hudson.model.TaskListener;
@@ -15,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -75,6 +77,9 @@ public class LogstashWriterTest {
 
   @Mock BuildData mockBuildData;
   @Mock TaskListener mockListener;
+  @Mock Computer mockComputer;
+  @Mock Executor mockExecutor;
+
 
   @Captor ArgumentCaptor<List<String>> logLinesCaptor;
 
@@ -85,7 +90,6 @@ public class LogstashWriterTest {
     when(mockBuild.getDisplayName()).thenReturn("LogstashNotifierTest");
     when(mockBuild.getProject()).thenReturn(mockProject);
     when(mockBuild.getParent()).thenReturn(mockProject);
-    when(mockBuild.getBuiltOn()).thenReturn(null);
     when(mockBuild.getNumber()).thenReturn(123456);
     when(mockBuild.getTimestamp()).thenReturn(new GregorianCalendar());
     when(mockBuild.getRootBuild()).thenReturn(mockBuild);
@@ -93,10 +97,12 @@ public class LogstashWriterTest {
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
     when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
-    when(mockBuild.getLog(0)).thenReturn(Arrays.asList());
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "Log truncated..."));
-    when(mockBuild.getLog(Integer.MAX_VALUE)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "line 4"));
     when(mockBuild.getEnvironment(null)).thenReturn(new EnvVars());
+    when(mockBuild.getExecutor()).thenReturn(mockExecutor);
+    when(mockExecutor.getOwner()).thenReturn(mockComputer);
+    when(mockComputer.getNode()).thenReturn(null);
+
 
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
@@ -142,7 +148,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getDescription();
     verify(mockBuild).getUrl();
     verify(mockBuild).getAction(AbstractTestResultAction.class);
-    verify(mockBuild).getBuiltOn();
+    verify(mockBuild).getExecutor();
     verify(mockBuild, times(2)).getNumber();
     verify(mockBuild).getTimestamp();
     verify(mockBuild, times(4)).getRootBuild();

@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.599</version>
+    <version>1.608</version>
   </parent>
 
   <repositories>
@@ -65,8 +65,6 @@
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
       <version>2.6.0</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -88,8 +86,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>2.1.0</version>
-      <type>jar</type>
+      <version>2.10.0</version>
       <scope>test</scope>
     </dependency>
     
@@ -126,6 +123,18 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>structs</artifactId>
       <version>1.2</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.powermock</groupId>
+    	<artifactId>powermock-api-mockito2</artifactId>
+    	<version>2.0.0-beta.5</version>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.powermock</groupId>
+    	<artifactId>powermock-module-junit4</artifactId>
+    	<version>2.0.0-beta.5</version>
+    	<scope>test</scope>
     </dependency>
   </dependencies>
 

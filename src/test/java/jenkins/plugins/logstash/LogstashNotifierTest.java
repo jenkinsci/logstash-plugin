@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 @SuppressWarnings("rawtypes")
@@ -76,18 +75,21 @@ public class LogstashNotifierTest {
   @Mock LogstashWriter mockWriter;
   @Mock Launcher mockLauncher;
   @Mock BuildListener mockListener;
+  @Mock AbstractProject mockProject;
 
   ByteArrayOutputStream errorBuffer;
   PrintStream errorStream;
   LogstashNotifier notifier;
   MockRun mockRun;
 
+
   @Before
   public void before() throws Exception {
     errorBuffer = new ByteArrayOutputStream();
     errorStream = new PrintStream(errorBuffer, true);
 
-    mockRun = new MockRun(mock(AbstractProject.class));
+    when(mockProject.assignBuildNumber()).thenReturn(1);
+    mockRun = new MockRun(mockProject);
 
     when(mockListener.getLogger()).thenReturn(errorStream);
 
