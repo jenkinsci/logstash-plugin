@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,6 +33,7 @@ public class LogstashOutputStreamTest {
     buffer = new ByteArrayOutputStream();
     Mockito.doNothing().when(mockWriter).write(anyString());
     when(mockWriter.isConnectionBroken()).thenReturn(false);
+    when(mockWriter.getCharset()).thenReturn(Charset.defaultCharset());
   }
 
   @After
@@ -61,6 +63,7 @@ public class LogstashOutputStreamTest {
     assertEquals("Results don't match", msg, buffer.toString());
     verify(mockWriter).isConnectionBroken();
     verify(mockWriter).write(msg);
+    verify(mockWriter).getCharset();
   }
 
   @Test
@@ -102,6 +105,7 @@ public class LogstashOutputStreamTest {
     //Verify calls were made to the dao logging twice, not three times.
     verify(mockWriter, times(2)).write(msg);
     verify(mockWriter, times(3)).isConnectionBroken();
+    verify(mockWriter, times(2)).getCharset();
   }
 
   @Test

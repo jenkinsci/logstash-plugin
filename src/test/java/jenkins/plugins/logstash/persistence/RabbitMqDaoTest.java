@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -36,6 +37,8 @@ public class RabbitMqDaoTest {
       verify(mockPool, atLeastOnce()).setUsername(username);
       verify(mockPool, atLeastOnce()).setPassword(password);
     }
+
+    factory.setCharset(Charset.defaultCharset());
 
     return factory;
   }

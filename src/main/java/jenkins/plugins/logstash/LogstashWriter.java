@@ -38,6 +38,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -60,11 +61,13 @@ public class LogstashWriter {
   final String jenkinsUrl;
   final LogstashIndexerDao dao;
   private boolean connectionBroken;
+  private Charset charset;
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
     this.listener = listener;
+    this.charset = charset;
     this.dao = this.getDaoOrNull();
     if (this.dao == null) {
       this.jenkinsUrl = "";
@@ -72,7 +75,17 @@ public class LogstashWriter {
     } else {
       this.jenkinsUrl = getJenkinsUrl();
       this.buildData = getBuildData();
+      dao.setCharset(charset);
     }
+  }
+
+  /**
+   * gets the charset that Jenkins is using during this build.
+   * @return
+   */
+  public Charset getCharset()
+  {
+    return charset;
   }
 
   /**
@@ -184,7 +197,7 @@ public class LogstashWriter {
   private void logErrorMessage(String msg) {
     try {
       connectionBroken = true;
-      errorStream.write(msg.getBytes());
+      errorStream.write(msg.getBytes(charset));
       errorStream.flush();
     } catch (IOException ex) {
       // This should never happen, but if it does we just have to let it go.

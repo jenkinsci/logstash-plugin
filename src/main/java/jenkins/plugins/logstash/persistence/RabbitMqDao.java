@@ -87,7 +87,7 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
         channel.queueDeclare(key, true, false, false, null);
       }
 
-      channel.basicPublish("", key, null, data.getBytes());
+      channel.basicPublish("", key, null, data.getBytes(getCharset()));
     } finally {
       finalizeChannel(channel);
       finalizeConnection(connection);

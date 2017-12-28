@@ -46,7 +46,6 @@ import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
 
 /**
  * Build wrapper that decorates the build's logger to insert a
- * {@link LogstashNote} on each output line.
  *
  * @author K Jonathan Harker
  */
@@ -102,13 +101,14 @@ public class LogstashBuildWrapper extends BuildWrapper {
     return los;
   }
 
+  @Override
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl) super.getDescriptor();
   }
 
   // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
-    return new LogstashWriter(build, errorStream, null);
+    return new LogstashWriter(build, errorStream, null, build.getCharset());
   }
 
   /**

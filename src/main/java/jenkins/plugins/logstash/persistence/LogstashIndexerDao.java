@@ -25,6 +25,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import net.sf.json.JSONObject;
@@ -42,7 +43,7 @@ public interface LogstashIndexerDao {
     ELASTICSEARCH,
     SYSLOG
   }
-  
+
   static enum SyslogFormat {
 	RFC5424,
 	RFC3164
@@ -51,7 +52,9 @@ public interface LogstashIndexerDao {
   static enum SyslogProtocol {
 	UDP
   }
-  
+
+  public void setCharset(Charset charset);
+
   String getDescription();
 
   IndexerType getIndexerType();

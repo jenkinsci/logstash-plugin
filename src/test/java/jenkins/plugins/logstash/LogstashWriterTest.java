@@ -22,6 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -39,7 +40,7 @@ public class LogstashWriterTest {
                                              final String url,
                                              final LogstashIndexerDao indexer,
                                              final BuildData data) {
-    return new LogstashWriter(testBuild, error, null) {
+    return new LogstashWriter(testBuild, error, null, testBuild.getCharset()) {
       @Override
       LogstashIndexerDao getDao() throws InstantiationException {
         if (indexer == null) {
@@ -100,6 +101,7 @@ public class LogstashWriterTest {
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "Log truncated..."));
     when(mockBuild.getEnvironment(null)).thenReturn(new EnvVars());
     when(mockBuild.getExecutor()).thenReturn(mockExecutor);
+    when(mockBuild.getCharset()).thenReturn(Charset.defaultCharset());
     when(mockExecutor.getOwner()).thenReturn(mockComputer);
     when(mockComputer.getNode()).thenReturn(null);
 
@@ -156,6 +158,8 @@ public class LogstashWriterTest {
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
     verify(mockBuild).getEnvironment(null);
+    verify(mockBuild).getCharset();
+    verify(mockDao).setCharset(Charset.defaultCharset());
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -180,6 +184,7 @@ public class LogstashWriterTest {
     // Verify results
     assertEquals("Results don't match", exMessage, errorBuffer.toString());
     assertTrue("Connection not broken", writer.isConnectionBroken());
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -196,6 +201,7 @@ public class LogstashWriterTest {
     // Verify results
     assertEquals("Results don't match", "", errorBuffer.toString());
     assertTrue("Connection not broken", writer.isConnectionBroken());
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -211,6 +217,7 @@ public class LogstashWriterTest {
     // Verify results
     assertEquals("Results don't match", "", errorBuffer.toString());
     assertTrue("Connection not broken", writer.isConnectionBroken());
+    verify(mockBuild).getCharset();
   }
 
   @Test
@@ -228,6 +235,9 @@ public class LogstashWriterTest {
 
     verify(mockDao).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
+    verify(mockDao).setCharset(Charset.defaultCharset());
+    verify(mockBuild).getCharset();
+
   }
 
   @Test
@@ -242,9 +252,11 @@ public class LogstashWriterTest {
     // No error output
     assertEquals("Results don't match", "", errorBuffer.toString());
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getCharset();
 
     verify(mockDao).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
+    verify(mockDao).setCharset(Charset.defaultCharset());
   }
 
   @Test
@@ -289,6 +301,9 @@ public class LogstashWriterTest {
     verify(mockDao, times(2)).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).getIndexerType();
     verify(mockDao, times(2)).getDescription();
+    verify(mockDao).setCharset(Charset.defaultCharset());
+    verify(mockBuild).getCharset();
+
   }
 
   @Test
@@ -304,12 +319,14 @@ public class LogstashWriterTest {
 
     // Verify results
     verify(mockBuild).getLog(3);
+    verify(mockBuild).getCharset();
 
     List<String> expectedErrorLines =  Arrays.asList(
       "[logstash-plugin]: Unable to serialize log data.",
       "java.io.IOException: Unable to read log file");
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), logLinesCaptor.capture());
+    verify(mockDao).setCharset(Charset.defaultCharset());
     List<String> actualLogLines = logLinesCaptor.getValue();
 
     assertThat("The exception was not sent to Logstash", actualLogLines.get(0), containsString(expectedErrorLines.get(0)));
