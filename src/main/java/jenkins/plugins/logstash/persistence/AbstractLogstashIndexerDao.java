@@ -58,12 +58,22 @@ public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
     }
   }
 
+  /**
+   * Sets the charset used to push data to the indexer
+   *
+   *@param charset The charset to push data
+   */
   @Override
   public void setCharset(Charset charset)
   {
     this.charset = charset;
   }
 
+  /**
+   * Gets the configured charset used to push data to the indexer
+   *
+   * @return charste to push data
+   */
   public Charset getCharset()
   {
     return charset;
