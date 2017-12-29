@@ -64,7 +64,7 @@ import com.google.gson.GsonBuilder;
  */
 public class BuildData {
   // ISO 8601 date format
-  public transient static final FastDateFormat DATE_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  public transient static final FastDateFormat DATE_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
     int totalCount, skipCount, failCount, passCount;
