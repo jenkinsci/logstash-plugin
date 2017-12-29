@@ -121,7 +121,7 @@ public class BuildDataTest {
     verify(mockProject).getFullName();
 
     verify(mockBuild).getId();
-    verify(mockBuild, times(2)).getResult();
+    verify(mockBuild).getResult();
     verify(mockBuild, times(2)).getParent();
     verify(mockBuild).getDisplayName();
     verify(mockBuild).getFullDisplayName();

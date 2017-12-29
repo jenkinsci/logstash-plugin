@@ -141,7 +141,7 @@ public class LogstashWriterTest {
     // Verify that the BuildData constructor is what is being called here.
     // This also lets us verify that in the instantiation failure cases we do not construct BuildData.
     verify(mockBuild).getId();
-    verify(mockBuild, times(2)).getResult();
+    verify(mockBuild).getResult();
     verify(mockBuild, times(2)).getParent();
     verify(mockBuild, times(2)).getProject();
     verify(mockBuild, times(1)).getStartTimeInMillis();
