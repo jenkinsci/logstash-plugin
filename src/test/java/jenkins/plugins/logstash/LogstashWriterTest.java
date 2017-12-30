@@ -52,7 +52,7 @@ public class LogstashWriterTest {
 
       @Override
       BuildData getBuildData() {
-        assertNotNull("BuildData should never be requested for missing dao.", this.dao);
+        assertNotNull("BuildData should never be requested for missing dao.", this.getDao());
 
         // For testing, providing null data means use the actual method
         if (data == null) {
