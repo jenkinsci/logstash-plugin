@@ -59,6 +59,8 @@ public class LogstashInstallation extends ToolInstallation {
     super(name, home, properties);
   }
 
+  @SuppressFBWarnings(value="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+      justification="Jenkins 2.0 will never return null. So wait for upgrade.")
   public static Descriptor getLogstashDescriptor() {
     return (Descriptor) Jenkins.getInstance().getDescriptor(LogstashInstallation.class);
   }

@@ -36,6 +36,8 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -161,6 +163,8 @@ public class LogstashWriter {
     }
   }
 
+  @SuppressFBWarnings(value="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+      justification="Jenkins 2.0 will never return null. So wait for upgrade.")
   String getJenkinsUrl() {
     return Jenkins.getInstance().getRootUrl();
   }
