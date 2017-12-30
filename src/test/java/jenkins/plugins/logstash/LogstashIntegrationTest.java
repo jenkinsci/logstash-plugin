@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -24,15 +25,15 @@ import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.model.Slave;
 import hudson.model.queue.QueueTaskFuture;
+import jenkins.plugins.logstash.LogstashInstallation.Descriptor;
 import jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao;
 import jenkins.plugins.logstash.persistence.IndexerDaoFactory;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"javax.crypto.*"})
-@PrepareForTest(IndexerDaoFactory.class)
+@PrepareForTest({ IndexerDaoFactory.class, LogstashInstallation.class })
 public class LogstashIntegrationTest
 {
     @Rule
@@ -44,25 +45,28 @@ public class LogstashIntegrationTest
 
     private MemoryDao memoryDao;
 
+    @Mock
+    Descriptor descriptor;
+
     @Before
     public void setup() throws Exception
     {
         PowerMockito.mockStatic(IndexerDaoFactory.class);
-        LogstashInstallation.Descriptor descriptor = LogstashInstallation.getLogstashDescriptor();
-        descriptor.type = IndexerType.SYSLOG;
-        descriptor.host = "localhost";
-        descriptor.port = 1;
-        descriptor.username = "username";
-        descriptor.password = "password";
-        descriptor.key = "key";
+        PowerMockito.mockStatic(LogstashInstallation.class);
+        when(LogstashInstallation.getLogstashDescriptor()).thenReturn(descriptor);
+        when(descriptor.getType()).thenReturn(IndexerType.SYSLOG);
+        when(descriptor.getHost()).thenReturn("localhost");
+        when(descriptor.getPort()).thenReturn(1);
+        when(descriptor.getUsername()).thenReturn("username");
+        when(descriptor.getKey()).thenReturn("password");
+        when(descriptor.getKey()).thenReturn("key");
 
         memoryDao = new MemoryDao();
-        when(IndexerDaoFactory.getInstance(IndexerType.SYSLOG, descriptor.host, descriptor.port, descriptor.key,
-                descriptor.username, descriptor.password)).thenReturn(memoryDao);
+        when(IndexerDaoFactory.getInstance(IndexerType.SYSLOG, descriptor.getHost(), descriptor.getPort(),
+            descriptor.getKey(),descriptor.getUsername(), descriptor.getPassword())).thenReturn(memoryDao);
         slave = jenkins.createSlave();
         slave.setLabelString("myLabel");
         project = jenkins.createFreeStyleProject();
-
     }
 
     @Test

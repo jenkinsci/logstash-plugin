@@ -54,12 +54,12 @@ import java.util.List;
  */
 public class LogstashWriter {
 
-  final OutputStream errorStream;
-  final Run<?, ?> build;
-  final TaskListener listener;
-  final BuildData buildData;
-  final String jenkinsUrl;
-  final LogstashIndexerDao dao;
+  private final OutputStream errorStream;
+  private final Run<?, ?> build;
+  private final TaskListener listener;
+  private final BuildData buildData;
+  private final String jenkinsUrl;
+  private final LogstashIndexerDao dao;
   private boolean connectionBroken;
   private Charset charset;
 
@@ -86,6 +86,12 @@ public class LogstashWriter {
   public Charset getCharset()
   {
     return charset;
+  }
+
+  // for testing only
+  LogstashIndexerDao getDao()
+  {
+    return dao;
   }
 
   /**
@@ -141,9 +147,10 @@ public class LogstashWriter {
   }
 
   // Method to encapsulate calls for unit-testing
-  LogstashIndexerDao getDao() throws InstantiationException {
+  LogstashIndexerDao createDao() throws InstantiationException {
     LogstashInstallation.Descriptor descriptor = LogstashInstallation.getLogstashDescriptor();
-    return IndexerDaoFactory.getInstance(descriptor.type, descriptor.host, descriptor.port, descriptor.key, descriptor.username, descriptor.password);
+    return IndexerDaoFactory.getInstance(descriptor.getType(), descriptor.getHost(), descriptor.getPort(),
+        descriptor.getKey(), descriptor.getUsername(), descriptor.getPassword());
   }
 
   BuildData getBuildData() {
@@ -181,7 +188,7 @@ public class LogstashWriter {
    */
   private LogstashIndexerDao getDaoOrNull() {
     try {
-      return getDao();
+      return createDao();
     } catch (InstantiationException e) {
       String msg =  ExceptionUtils.getMessage(e) + "\n" +
         "[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n";

@@ -17,8 +17,8 @@ public class SyslogDao extends AbstractLogstashIndexerDao {
 
   private String syslogFormat = null;
   private final static Logger LOG = Logger.getLogger(SyslogDao.class.getName());
-  final UdpSyslogMessageSender messageSender;
-  
+  private final UdpSyslogMessageSender messageSender;
+
   public SyslogDao(String host, int port, String key, String username, String password) {
     this(null, host, port, key, username, password);
   }
@@ -29,15 +29,15 @@ public class SyslogDao extends AbstractLogstashIndexerDao {
   }
 
   public void setSyslogFormat(String format) {
-	syslogFormat = format;  	  
+	syslogFormat = format;
   }
-   
+
   @Override
   public void push(String data) throws IOException {
-	  
+
     try {
 	  Descriptor logstashPluginConfig = (Descriptor) Jenkins.getInstance().getDescriptor(LogstashInstallation.class);
-	  syslogFormat = logstashPluginConfig.syslogFormat.toString();	  
+	  syslogFormat = logstashPluginConfig.getSyslogFormat().toString();
 	} catch (NullPointerException e){
 	  LOG.log(Level.WARNING, "Unable to read syslogFormat in the jenkins logstash plugin configuration");
 	}
@@ -58,7 +58,7 @@ public class SyslogDao extends AbstractLogstashIndexerDao {
       messageSender.setMessageFormat(MessageFormat.RFC_3164);
     }
     else {
-      messageSender.setMessageFormat(MessageFormat.RFC_5424);	
+      messageSender.setMessageFormat(MessageFormat.RFC_5424);
     }
     // Sending the message
     messageSender.sendMessage(data);

@@ -38,6 +38,7 @@ import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
+import jenkins.plugins.logstash.persistence.BuildData.TestData;
 import net.sf.json.JSONObject;
 import net.sf.json.test.JSONAssert;
 
@@ -239,12 +240,14 @@ public class BuildDataTest {
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
 
-    Assert.assertEquals("Incorrect test results", 123, buildData.testResults.totalCount);
-    Assert.assertEquals("Incorrect test results", 0, buildData.testResults.skipCount);
-    Assert.assertEquals("Incorrect test results", 1, buildData.testResults.failCount);
-    Assert.assertEquals("Incorrect test details count", 1, buildData.testResults.failedTestsWithErrorDetail.size());
-    Assert.assertEquals("Incorrect failed test error details", "ErrorDetails Test", buildData.testResults.failedTestsWithErrorDetail.get(0).errorDetails);
-    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", buildData.testResults.failedTestsWithErrorDetail.get(0).fullName);
+    TestData testResults = buildData.getTestResults();
+
+    Assert.assertEquals("Incorrect test results", 123, testResults.getTotalCount());
+    Assert.assertEquals("Incorrect test results", 0, testResults.getSkipCount());
+    Assert.assertEquals("Incorrect test results", 1, testResults.getFailCount());
+    Assert.assertEquals("Incorrect test details count", 1, testResults.getFailedTestsWithErrorDetail().size());
+    Assert.assertEquals("Incorrect failed test error details", "ErrorDetails Test", testResults.getFailedTestsWithErrorDetail().get(0).getErrorDetails());
+    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", testResults.getFailedTestsWithErrorDetail().get(0).getFullName());
 
     verifyMocks();
     verifyTestResultActions();
@@ -256,8 +259,9 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+    TestData testResults = buildData.getTestResults();
 
-    Assert.assertEquals("Incorrect test results", null, buildData.testResults);
+    Assert.assertEquals("Incorrect test results", null, testResults);
 
     verifyMocks();
   }

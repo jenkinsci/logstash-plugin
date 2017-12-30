@@ -43,13 +43,19 @@ import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsOutputStream;
  * @author Rusty Gerard
  */
 public class LogstashOutputStream extends LineTransformationOutputStream {
-  final OutputStream delegate;
-  final LogstashWriter logstash;
+  private final OutputStream delegate;
+  private final LogstashWriter logstash;
 
   public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash) {
     super();
     this.delegate = delegate;
     this.logstash = logstash;
+  }
+
+  // for testing purposes
+  LogstashWriter getLogstashWriter()
+  {
+    return logstash;
   }
 
   public MaskPasswordsOutputStream maskPasswords(List<VarPasswordPair> passwords) {

@@ -54,8 +54,8 @@ import org.jenkinsci.Symbol;
  */
 public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
-  public int maxLines;
-  public boolean failBuild;
+  private int maxLines;
+  private boolean failBuild;
 
   @DataBoundConstructor
   public LogstashNotifier(int maxLines, boolean failBuild) {

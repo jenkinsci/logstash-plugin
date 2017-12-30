@@ -42,7 +42,7 @@ public class LogstashWriterTest {
                                              final BuildData data) {
     return new LogstashWriter(testBuild, error, null, testBuild.getCharset()) {
       @Override
-      LogstashIndexerDao getDao() throws InstantiationException {
+      protected LogstashIndexerDao createDao() throws InstantiationException {
         if (indexer == null) {
           throw new InstantiationException("DoaTestInstantiationException");
         }

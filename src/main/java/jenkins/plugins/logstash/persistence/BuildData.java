@@ -64,21 +64,31 @@ import com.google.gson.GsonBuilder;
  */
 public class BuildData {
   // ISO 8601 date format
-  public transient static final FastDateFormat DATE_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
+  private transient static final FastDateFormat DATE_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
-    int totalCount, skipCount, failCount, passCount;
-    List<FailedTest> failedTestsWithErrorDetail;
-    List<String> failedTests;
+    private int totalCount, skipCount, failCount, passCount;
+    private List<FailedTest> failedTestsWithErrorDetail;
+    private List<String> failedTests;
 
     public static class FailedTest {
-      final String fullName, errorDetails;
+      private final String fullName, errorDetails;
 
-		public FailedTest(String fullName, String errorDetails) {
-			super();
-			this.fullName = fullName;
-			this.errorDetails = errorDetails;
-		}
+      public FailedTest(String fullName, String errorDetails) {
+        super();
+        this.fullName = fullName;
+        this.errorDetails = errorDetails;
+      }
+
+      public String getFullName()
+      {
+        return fullName;
+      }
+
+      public String getErrorDetails()
+      {
+        return errorDetails;
+      }
     }
 
     public TestData() {
@@ -110,28 +120,58 @@ public class BuildData {
           failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(),result.getErrorDetails()));
       }
     }
+
+    public int getTotalCount()
+    {
+        return totalCount;
+    }
+
+    public int getSkipCount()
+    {
+        return skipCount;
+    }
+
+    public int getFailCount()
+    {
+        return failCount;
+    }
+
+    public int getPassCount()
+    {
+        return passCount;
+    }
+
+    public List<FailedTest> getFailedTestsWithErrorDetail()
+    {
+        return failedTestsWithErrorDetail;
+    }
+
+    public List<String> getFailedTests()
+    {
+        return failedTests;
+    }
   }
 
-  protected String id;
-  protected String result;
-  protected String projectName;
-  protected String fullProjectName;
-  protected String displayName;
-  protected String fullDisplayName;
-  protected String description;
-  protected String url;
-  protected String buildHost;
-  protected String buildLabel;
-  protected int buildNum;
-  protected long buildDuration;
-  protected transient String timestamp; // This belongs in the root object
-  protected String rootProjectName;
-  protected String rootFullProjectName;
-  protected String rootProjectDisplayName;
-  protected int rootBuildNum;
-  protected Map<String, String> buildVariables;
-  protected Set<String> sensitiveBuildVariables;
-  protected TestData testResults = null;
+  private String id;
+  private String result;
+  private String projectName;
+  private String fullProjectName;
+  private String displayName;
+  private String fullDisplayName;
+  private String description;
+  private String url;
+  private String buildHost;
+  private String buildLabel;
+  private int buildNum;
+  private long buildDuration;
+  private transient String timestamp; // This belongs in the root object
+  private String rootProjectName;
+  private String rootFullProjectName;
+  private String rootProjectDisplayName;
+  private int rootBuildNum;
+  private Map<String, String> buildVariables;
+  private Set<String> sensitiveBuildVariables;
+  private TestData testResults = null;
 
   // Freestyle project build
   public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
@@ -396,5 +436,10 @@ public class BuildData {
 
   public void setTestResults(TestData testResults) {
     this.testResults = testResults;
+  }
+
+  public static FastDateFormat getDateFormatter()
+  {
+    return DATE_FORMATTER;
   }
 }

@@ -35,6 +35,8 @@ import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Factory for AbstractLogstashIndexerDao objects.
  *
@@ -74,6 +76,7 @@ public final class IndexerDaoFactory {
    * @return The instance of the appropriate indexer DAO, never null
    * @throws InstantiationException
    */
+  @SuppressFBWarnings(value="BX_UNBOXING_IMMEDIATELY_REBOXED", justification="Code becomes obsolete when changing to GlobalConfiguration")
   public static synchronized LogstashIndexerDao getInstance(IndexerType type, String host, Integer port, String key, String username, String password) throws InstantiationException {
     if (!INDEXER_MAP.containsKey(type)) {
       throw new InstantiationException("[logstash-plugin]: Unknown IndexerType '" + type + "'. Did you forget to configure the plugin?");

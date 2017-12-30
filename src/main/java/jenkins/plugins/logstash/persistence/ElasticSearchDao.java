@@ -55,10 +55,10 @@ import com.google.common.collect.Range;
  * @since 1.0.4
  */
 public class ElasticSearchDao extends AbstractLogstashIndexerDao {
-  final HttpClientBuilder clientBuilder;
-  final URI uri;
-  final String auth;
-  final Range<Integer> successCodes = closedOpen(200,300);
+  private final HttpClientBuilder clientBuilder;
+  private final URI uri;
+  private final String auth;
+  private final Range<Integer> successCodes = closedOpen(200,300);
 
   //primary constructor used by indexer factory
   public ElasticSearchDao(String host, int port, String key, String username, String password) {
@@ -94,6 +94,18 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     }
 
     clientBuilder = factory == null ? HttpClientBuilder.create() : factory;
+  }
+
+  // for testing only
+  String getAuth()
+  {
+    return auth;
+  }
+
+  //for testing only
+  URI getUri()
+  {
+    return uri;
   }
 
   HttpPost getHttpPost(String data) {
