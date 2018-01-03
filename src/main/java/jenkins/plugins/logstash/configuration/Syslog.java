@@ -16,8 +16,7 @@ public class Syslog extends LogstashIndexer<SyslogDao>
 
   @DataBoundConstructor
   public Syslog()
-  {
-  }
+  {}
 
   public MessageFormat getMessageFormat()
   {
@@ -42,10 +41,30 @@ public class Syslog extends LogstashIndexer<SyslogDao>
   }
 
   @Override
-  protected boolean shouldRefreshInstance()
+  public int hashCode()
   {
-    return super.shouldRefreshInstance() ||
-        !instance.getMessageFormat().equals(messageFormat);
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((messageFormat == null) ? 0 : messageFormat.hashCode());
+    result = prime * result + ((syslogProtocol == null) ? 0 : syslogProtocol.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Syslog other = (Syslog)obj;
+    if (messageFormat != other.messageFormat)
+      return false;
+    if (syslogProtocol != other.syslogProtocol)
+      return false;
+    return true;
   }
 
   @Override

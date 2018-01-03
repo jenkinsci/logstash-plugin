@@ -8,8 +8,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import jenkins.plugins.logstash.persistence.RabbitMqDao;
-
 public class RabbitMqTest
 {
 
@@ -17,7 +15,7 @@ public class RabbitMqTest
   public JenkinsRule j = new JenkinsRule();
 
   private RabbitMq indexer;
-  private RabbitMqDao dao;
+  private RabbitMq indexer2;
 
   @Before
   public void setup()
@@ -28,35 +26,40 @@ public class RabbitMqTest
     indexer.setPassword("password");
     indexer.setUsername("user");
     indexer.setQueue("queue");
-    dao = indexer.getInstance();
+
+    indexer2 = new RabbitMq();
+    indexer2.setHost("localhost");
+    indexer2.setPort(4567);
+    indexer2.setPassword("password");
+    indexer2.setUsername("user");
+    indexer2.setQueue("queue");
   }
 
   @Test
-  public void noChangeReturnsSameInstance()
+  public void sameSettingsAreEqual()
   {
-    assertThat(indexer.shouldRefreshInstance(), is(false));
-    assertThat(indexer.getInstance(),is(dao));
+    assertThat(indexer.equals(indexer2), is(true));
   }
 
   @Test
-  public void passwordChangeLeadsToNewInstance()
+  public void passwordChangeIsNotEqual()
   {
     indexer.setPassword("newPassword");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void usernameChangeLeadsToNewInstance()
+  public void usernameChangeIsNotEqual()
   {
     indexer.setUsername("newUser");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void queueChangeLeadsToNewInstance()
+  public void queueChangeIsNotEqual()
   {
     indexer.setQueue("newQueue");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
 }

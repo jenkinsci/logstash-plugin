@@ -57,12 +57,49 @@ public class RabbitMq extends LogstashIndexer<RabbitMqDao>
   }
 
   @Override
-  protected boolean shouldRefreshInstance()
+  public boolean equals(Object obj)
   {
-    return super.shouldRefreshInstance() ||
-        !instance.getPassword().equals(Secret.toString(password)) ||
-        !StringUtils.equals(instance.getUsername(), username) ||
-        !StringUtils.equals(instance.getQueue(), queue);
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    RabbitMq other = (RabbitMq) obj;
+    if (!Secret.toString(password).equals(other.getPassword()))
+    {
+      return false;
+    }
+    if (queue == null)
+    {
+      if (other.queue != null)
+        return false;
+    }
+    else if (!queue.equals(other.queue))
+    {
+      return false;
+    }
+    if (username == null)
+    {
+      if (other.username != null)
+        return false;
+    }
+    else if (!username.equals(other.username))
+    {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((queue == null) ? 0 : queue.hashCode());
+    result = prime * result + ((username == null) ? 0 : username.hashCode());
+    result = prime * result + Secret.toString(password).hashCode();
+    return result;
   }
 
   @Override

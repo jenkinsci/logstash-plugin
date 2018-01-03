@@ -45,11 +45,39 @@ public class Redis extends LogstashIndexer<RedisDao>
   }
 
   @Override
-  protected boolean shouldRefreshInstance()
+  public boolean equals(Object obj)
   {
-    return super.shouldRefreshInstance() ||
-        !instance.getPassword().equals(Secret.toString(password))||
-        !StringUtils.equals(instance.getKey(), key);
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Redis other = (Redis) obj;
+    if (!Secret.toString(password).equals(other.getPassword()))
+    {
+      return false;
+    }
+    if (key == null)
+    {
+      if (other.key != null)
+        return false;
+    }
+    else if (!key.equals(other.key))
+    {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((key == null) ? 0 : key.hashCode());
+    result = prime * result + Secret.toString(password).hashCode();
+    return result;
   }
 
 

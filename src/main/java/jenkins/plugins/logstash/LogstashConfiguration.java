@@ -30,10 +30,15 @@ public class LogstashConfiguration extends GlobalConfiguration
   private static final Logger LOGGER = Logger.getLogger(LogstashConfiguration.class.getName());
   private LogstashIndexer<?> logstashIndexer;
   private boolean dataMigrated = false;
+  private transient LogstashIndexer<?> activeIndexer;
 
   public LogstashConfiguration()
   {
     load();
+    if (logstashIndexer != null)
+    {
+      activeIndexer = logstashIndexer;
+    }
   }
 
   /**
@@ -58,9 +63,9 @@ public class LogstashConfiguration extends GlobalConfiguration
   @CheckForNull
   public LogstashIndexerDao getIndexerInstance()
   {
-    if (logstashIndexer != null)
+    if (activeIndexer != null)
     {
-      return logstashIndexer.getInstance();
+      return activeIndexer.getInstance();
     }
     return null;
   }
@@ -134,6 +139,7 @@ public class LogstashConfiguration extends GlobalConfiguration
             LOGGER.log(Level.INFO, "unknown logstash Indexer type: " + type);
             break;
         }
+        activeIndexer = logstashIndexer;
       }
       dataMigrated = true;
       save();
@@ -143,15 +149,12 @@ public class LogstashConfiguration extends GlobalConfiguration
   @Override
   public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException
   {
-    JSONObject j = json.getJSONObject("logstashIndexer");
-    String clazz = j.getString("stapler-class");
-    if (logstashIndexer == null || !logstashIndexer.getClass().getName().equals(clazz))
+    // when we bind the stapler request we get a new instance of logstashIndexer
+    staplerRequest.bindJSON(this, json);
+
+    if (logstashIndexer != null && !logstashIndexer.equals(activeIndexer))
     {
-      staplerRequest.bindJSON(this, json);
-    }
-    else
-    {
-      logstashIndexer.reconfigure(staplerRequest, j);
+      activeIndexer = logstashIndexer;
     }
     save();
     return true;
