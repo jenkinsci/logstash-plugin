@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -151,8 +152,7 @@ public class LogstashConfiguration extends GlobalConfiguration
   {
     // when we bind the stapler request we get a new instance of logstashIndexer
     staplerRequest.bindJSON(this, json);
-
-    if (logstashIndexer != null && !logstashIndexer.equals(activeIndexer))
+    if (!Objects.equals(logstashIndexer, activeIndexer))
     {
       activeIndexer = logstashIndexer;
     }
