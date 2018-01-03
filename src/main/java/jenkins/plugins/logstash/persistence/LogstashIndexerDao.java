@@ -37,13 +37,15 @@ import net.sf.json.JSONObject;
  * @since 1.0.0
  */
 public interface LogstashIndexerDao {
-  public static enum IndexerType {
+  @Deprecated
+  static enum IndexerType {
     REDIS,
     RABBIT_MQ,
     ELASTICSEARCH,
     SYSLOG
   }
 
+  @Deprecated
   static enum SyslogFormat {
 	RFC5424,
 	RFC3164

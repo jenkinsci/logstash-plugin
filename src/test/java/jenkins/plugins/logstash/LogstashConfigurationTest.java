@@ -18,7 +18,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
 {
 
   @Test
-  public void test_unconfiguredWillReturnNull()
+  public void unconfiguredWillReturnNull()
   {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/notExisting.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
@@ -26,7 +26,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void test_elasticSearchIsProperlyConfigured()
+  public void elasticSearchIsProperlyConfigured()
   {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/elasticSearch.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
@@ -34,7 +34,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void test_rabbitMqIsProperlyConfigured()
+  public void rabbitMqIsProperlyConfigured()
   {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
@@ -42,7 +42,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void test_redisIsProperlyConfigured()
+  public void redisIsProperlyConfigured()
   {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/redis.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
@@ -50,7 +50,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void test_syslogIsProperlyConfigured()
+  public void syslogIsProperlyConfigured()
   {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/syslog.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();

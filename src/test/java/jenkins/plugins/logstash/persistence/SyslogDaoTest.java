@@ -21,7 +21,6 @@ public class SyslogDaoTest {
   String host = "localhost";
   String appname = "jenkins:";
   int port = 514;
-  UdpSyslogMessageSender udpSyslogMessageSender = new UdpSyslogMessageSender();
   @Mock UdpSyslogMessageSender mockUdpSyslogMessageSender;
 
   @Before

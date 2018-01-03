@@ -27,14 +27,14 @@ public class SyslogTest
   }
 
   @Test
-  public void test_noChangeReturnsSameInstance()
+  public void noChangeReturnsSameInstance()
   {
     assertThat(indexer.shouldRefreshInstance(), is(false));
     assertThat(indexer.getInstance(),is(dao));
   }
 
   @Test
-  public void test_messageFormatChangeLeadsToNewInstance()
+  public void messageFormatChangeLeadsToNewInstance()
   {
     indexer.setMessageFormat(MessageFormat.RFC_5424);
     assertThat(indexer.shouldRefreshInstance(), is(true));

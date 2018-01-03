@@ -59,7 +59,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void test_redisMigration()
+  public void redisMigration()
   {
     when(descriptor.getType()).thenReturn(IndexerType.REDIS);
     configuration.migrateData();
@@ -73,7 +73,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void test_syslogMigrationRFC3164()
+  public void syslogMigrationRFC3164()
   {
     when(descriptor.getType()).thenReturn(IndexerType.SYSLOG);
     when(descriptor.getSyslogFormat()).thenReturn(SyslogFormat.RFC3164);
@@ -87,7 +87,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void test_syslogMigrationRFC5424()
+  public void syslogMigrationRFC5424()
   {
     when(descriptor.getType()).thenReturn(IndexerType.SYSLOG);
     when(descriptor.getSyslogFormat()).thenReturn(SyslogFormat.RFC5424);
@@ -101,7 +101,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void test_elasticSearchMigration()
+  public void elasticSearchMigration()
   {
     when(descriptor.getType()).thenReturn(IndexerType.ELASTICSEARCH);
     configuration.migrateData();
@@ -116,7 +116,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void test_rabbitMqMigration()
+  public void rabbitMqMigration()
   {
     when(descriptor.getType()).thenReturn(IndexerType.RABBIT_MQ);
     configuration.migrateData();

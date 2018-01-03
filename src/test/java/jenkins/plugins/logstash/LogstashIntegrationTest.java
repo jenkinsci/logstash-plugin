@@ -57,7 +57,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void test_buildWrapperOnMaster() throws Exception
+    public void buildWrapperOnMaster() throws Exception
     {
         project.getBuildWrappersList().add(new LogstashBuildWrapper());
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -74,7 +74,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void test_buildWrapperOnSlave() throws Exception
+    public void buildWrapperOnSlave() throws Exception
     {
         project.getBuildWrappersList().add(new LogstashBuildWrapper());
         project.setAssignedNode(slave);
@@ -93,7 +93,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void test_buildNotifierOnMaster() throws Exception
+    public void buildNotifierOnMaster() throws Exception
     {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -108,7 +108,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void test_buildNotifierOnSlave() throws Exception
+    public void buildNotifierOnSlave() throws Exception
     {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         project.setAssignedNode(slave);

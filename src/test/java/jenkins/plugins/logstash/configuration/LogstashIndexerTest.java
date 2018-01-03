@@ -23,14 +23,14 @@ public class LogstashIndexerTest
   }
 
   @Test
-  public void test_HostChangeLeadsToNewInstance()
+  public void hostChangeLeadsToNewInstance()
   {
     indexer.setHost("remoteHost");
     assertThat(indexer.shouldRefreshInstance(), is(true));
   }
 
   @Test
-  public void test_PortChangeLeadsToNewInstance()
+  public void portChangeLeadsToNewInstance()
   {
     indexer.setPort(7654);
     assertThat(indexer.shouldRefreshInstance(), is(true));

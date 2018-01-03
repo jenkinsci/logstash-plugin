@@ -32,28 +32,28 @@ public class RabbitMqTest
   }
 
   @Test
-  public void test_noChangeReturnsSameInstance()
+  public void noChangeReturnsSameInstance()
   {
     assertThat(indexer.shouldRefreshInstance(), is(false));
     assertThat(indexer.getInstance(),is(dao));
   }
 
   @Test
-  public void test_passwordChangeLeadsToNewInstance()
+  public void passwordChangeLeadsToNewInstance()
   {
     indexer.setPassword("newPassword");
     assertThat(indexer.shouldRefreshInstance(), is(true));
   }
 
   @Test
-  public void test_usernameChangeLeadsToNewInstance()
+  public void usernameChangeLeadsToNewInstance()
   {
     indexer.setUsername("newUser");
     assertThat(indexer.shouldRefreshInstance(), is(true));
   }
 
   @Test
-  public void test_QueueChangeLeadsToNewInstance()
+  public void queueChangeLeadsToNewInstance()
   {
     indexer.setQueue("newQueue");
     assertThat(indexer.shouldRefreshInstance(), is(true));

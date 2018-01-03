@@ -31,7 +31,7 @@ public class RedisTest
   }
 
   @Test
-  public void test_noChangeReturnsSameInstance()
+  public void noChangeReturnsSameInstance()
   {
     assertThat(indexer.shouldRefreshInstance(), is(false));
     assertThat(indexer.getInstance(),is(dao));
@@ -39,14 +39,14 @@ public class RedisTest
 
 
   @Test
-  public void test_passwordChangeLeadsToNewInstance()
+  public void passwordChangeLeadsToNewInstance()
   {
     indexer.setPassword("newPassword");
     assertThat(indexer.shouldRefreshInstance(), is(true));
   }
 
   @Test
-  public void test_KeyChangeLeadsToNewInstance()
+  public void keyChangeLeadsToNewInstance()
   {
     indexer.setKey("newKey");
     assertThat(indexer.shouldRefreshInstance(), is(true));
