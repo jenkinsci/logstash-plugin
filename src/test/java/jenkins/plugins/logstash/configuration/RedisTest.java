@@ -8,8 +8,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import jenkins.plugins.logstash.persistence.RedisDao;
-
 public class RedisTest
 {
 
@@ -17,7 +15,7 @@ public class RedisTest
   public JenkinsRule j = new JenkinsRule();
 
   private Redis indexer;
-  private RedisDao dao;
+  private Redis indexer2;
 
   @Before
   public void setup()
@@ -27,29 +25,32 @@ public class RedisTest
     indexer.setPort(4567);
     indexer.setKey("key");
     indexer.setPassword("password");
-    dao = indexer.getInstance();
-  }
+
+    indexer2 = new Redis();
+    indexer2.setHost("localhost");
+    indexer2.setPort(4567);
+    indexer2.setKey("key");
+    indexer2.setPassword("password");
+}
 
   @Test
-  public void test_noChangeReturnsSameInstance()
+  public void test_sameSettingsAreEqual()
   {
-    assertThat(indexer.shouldRefreshInstance(), is(false));
-    assertThat(indexer.getInstance(),is(dao));
+    assertThat(indexer.equals(indexer2), is(true));
   }
 
-
   @Test
-  public void test_passwordChangeLeadsToNewInstance()
+  public void test_passwordChangeIsNotEqual()
   {
     indexer.setPassword("newPassword");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void test_KeyChangeLeadsToNewInstance()
+  public void test_KeyChangeIsNotEqual()
   {
     indexer.setKey("newKey");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
 

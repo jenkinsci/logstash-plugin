@@ -8,16 +8,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import jenkins.plugins.logstash.persistence.ElasticSearchDao;
-
 public class ElasticSearchTest
 {
 
   @Rule
   public JenkinsRule j = new JenkinsRule();
-  private ElasticSearchDao dao;
 
   private ElasticSearch indexer;
+  private ElasticSearch indexer2;
 
   @Before
   public void setup()
@@ -28,35 +26,40 @@ public class ElasticSearchTest
     indexer.setPassword("password");
     indexer.setUsername("user");
     indexer.setKey("key");
-    dao = indexer.getInstance();
-  }
+
+    indexer2 = new ElasticSearch();
+    indexer2.setHost("http://localhost");
+    indexer2.setPort(4567);
+    indexer2.setPassword("password");
+    indexer2.setUsername("user");
+    indexer2.setKey("key");
+}
 
   @Test
-  public void test_noChangeReturnsSameInstance()
+  public void test_sameSettingsAreEqual()
   {
-    assertThat(indexer.shouldRefreshInstance(), is(false));
-    assertThat(indexer.getInstance(),is(dao));
+    assertThat(indexer.equals(indexer2), is(true));
   }
 
   @Test
-  public void test_passwordChangeLeadsToNewInstance()
+  public void test_passwordChangeIsNotEqual()
   {
     indexer.setPassword("newPassword");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void test_usernameChangeLeadsToNewInstance()
+  public void test_usernameChangeIsNotEqual()
   {
     indexer.setUsername("newUser");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void test_KeyChangeLeadsToNewInstance()
+  public void test_KeyChangeIsNotEqual()
   {
     indexer.setKey("newKey");
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
 }

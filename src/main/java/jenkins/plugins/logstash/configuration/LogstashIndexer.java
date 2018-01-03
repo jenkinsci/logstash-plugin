@@ -82,15 +82,13 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
   /**
    * Gets the instance of the actual {@link AbstractLogstashIndexerDao} that is represented by this
    * configuration.
-   * Checks via {@link #shouldRefreshInstance()}, if a new {@link AbstractLogstashIndexerDao}
-   * needs to be created. If yes calls {@link #createIndexerInstance()} to create a new instance.
    *
    * @return {@link AbstractLogstashIndexerDao} instance
    */
   @Nonnull
   public final T getInstance()
   {
-    if (shouldRefreshInstance())
+    if (instance == null)
     {
       instance = createIndexerInstance();
     }
@@ -105,22 +103,34 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    */
   protected abstract T createIndexerInstance();
 
-  /**
-   * Decides whether a new instance of {@link AbstractLogstashIndexerDao} should be created or not.
-   * Implementers should overwrite this method if they have own configuration.
-   * @return true if the current configuration differs from the current {@link AbstractLogstashIndexerDao dao instance}
-   */
-  protected boolean shouldRefreshInstance()
-  {
-    if (instance == null)
-    {
-      return true;
-    }
-
-    boolean matches = StringUtils.equals(instance.getHost(), host) &&
-        (instance.getPort() == port);
-    return !matches;
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((host == null) ? 0 : host.hashCode());
+    result = prime * result + port;
+    return result;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    LogstashIndexer<?> other = (LogstashIndexer<?>) obj;
+    if (host == null) {
+      if (other.host != null)
+        return false;
+    } else if (!host.equals(other.host))
+      return false;
+    if (port != other.port)
+      return false;
+    return true;
+  }
+
 
   @SuppressWarnings("unchecked")
   public static DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>> all()

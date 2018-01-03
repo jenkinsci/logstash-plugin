@@ -8,13 +8,11 @@ import org.junit.Test;
 
 import com.cloudbees.syslog.MessageFormat;
 
-import jenkins.plugins.logstash.persistence.SyslogDao;
-
 public class SyslogTest
 {
 
   private Syslog indexer;
-  private SyslogDao dao;
+  private Syslog indexer2;
 
   @Before
   public void setup()
@@ -23,21 +21,24 @@ public class SyslogTest
     indexer.setHost("localhost");
     indexer.setPort(4567);
     indexer.setMessageFormat(MessageFormat.RFC_3164);
-    dao = indexer.getInstance();
-  }
+
+    indexer2 = new Syslog();
+    indexer2.setHost("localhost");
+    indexer2.setPort(4567);
+    indexer2.setMessageFormat(MessageFormat.RFC_3164);
+}
 
   @Test
-  public void test_noChangeReturnsSameInstance()
+  public void test_sameSettingsAreEqual()
   {
-    assertThat(indexer.shouldRefreshInstance(), is(false));
-    assertThat(indexer.getInstance(),is(dao));
+    assertThat(indexer.equals(indexer2), is(true));
   }
 
   @Test
-  public void test_messageFormatChangeLeadsToNewInstance()
+  public void test_messageFormatChangeIsNotEqual()
   {
     indexer.setMessageFormat(MessageFormat.RFC_5424);
-    assertThat(indexer.shouldRefreshInstance(), is(true));
+    assertThat(indexer.equals(indexer2), is(false));
   }
 
 }
