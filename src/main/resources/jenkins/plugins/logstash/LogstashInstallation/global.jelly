@@ -2,7 +2,7 @@
 <!-- We need to keep this file in order to prevent that in the UI we get the option to configure a Logstash Installation -->
 <f:section title="Logstash Plugin" name="logstash">
   <f:entry>
-    <p>Logstash configuration has moved to the <a href="${rootURL}/configure">Global Configuration</a></p>
+    Logstash configuration has moved to the <a href="${rootURL}/configure">Global Configuration</a>
   </f:entry>
 </f:section>
 </j:jelly>
