@@ -35,6 +35,8 @@ import net.sf.json.JSONObject;
 /**
  * Abstract data access object for Logstash indexers.
  *
+ * TODO: a charset is only required for RabbitMq currently (ES as well but there it is currently configured via the ContentType),
+ *   so better move this to the corresponding classes.
  * @author Rusty Gerard
  * @since 1.0.0
  */

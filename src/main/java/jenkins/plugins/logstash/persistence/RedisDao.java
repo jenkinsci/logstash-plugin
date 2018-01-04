@@ -51,7 +51,11 @@ public class RedisDao extends HostBasedLogstashIndexerDao {
     this(null, host, port, key, password);
   }
 
-  // Factored for unit testing
+  /*
+   * TODO: this constructor is only for testing so one can inject a mocked JedisPool.
+   *       With Powermock we can intercept the creation of the JedisPool and replace with a mock
+   *       making this constructor obsolete
+   */
   RedisDao(JedisPool factory, String host, int port, String key, String password) {
     super(host, port);
 

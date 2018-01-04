@@ -35,6 +35,8 @@ import com.rabbitmq.client.ConnectionFactory;
 /**
  * RabbitMQ Data Access Object.
  *
+ * TODO: make the charset configurable via the UI with UTF-8 being the default
+ *
  * @author Rusty Gerard
  * @since 1.0.0
  */
@@ -50,7 +52,11 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     this(null, host, port, key, username, password);
   }
 
-  // Factored for unit testing
+  /*
+   * TODO: this constructor is only for testing so one can inject a mocked ConnectionFactory.
+   *       With Powermock we can intercept the creation of the ConnectionFactory and replace with a mock
+   *       making this constructor obsolete
+   */
   RabbitMqDao(ConnectionFactory factory, String host, int port, String queue, String username, String password) {
     super(host, port);
 

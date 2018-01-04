@@ -7,6 +7,9 @@ import com.cloudbees.syslog.MessageFormat;
 import com.cloudbees.syslog.Severity;
 import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
 
+/*
+ * TODO: add support for TcpSyslogMessageSender
+ */
 public class SyslogDao extends HostBasedLogstashIndexerDao {
 
   private MessageFormat messageFormat = MessageFormat.RFC_3164;
@@ -15,6 +18,12 @@ public class SyslogDao extends HostBasedLogstashIndexerDao {
   public SyslogDao(String host, int port) {
     this(null, host, port);
   }
+
+  /*
+   * TODO: this constructor is only for testing so one can inject a mocked UdpSyslogMessageSender.
+   *       With Powermock we can intercept the creation of the UdpSyslogMessageSender and replace with a mock
+   *       making this constructor obsolete
+   */
 
   public SyslogDao(UdpSyslogMessageSender udpSyslogMessageSender, String host, int port) {
     super(host, port);
