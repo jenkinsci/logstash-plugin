@@ -5,8 +5,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -23,14 +25,16 @@ public class ElasticSearchTest
   private ElasticSearch indexer2;
 
   @Before
-  public void setup() throws URISyntaxException
+  public void setup() throws MalformedURLException
   {
-    String uri = "http://localhost:4567/key";
-    indexer = new ElasticSearch(uri);
+    URL url = new URL("http://localhost:4567/key");
+    indexer = new ElasticSearch();
+    indexer.setUrl(url);
     indexer.setPassword("password");
     indexer.setUsername("user");
 
-    indexer2 = new ElasticSearch(uri);
+    indexer2 = new ElasticSearch();
+    indexer2.setUrl(url);
     indexer2.setPassword("password");
     indexer2.setUsername("user");
 }
@@ -49,9 +53,9 @@ public class ElasticSearchTest
   }
 
   @Test
-  public void uriChangeIsNotEqual() throws URISyntaxException
+  public void urlChangeIsNotEqual() throws MalformedURLException
   {
-    indexer.setUri("https://localhost:4567/key");
+    indexer.setUrl(new URL("https://localhost:4567/key"));
     assertThat(indexer.equals(indexer2), is(false));
   }
 
@@ -62,45 +66,4 @@ public class ElasticSearchTest
     assertThat(indexer.equals(indexer2), is(false));
   }
 
-  @Test
-  public void missingPathThrowsException() throws URISyntaxException
-  {
-    try
-    {
-      indexer.setUri("http://localhost:8000/");
-      fail("Expected an IllegalArgumentException");
-    }
-    catch (IllegalArgumentException e)
-    {
-      assertThat("Please specify an elastic search key.",equalTo(e.getMessage()));
-    }
-  }
-
-  @Test
-  public void missingPortThrowsException() throws URISyntaxException
-  {
-    try
-    {
-      indexer.setUri("http://localhost/logstash");
-      fail("Expected an IllegalArgumentException");
-    }
-    catch (IllegalArgumentException e)
-    {
-      assertThat("Please specify a port.",equalTo(e.getMessage()));
-    }
-  }
-
-  @Test
-  public void missingSchemeThrowsException() throws URISyntaxException
-  {
-    try
-    {
-      indexer.setUri("localhost:8000/logstash");
-      fail("Expected an IllegalArgumentException");
-    }
-    catch (IllegalArgumentException e)
-    {
-      assertThat("unknown protocol: localhost",equalTo(e.getMessage()));
-    }
-  }
 }

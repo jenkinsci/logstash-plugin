@@ -39,7 +39,7 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    * @return {@link AbstractLogstashIndexerDao} instance
    */
   @Nonnull
-  public synchronized final T getInstance()
+  public synchronized T getInstance()
   {
     if (instance == null)
     {

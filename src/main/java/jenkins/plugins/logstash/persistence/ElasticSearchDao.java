@@ -83,7 +83,15 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     this.username = username;
     this.password = password;
 
-    ElasticSearch.validateUri(uri);
+
+    try
+    {
+      uri.toURL();
+    }
+    catch (MalformedURLException e)
+    {
+      throw new IllegalArgumentException(e);
+    }
 
     if (StringUtils.isNotBlank(username)) {
       auth = Base64.encodeBase64String((username + ":" + StringUtils.defaultString(password)).getBytes(StandardCharsets.UTF_8));
@@ -196,20 +204,6 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
         stream.close();
       }
     }
-  }
-
-  public static void main(String[] args) throws URISyntaxException, MalformedURLException
-  {
-    URI uri = (new URIBuilder("localhost:8000")).setPath("/logstash").build();
-
-    //System.out.println(uri.toURL());
-    System.out.println("host:" + uri.getHost());
-    System.out.println("port:" + uri.getPort());
-    System.out.println("path:" + uri.getPath());
-    System.out.println("scheme:" + uri.getScheme());
-    System.out.println("fragment:" + uri.getFragment());
-    System.out.println("rawpath:" + uri.getRawPath());
-
   }
 
   @Override

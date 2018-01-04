@@ -5,7 +5,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -58,22 +57,12 @@ public class ElasticSearchDaoTest {
   }
 
   @Test
-  public void constructorFailMissingScheme() throws Exception {
+  public void constructorFailInvalidUrl() throws Exception {
     try {
-      createDao("localhost:8200/logstash", "username", "password");
+      createDao("localhost:8000/logstash", "username", "password");
       fail("Expected an IllegalArgumentException.");
     } catch (IllegalArgumentException e) {
-      assertEquals("Wrong error message was thrown", "unknown protocol: localhost", e.getMessage());
-    }
-  }
-
-  @Test
-  public void constructorFailEmptyKey() throws Exception {
-    try {
-      createDao("http://localhost:8200", "username", "password");
-      fail("Expected an IllegalArgumentException.");
-    } catch (IllegalArgumentException e) {
-      assertEquals("Wrong error message was thrown", "Please specify an elastic search key.", e.getMessage());
+      assertEquals("Wrong error message was thrown", "java.net.MalformedURLException: unknown protocol: localhost", e.getMessage());
     }
   }
 

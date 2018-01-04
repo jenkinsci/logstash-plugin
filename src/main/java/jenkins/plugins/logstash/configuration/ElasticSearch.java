@@ -3,6 +3,7 @@ package jenkins.plugins.logstash.configuration;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -19,25 +20,41 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
 {
   private String username;
   private Secret password;
-  private URI uri;
+  private URL url;
 
   @DataBoundConstructor
-  public ElasticSearch(String uri) throws URISyntaxException
+  public ElasticSearch()
   {
-    this.uri = new URI(uri);
-    validateUri(this.uri);
   }
 
-  public URI getUri()
+  public URL getUrl()
   {
-    return uri;
+    return url;
   }
 
-  public void setUri(String value) throws URISyntaxException
+
+  private URI getUri()
   {
-    URI uri = new URI(value);
-    validateUri(uri);
-    this.uri = uri;
+    if (url != null)
+    {
+      URI uri;
+      try
+      {
+        uri = url.toURI();
+        return uri;
+      }
+      catch (URISyntaxException e)
+      {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  @DataBoundSetter
+  public void setUrl(URL uri)
+  {
+    this.url = uri;
   }
 
   public String getUsername()
@@ -76,12 +93,14 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     {
       return false;
     }
-    if (uri == null)
+    if (url == null)
     {
-      if (other.uri != null)
+      if (other.url != null)
         return false;
     }
-    else if (!uri.equals(other.uri))
+    // String comparison is not optimal but comparing the urls directly  is
+    // criticized by findbugs as being a blocking operation
+    else if (!url.toString().equals(other.url.toString()))
     {
       return false;
     }
@@ -102,7 +121,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+    result = prime * result + ((url == null) ? 0 : url.toString().hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
     result = prime * result + Secret.toString(password).hashCode();
     return result;
@@ -111,7 +130,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   @Override
   public ElasticSearchDao createIndexerInstance()
   {
-    return new ElasticSearchDao(uri, username, Secret.toString(password));
+    return new ElasticSearchDao(getUri(), username, Secret.toString(password));
   }
 
   @Extension
@@ -129,7 +148,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       return 9300;
     }
 
-    public FormValidation doCheckUri(@QueryParameter("value") String value)
+    public FormValidation doCheckUrl(@QueryParameter("value") String value)
     {
       if (StringUtils.isBlank(value))
       {
@@ -137,10 +156,20 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       }
       try
       {
-        URI uri = new URI(value);
-        validateUri(uri);
+        URL url = new URL(value);
+
+        if (url.getUserInfo() != null)
+        {
+          return FormValidation.error("Please specify user and password not as part of the url.");
+        }
+
+        if(StringUtils.isBlank(url.getPath()) || url.getPath().trim().matches("^\\/+$")) {
+          return FormValidation.warning("Elastic Search requires a key to be able to index the logs.");
+        }
+
+        url.toURI();
       }
-      catch (URISyntaxException | IllegalArgumentException e)
+      catch (MalformedURLException | URISyntaxException e)
       {
         return FormValidation.error(e.getMessage());
       }
@@ -148,29 +177,13 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     }
   }
 
-  /**
-   * Validates that the given uri has a scheme, a port and a path which is not empty or just "/"
-   *
-   * @param uri
-   * @throws IllegalArgumentException when one of scheme, port or path
-   */
-  public static void validateUri(URI uri) throws IllegalArgumentException
+  public static void main(String[] args) throws MalformedURLException, URISyntaxException
   {
-      try
-      {
-        uri.toURL();
-      }
-      catch (MalformedURLException e)
-      {
-        throw new IllegalArgumentException(e.getMessage());
-      }
+    URL url = new URL("localhost/logstash");
+    System.out.println("Path: " + url.getPath());
+    System.out.println(url.toURI().getUserInfo());
+    System.out.println(url.toURI().getAuthority());
+    System.out.println(url.toURI().getHost());
 
-    if(uri.getPort() == -1) {
-      throw new IllegalArgumentException("Please specify a port.");
-    }
-
-    if(StringUtils.isBlank(uri.getPath()) || uri.getPath().trim().matches("^\\/+$")) {
-      throw new IllegalArgumentException("Please specify an elastic search key.");
-    }
   }
 }

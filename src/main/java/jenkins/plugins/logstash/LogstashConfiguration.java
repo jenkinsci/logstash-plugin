@@ -1,5 +1,6 @@
 package jenkins.plugins.logstash;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -108,12 +109,13 @@ public class LogstashConfiguration extends GlobalConfiguration
               uri = (new URIBuilder(descriptor.getHost()))
                   .setPort(descriptor.getPort())
                   .setPath("/" + descriptor.getKey()).build();
-              ElasticSearch es = new ElasticSearch(uri.toString());
+              ElasticSearch es = new ElasticSearch();
+              es.setUrl(uri.toURL());
               es.setUsername(descriptor.getUsername());
               es.setPassword(descriptor.getPassword());
               logstashIndexer = es;
             }
-            catch (URISyntaxException e)
+            catch (URISyntaxException | MalformedURLException e)
             {
               LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search failed: " + e.toString());
             }

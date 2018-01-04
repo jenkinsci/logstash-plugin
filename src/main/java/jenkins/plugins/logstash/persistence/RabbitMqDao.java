@@ -36,6 +36,8 @@ import com.rabbitmq.client.ConnectionFactory;
  * RabbitMQ Data Access Object.
  *
  * TODO: make the charset configurable via the UI with UTF-8 being the default
+ * TODO: support TLS
+ * TODO: support vhost
  *
  * @author Rusty Gerard
  * @since 1.0.0
@@ -97,6 +99,15 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
   }
 
 
+  /*
+   * TODO: do we really need to open a connection each time?
+   *       channels are not thread-safe so we need a new channel each time but the connection
+   *       could be shared. Another idea would be to use one dao per build, reuse the channel and
+   *       synchronize the push on the channel (for pipeline builds where we can have multiple
+   *       threads writing, are freestyle projects guaranteed to be single threaded?).
+   * (non-Javadoc)
+   * @see jenkins.plugins.logstash.persistence.LogstashIndexerDao#push(java.lang.String)
+   */
   @Override
   public void push(String data) throws IOException {
     Connection connection = null;
@@ -104,8 +115,8 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     try {
       connection = pool.newConnection();
       channel = connection.createChannel();
-
       // Ensure the queue exists
+
       try {
         channel.queueDeclarePassive(queue);
       } catch (IOException e) {
@@ -124,6 +135,7 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     }
   }
 
+  // TODO: connection.isOpen() should be avoided (see the rabbitmq doc)
   private void finalizeConnection(Connection connection) {
     if (connection != null && connection.isOpen()) {
       try {
@@ -135,6 +147,7 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     }
   }
 
+  // TODO: connection.isOpen() should be avoided (see the rabbitmq doc)
   private void finalizeChannel(Channel channel) {
     if (channel != null && channel.isOpen()) {
       try {
