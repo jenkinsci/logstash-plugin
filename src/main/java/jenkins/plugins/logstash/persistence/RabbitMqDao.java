@@ -38,7 +38,7 @@ import com.rabbitmq.client.ConnectionFactory;
  * @author Rusty Gerard
  * @since 1.0.0
  */
-public class RabbitMqDao extends AbstractLogstashIndexerDao {
+public class RabbitMqDao extends HostBasedLogstashIndexerDao {
   private final ConnectionFactory pool;
 
   private String queue;

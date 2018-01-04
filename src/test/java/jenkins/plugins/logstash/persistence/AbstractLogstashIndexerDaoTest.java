@@ -66,9 +66,15 @@ public class AbstractLogstashIndexerDaoTest {
   }
 
   private AbstractLogstashIndexerDao getInstance() {
-    return new AbstractLogstashIndexerDao("localhost", -1) {
+    return new AbstractLogstashIndexerDao() {
       @Override
     public void push(String data) throws IOException {}
+
+      @Override
+      public String getDescription()
+      {
+        return "test";
+      }
     };
   }
 }

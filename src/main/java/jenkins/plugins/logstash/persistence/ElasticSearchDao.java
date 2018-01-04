@@ -41,12 +41,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import com.google.common.collect.Range;
+
+import jenkins.plugins.logstash.configuration.ElasticSearch;
 
 /**
  * Elastic Search Data Access Object.
@@ -60,40 +63,27 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   private final String auth;
   private final Range<Integer> successCodes = closedOpen(200,300);
 
-  private String key;
   private String username;
   private String password;
 
   //primary constructor used by indexer factory
-  public ElasticSearchDao(String host, int port, String key, String username, String password) {
-    this(null, host, port, key, username, password);
+  public ElasticSearchDao(URI uri, String username, String password) {
+    this(null, uri, username, password);
   }
 
   // Factored for unit testing
-  ElasticSearchDao(HttpClientBuilder factory, String host, int port, String key, String username, String password) {
-    super(host, port);
+  ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password) {
 
-    this.key = key;
+    if (uri == null)
+    {
+      throw new IllegalArgumentException("uri field must not be empty");
+    }
+
+    this.uri = uri;
     this.username = username;
     this.password = password;
 
-    if (StringUtils.isBlank(key)) {
-      throw new IllegalArgumentException("elastic index name is required");
-    }
-
-    try {
-      uri = new URIBuilder(host)
-        .setPort(port)
-        // Normalizer will remove extra starting slashes, but missing slash will cause annoying failures
-        .setPath("/" + key)
-        .build();
-    } catch (URISyntaxException e) {
-      throw new IllegalArgumentException("Could not create uri", e);
-    }
-
-    if(StringUtils.isBlank(uri.getScheme())) {
-      throw new IllegalArgumentException("host field must specify scheme, such as 'http://'");
-    }
+    ElasticSearch.validateUri(uri);
 
     if (StringUtils.isNotBlank(username)) {
       auth = Base64.encodeBase64String((username + ":" + StringUtils.defaultString(password)).getBytes(StandardCharsets.UTF_8));
@@ -109,9 +99,19 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     return uri;
   }
 
-  public String getKey()
+  public String getHost()
   {
-    return key;
+    return uri.getHost();
+  }
+
+  public String getScheme()
+  {
+    return uri.getScheme();
+  }
+
+  public int getPort()
+  {
+    return uri.getPort();
   }
 
   public String getUsername()
@@ -122,6 +122,11 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   public String getPassword()
   {
       return password;
+  }
+
+  public String getKey()
+  {
+    return uri.getPath();
   }
 
   String getAuth()
@@ -191,5 +196,25 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
         stream.close();
       }
     }
+  }
+
+  public static void main(String[] args) throws URISyntaxException, MalformedURLException
+  {
+    URI uri = (new URIBuilder("localhost:8000")).setPath("/logstash").build();
+
+    //System.out.println(uri.toURL());
+    System.out.println("host:" + uri.getHost());
+    System.out.println("port:" + uri.getPort());
+    System.out.println("path:" + uri.getPath());
+    System.out.println("scheme:" + uri.getScheme());
+    System.out.println("fragment:" + uri.getFragment());
+    System.out.println("rawpath:" + uri.getRawPath());
+
+  }
+
+  @Override
+  public String getDescription()
+  {
+    return uri.toString();
   }
 }

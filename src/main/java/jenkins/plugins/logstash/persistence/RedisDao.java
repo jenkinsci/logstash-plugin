@@ -40,7 +40,7 @@ import redis.clients.jedis.exceptions.JedisException;
  * @author Rusty Gerard
  * @since 1.0.0
  */
-public class RedisDao extends AbstractLogstashIndexerDao {
+public class RedisDao extends HostBasedLogstashIndexerDao {
   private final JedisPool pool;
 
   private String password;

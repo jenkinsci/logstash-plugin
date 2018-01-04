@@ -46,7 +46,7 @@ public class LogstashIntegrationTest
     @Before
     public void setup() throws Exception
     {
-        memoryDao = new MemoryDao("localhost", 4567);
+        memoryDao = new MemoryDao();
         PowerMockito.mockStatic(LogstashConfiguration.class);
         when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
         when(logstashConfiguration.getIndexerInstance()).thenReturn(memoryDao);

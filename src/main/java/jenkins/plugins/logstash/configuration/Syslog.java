@@ -9,7 +9,7 @@ import hudson.Extension;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogProtocol;
 import jenkins.plugins.logstash.persistence.SyslogDao;
 
-public class Syslog extends LogstashIndexer<SyslogDao>
+public class Syslog extends HostBasedLogstashIndexer<SyslogDao>
 {
   private MessageFormat messageFormat;
   private SyslogProtocol syslogProtocol;
@@ -70,7 +70,7 @@ public class Syslog extends LogstashIndexer<SyslogDao>
   @Override
   public SyslogDao createIndexerInstance()
   {
-    SyslogDao syslogDao = new SyslogDao(host, port);
+    SyslogDao syslogDao = new SyslogDao(getHost(), getPort());
     syslogDao.setMessageFormat(messageFormat);
     return syslogDao;
   }

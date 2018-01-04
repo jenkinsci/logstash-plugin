@@ -1,7 +1,8 @@
 package jenkins.plugins.logstash.configuration;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -16,24 +17,27 @@ import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 
 public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
 {
-  protected String key;
-  protected String username;
-  protected Secret password;
+  private String username;
+  private Secret password;
+  private URI uri;
 
   @DataBoundConstructor
-  public ElasticSearch()
+  public ElasticSearch(String uri) throws URISyntaxException
   {
+    this.uri = new URI(uri);
+    validateUri(this.uri);
   }
 
-  public String getKey()
+  public URI getUri()
   {
-    return key;
+    return uri;
   }
 
-  @DataBoundSetter
-  public void setKey(String key)
+  public void setUri(String value) throws URISyntaxException
   {
-    this.key = key;
+    URI uri = new URI(value);
+    validateUri(uri);
+    this.uri = uri;
   }
 
   public String getUsername()
@@ -61,10 +65,10 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   @Override
   public boolean equals(Object obj)
   {
+    if (obj == null)
+      return false;
     if (this == obj)
       return true;
-    if (!super.equals(obj))
-      return false;
     if (getClass() != obj.getClass())
       return false;
     ElasticSearch other = (ElasticSearch) obj;
@@ -72,12 +76,12 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     {
       return false;
     }
-    if (key == null)
+    if (uri == null)
     {
-      if (other.key != null)
+      if (other.uri != null)
         return false;
     }
-    else if (!key.equals(other.key))
+    else if (!uri.equals(other.uri))
     {
       return false;
     }
@@ -98,7 +102,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((key == null) ? 0 : key.hashCode());
+    result = prime * result + ((uri == null) ? 0 : uri.hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
     result = prime * result + Secret.toString(password).hashCode();
     return result;
@@ -107,7 +111,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   @Override
   public ElasticSearchDao createIndexerInstance()
   {
-    return new ElasticSearchDao(host, port, key, username, Secret.toString(password));
+    return new ElasticSearchDao(uri, username, Secret.toString(password));
   }
 
   @Extension
@@ -125,8 +129,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       return 9300;
     }
 
-    @Override
-    public FormValidation doCheckHost(@QueryParameter("value") String value)
+    public FormValidation doCheckUri(@QueryParameter("value") String value)
     {
       if (StringUtils.isBlank(value))
       {
@@ -134,24 +137,40 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       }
       try
       {
-        new URL(value);
+        URI uri = new URI(value);
+        validateUri(uri);
       }
-      catch (MalformedURLException e)
+      catch (URISyntaxException | IllegalArgumentException e)
       {
         return FormValidation.error(e.getMessage());
       }
       return FormValidation.ok();
     }
+  }
 
-    public FormValidation doCheckKey(@QueryParameter("value") String value)
-    {
-      if (StringUtils.isBlank(value))
+  /**
+   * Validates that the given uri has a scheme, a port and a path which is not empty or just "/"
+   *
+   * @param uri
+   * @throws IllegalArgumentException when one of scheme, port or path
+   */
+  public static void validateUri(URI uri) throws IllegalArgumentException
+  {
+      try
       {
-        return FormValidation.error(Messages.ValueIsRequired());
+        uri.toURL();
+      }
+      catch (MalformedURLException e)
+      {
+        throw new IllegalArgumentException(e.getMessage());
       }
 
-      return FormValidation.ok();
+    if(uri.getPort() == -1) {
+      throw new IllegalArgumentException("Please specify a port.");
     }
 
+    if(StringUtils.isBlank(uri.getPath()) || uri.getPath().trim().matches("^\\/+$")) {
+      throw new IllegalArgumentException("Please specify an elastic search key.");
+    }
   }
 }

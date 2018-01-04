@@ -11,7 +11,7 @@ import hudson.util.Secret;
 import jenkins.plugins.logstash.Messages;
 import jenkins.plugins.logstash.persistence.RedisDao;
 
-public class Redis extends LogstashIndexer<RedisDao>
+public class Redis extends HostBasedLogstashIndexer<RedisDao>
 {
 
   protected String key;
@@ -84,7 +84,7 @@ public class Redis extends LogstashIndexer<RedisDao>
   @Override
   public RedisDao createIndexerInstance()
   {
-    return new RedisDao(host, port, key, Secret.toString(password));
+    return new RedisDao(getHost(), getPort(), key, Secret.toString(password));
   }
 
   @Extension

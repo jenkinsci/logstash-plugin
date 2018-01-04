@@ -7,7 +7,7 @@ import com.cloudbees.syslog.MessageFormat;
 import com.cloudbees.syslog.Severity;
 import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
 
-public class SyslogDao extends AbstractLogstashIndexerDao {
+public class SyslogDao extends HostBasedLogstashIndexerDao {
 
   private MessageFormat messageFormat = MessageFormat.RFC_3164;
   private final UdpSyslogMessageSender messageSender;

@@ -2,6 +2,8 @@ package jenkins.plugins.logstash.persistence;
 
 import com.cloudbees.syslog.MessageFormat;
 import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -41,6 +43,8 @@ public class SyslogDaoTestIT{
 
     // Clean up the the logstash log file
     try {
+      File file = new File(logfile);
+      file.getParentFile().mkdirs();
       writer = new PrintWriter(logfile);
     }
     catch (FileNotFoundException e) {

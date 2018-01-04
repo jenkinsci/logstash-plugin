@@ -38,8 +38,18 @@ import net.sf.json.JSONObject;
  * @author Rusty Gerard
  * @since 1.0.0
  */
-public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
+public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexerDao {
+  private final String host;
+  private final int port;
   private Charset charset;
+
+  public HostBasedLogstashIndexerDao(String host, int port) {
+    this.host = host;
+    this.port = port;
+    if (StringUtils.isBlank(host)) {
+      throw new IllegalArgumentException("host name is required");
+    }
+  }
 
   /**
    * Sets the charset used to push data to the indexer
@@ -57,6 +67,7 @@ public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
    *
    * @return charste to push data
    */
+  @Override
   public Charset getCharset()
   {
     return charset;
@@ -74,5 +85,20 @@ public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
     payload.put("@version", 1);
 
     return payload;
+  }
+
+  public String getHost()
+  {
+    return host;
+  }
+
+  public int getPort()
+  {
+    return port;
+  }
+
+  @Override
+  public String getDescription() {
+    return this.host + ":" + this.port;
   }
 }

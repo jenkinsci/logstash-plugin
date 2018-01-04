@@ -1,5 +1,7 @@
 package jenkins.plugins.logstash;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -11,6 +13,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.syslog.MessageFormat;
 
+import org.apache.http.client.utils.URIBuilder;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -76,6 +79,7 @@ public class LogstashConfiguration extends GlobalConfiguration
     return LogstashIndexer.all();
   }
 
+  @SuppressWarnings("deprecation")
   @Initializer(after = InitMilestone.JOB_LOADED)
   public void migrateData()
   {
@@ -98,13 +102,21 @@ public class LogstashConfiguration extends GlobalConfiguration
             break;
           case ELASTICSEARCH:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search");
-            ElasticSearch es = new ElasticSearch();
-            es.setHost(descriptor.getHost());
-            es.setPort(descriptor.getPort());
-            es.setKey(descriptor.getKey());
-            es.setUsername(descriptor.getUsername());
-            es.setPassword(descriptor.getPassword());
-            logstashIndexer = es;
+            URI uri;
+            try
+            {
+              uri = (new URIBuilder(descriptor.getHost()))
+                  .setPort(descriptor.getPort())
+                  .setPath("/" + descriptor.getKey()).build();
+              ElasticSearch es = new ElasticSearch(uri.toString());
+              es.setUsername(descriptor.getUsername());
+              es.setPassword(descriptor.getPassword());
+              logstashIndexer = es;
+            }
+            catch (URISyntaxException e)
+            {
+              LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search failed: " + e.toString());
+            }
             break;
           case RABBIT_MQ:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for  RabbitMQ");

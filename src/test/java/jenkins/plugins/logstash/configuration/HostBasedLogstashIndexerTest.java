@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import jenkins.plugins.logstash.persistence.MemoryDao;
 
-public class LogstashIndexerTest
+public class HostBasedLogstashIndexerTest
 {
 
   private LogstashIndexerForTest indexer;
@@ -41,7 +41,7 @@ public class LogstashIndexerTest
     assertThat(indexer.equals(indexer2), is(false));
   }
 
-  public static class LogstashIndexerForTest extends LogstashIndexer<MemoryDao>
+  public static class LogstashIndexerForTest extends HostBasedLogstashIndexer<MemoryDao>
   {
 
     public LogstashIndexerForTest(String host, int port)
@@ -53,7 +53,7 @@ public class LogstashIndexerTest
     @Override
     public MemoryDao createIndexerInstance()
     {
-      return new MemoryDao(getHost(), getPort());
+      return new MemoryDao();
     }
   }
 }

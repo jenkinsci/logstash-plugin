@@ -7,7 +7,10 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Before;
 import org.junit.Rule;
@@ -101,16 +104,16 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void elasticSearchMigration()
+  public void elasticSearchMigration() throws URISyntaxException
   {
     when(descriptor.getType()).thenReturn(IndexerType.ELASTICSEARCH);
+    when(descriptor.getHost()).thenReturn("http://localhost");
     configuration.migrateData();
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
     assertThat(indexer, IsInstanceOf.instanceOf(ElasticSearch.class));
     ElasticSearch es = (ElasticSearch) indexer;
-    assertThat(es.getHost(),equalTo("localhost"));
-    assertThat(es.getPort(),is(4567));
-    assertThat(es.getKey(), equalTo("logstash"));
+    URI uri = (new URIBuilder("http://localhost")).setPort(4567).setPath("/logstash").build();
+    assertThat(es.getUri(),equalTo(uri));
     assertThat(es.getPassword(), equalTo("pwd"));
     assertThat(es.getUsername(), equalTo("user"));
   }

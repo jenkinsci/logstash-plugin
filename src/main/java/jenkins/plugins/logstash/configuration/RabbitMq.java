@@ -11,12 +11,12 @@ import hudson.util.Secret;
 import jenkins.plugins.logstash.Messages;
 import jenkins.plugins.logstash.persistence.RabbitMqDao;
 
-public class RabbitMq extends LogstashIndexer<RabbitMqDao>
+public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
 {
 
-  protected String queue;
-  protected String username;
-  protected Secret password;
+  private String queue;
+  private String username;
+  private Secret password;
 
   @DataBoundConstructor
   public RabbitMq()
@@ -105,7 +105,7 @@ public class RabbitMq extends LogstashIndexer<RabbitMqDao>
   @Override
   public RabbitMqDao createIndexerInstance()
   {
-    return new RabbitMqDao(host, port, queue, username, Secret.toString(password));
+    return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password));
   }
 
   @Extension

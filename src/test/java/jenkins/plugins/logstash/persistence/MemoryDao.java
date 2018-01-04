@@ -11,9 +11,9 @@ public class MemoryDao extends AbstractLogstashIndexerDao
 {
     List<JSONObject> output = new ArrayList<>();
 
-    public MemoryDao(String host, int port)
+    public MemoryDao()
     {
-        super(host, port);
+        super();
     }
 
     @Override
@@ -26,5 +26,11 @@ public class MemoryDao extends AbstractLogstashIndexerDao
     public List<JSONObject> getOutput()
     {
         return output;
+    }
+
+    @Override
+    public String getDescription()
+    {
+      return "test";
     }
 }
