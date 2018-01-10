@@ -20,41 +20,31 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
 {
   private String username;
   private Secret password;
-  private URL url;
+  private URI uri;
 
   @DataBoundConstructor
   public ElasticSearch()
   {
   }
 
-  public URL getUrl()
+  public URI getUri()
   {
-    return url;
+    return uri;
   }
 
 
-  private URI getUri()
-  {
-    if (url != null)
-    {
-      URI uri;
-      try
-      {
-        uri = url.toURI();
-        return uri;
-      }
-      catch (URISyntaxException e)
-      {
-        return null;
-      }
-    }
-    return null;
-  }
-
+  /*
+   * We use URL for the setter as stapler can autoconvert a string to a URL but not to a URI
+   */
   @DataBoundSetter
-  public void setUrl(URL uri)
+  public void setUri(URL url) throws URISyntaxException
   {
-    this.url = uri;
+    this.uri = url.toURI();
+  }
+
+  public void setUri(URI uri) throws URISyntaxException
+  {
+    this.uri = uri;
   }
 
   public String getUsername()
@@ -93,14 +83,12 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     {
       return false;
     }
-    if (url == null)
+    if (uri == null)
     {
-      if (other.url != null)
+      if (other.uri != null)
         return false;
     }
-    // String comparison is not optimal but comparing the urls directly  is
-    // criticized by findbugs as being a blocking operation
-    else if (!url.toString().equals(other.url.toString()))
+    else if (!uri.equals(other.uri))
     {
       return false;
     }
@@ -121,7 +109,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((url == null) ? 0 : url.toString().hashCode());
+    result = prime * result + ((uri == null) ? 0 : uri.hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
     result = prime * result + Secret.toString(password).hashCode();
     return result;
@@ -145,7 +133,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     @Override
     public int getDefaultPort()
     {
-      return 9300;
+      return 0;
     }
 
     public FormValidation doCheckUrl(@QueryParameter("value") String value)
@@ -175,15 +163,5 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       }
       return FormValidation.ok();
     }
-  }
-
-  public static void main(String[] args) throws MalformedURLException, URISyntaxException
-  {
-    URL url = new URL("localhost/logstash");
-    System.out.println("Path: " + url.getPath());
-    System.out.println(url.toURI().getUserInfo());
-    System.out.println(url.toURI().getAuthority());
-    System.out.println(url.toURI().getHost());
-
   }
 }

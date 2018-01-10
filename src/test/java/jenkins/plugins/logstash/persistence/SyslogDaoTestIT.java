@@ -43,8 +43,6 @@ public class SyslogDaoTestIT{
 
     // Clean up the the logstash log file
     try {
-      File file = new File(logfile);
-      file.getParentFile().mkdirs();
       writer = new PrintWriter(logfile);
     }
     catch (FileNotFoundException e) {

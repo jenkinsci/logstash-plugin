@@ -8,6 +8,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -112,8 +113,8 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
     assertThat(indexer, IsInstanceOf.instanceOf(ElasticSearch.class));
     ElasticSearch es = (ElasticSearch) indexer;
-    URL url = new URL("http://localhost:4567/logstash");
-    assertThat(es.getUrl(),equalTo(url));
+    URI uri = new URI("http://localhost:4567/logstash");
+    assertThat(es.getUri(),equalTo(uri));
     assertThat(es.getPassword(), equalTo("pwd"));
     assertThat(es.getUsername(), equalTo("user"));
   }

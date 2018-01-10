@@ -58,8 +58,9 @@ public class ElasticSearchDaoTest {
 
   @Test
   public void constructorFailInvalidUrl() throws Exception {
+    URI uri = new URI("localhost:8000/logstash");
     try {
-      createDao("localhost:8000/logstash", "username", "password");
+      new ElasticSearchDao(mockClientBuilder, uri,  "username", "password");
       fail("Expected an IllegalArgumentException.");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "java.net.MalformedURLException: unknown protocol: localhost", e.getMessage());

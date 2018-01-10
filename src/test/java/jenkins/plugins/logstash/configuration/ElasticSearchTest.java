@@ -25,16 +25,16 @@ public class ElasticSearchTest
   private ElasticSearch indexer2;
 
   @Before
-  public void setup() throws MalformedURLException
+  public void setup() throws MalformedURLException, URISyntaxException
   {
     URL url = new URL("http://localhost:4567/key");
     indexer = new ElasticSearch();
-    indexer.setUrl(url);
+    indexer.setUri(url);
     indexer.setPassword("password");
     indexer.setUsername("user");
 
     indexer2 = new ElasticSearch();
-    indexer2.setUrl(url);
+    indexer2.setUri(url);
     indexer2.setPassword("password");
     indexer2.setUsername("user");
 }
@@ -53,9 +53,9 @@ public class ElasticSearchTest
   }
 
   @Test
-  public void urlChangeIsNotEqual() throws MalformedURLException
+  public void urlChangeIsNotEqual() throws MalformedURLException, URISyntaxException
   {
-    indexer.setUrl(new URL("https://localhost:4567/key"));
+    indexer.setUri(new URL("https://localhost:4567/key"));
     assertThat(indexer.equals(indexer2), is(false));
   }
 

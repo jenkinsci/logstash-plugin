@@ -40,10 +40,7 @@ public class LogstashConfiguration extends GlobalConfiguration
   public LogstashConfiguration()
   {
     load();
-    if (logstashIndexer != null)
-    {
-      activeIndexer = logstashIndexer;
-    }
+    activeIndexer = logstashIndexer;
   }
 
   /**
@@ -110,12 +107,12 @@ public class LogstashConfiguration extends GlobalConfiguration
                   .setPort(descriptor.getPort())
                   .setPath("/" + descriptor.getKey()).build();
               ElasticSearch es = new ElasticSearch();
-              es.setUrl(uri.toURL());
+              es.setUri(uri);
               es.setUsername(descriptor.getUsername());
               es.setPassword(descriptor.getPassword());
               logstashIndexer = es;
             }
-            catch (URISyntaxException | MalformedURLException e)
+            catch (URISyntaxException e)
             {
               LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search failed: " + e.toString());
             }
@@ -164,7 +161,10 @@ public class LogstashConfiguration extends GlobalConfiguration
   @Override
   public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException
   {
-    // when we bind the stapler request we get a new instance of logstashIndexer
+    // when we bind the stapler request we get a new instance of logstashIndexer.
+    // logstashIndexer is holder for the dao instance.
+    // To avoid that we get a new dao instance in case there was no change in configuration
+    // we compare it to the currently active configuration.
     staplerRequest.bindJSON(this, json);
     if (!Objects.equals(logstashIndexer, activeIndexer))
     {
