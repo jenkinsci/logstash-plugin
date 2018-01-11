@@ -11,7 +11,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -34,6 +36,9 @@ public class ElasticSearchDaoTest {
   @Mock StatusLine mockStatusLine;
   @Mock CloseableHttpResponse mockResponse;
   @Mock HttpEntity mockEntity;
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   ElasticSearchDao createDao(String url, String username, String password) throws URISyntaxException {
     URI uri = new URI(url);
@@ -59,12 +64,9 @@ public class ElasticSearchDaoTest {
   @Test
   public void constructorFailInvalidUrl() throws Exception {
     URI uri = new URI("localhost:8000/logstash");
-    try {
-      new ElasticSearchDao(mockClientBuilder, uri,  "username", "password");
-      fail("Expected an IllegalArgumentException.");
-    } catch (IllegalArgumentException e) {
-      assertEquals("Wrong error message was thrown", "java.net.MalformedURLException: unknown protocol: localhost", e.getMessage());
-    }
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("java.net.MalformedURLException: unknown protocol: localhost");
+    new ElasticSearchDao(mockClientBuilder, uri,  "username", "password");
   }
 
   @Test
