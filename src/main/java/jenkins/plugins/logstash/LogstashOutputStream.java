@@ -58,7 +58,7 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
     return logstash;
   }
 
-  public MaskPasswordsOutputStream maskPasswords(List<VarPasswordPair> passwords) {
+  public OutputStream maskPasswords(List<VarPasswordPair> passwords) {
     List<String> passwordStrings = new ArrayList<String>();
     for (VarPasswordPair password: passwords) {
       passwordStrings.add(password.getPassword());
