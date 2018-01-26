@@ -76,6 +76,7 @@ public class LogstashInstallation extends ToolInstallation {
     private String username;
     private String password;
     private String key;
+    private String pipeline;
 
     public Descriptor() {
       super();
@@ -210,5 +211,14 @@ public class LogstashInstallation extends ToolInstallation {
       this.key = key;
     }
 
+    public String getPipeline()
+    {
+      return pipeline;
+    }
+
+    public void setPipeline(String pipeline)
+    {
+      this.pipeline = pipeline;
+    }
   }
 }

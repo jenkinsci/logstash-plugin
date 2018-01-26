@@ -26,6 +26,8 @@ package jenkins.plugins.logstash.persistence;
 
 import static com.google.common.collect.Ranges.closedOpen;
 
+import jenkins.model.Jenkins;
+import jenkins.plugins.logstash.LogstashInstallation;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -45,6 +47,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.common.collect.Range;
 
@@ -55,6 +59,8 @@ import com.google.common.collect.Range;
  * @since 1.0.4
  */
 public class ElasticSearchDao extends AbstractLogstashIndexerDao {
+  private String pipeline = "";
+  private final static Logger LOG = Logger.getLogger(ElasticSearchDao.class.getName());
   private final HttpClientBuilder clientBuilder;
   private final URI uri;
   private final String auth;
@@ -74,11 +80,24 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     }
 
     try {
-      uri = new URIBuilder(host)
+      LogstashInstallation.Descriptor logstashPluginConfig = (LogstashInstallation.Descriptor) Jenkins.getInstance().getDescriptor(LogstashInstallation.class);
+      pipeline = logstashPluginConfig.getPipeline();
+    } catch (NullPointerException e){
+      LOG.log(Level.WARNING, "Unable to read pipeline in the jenkins logstash plugin configuration");
+    }
+
+    try {
+      URIBuilder baseUri = new URIBuilder(host)
         .setPort(port)
-        // Normalizer will remove extra starting slashes, but missing slash will cause annoying failures
-        .setPath("/" + key)
-        .build();
+        .setPath("/" + key);
+
+      if (StringUtils.isBlank(pipeline)) {
+        uri = baseUri.build();
+      } else {
+        uri = baseUri
+          .setParameter("pipeline", pipeline)
+          .build();
+      }
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException("Could not create uri", e);
     }
