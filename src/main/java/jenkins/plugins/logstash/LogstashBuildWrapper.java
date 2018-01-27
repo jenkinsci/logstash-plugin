@@ -30,8 +30,8 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildableItemWithBuildWrappers;
-import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
+import jenkins.tasks.SimpleBuildWrapper;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.jenkinsci.Symbol;
 
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair;
@@ -49,7 +50,7 @@ import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
  *
  * @author K Jonathan Harker
  */
-public class LogstashBuildWrapper extends BuildWrapper {
+public class LogstashBuildWrapper extends SimpleBuildWrapper {
 
   /**
    * Create a new {@link LogstashBuildWrapper}.
@@ -114,7 +115,7 @@ public class LogstashBuildWrapper extends BuildWrapper {
   /**
    * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
    */
-  @Extension
+  @Extension @Symbol("logstash")
   public static class DescriptorImpl extends BuildWrapperDescriptor {
 
     public DescriptorImpl() {
