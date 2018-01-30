@@ -41,6 +41,20 @@ Logstash plugin can be used as a publisher in pipeline jobs:
  }
 ```
 
+Or it can be used as a regular step.
+When you combine with timestamps step, you should make the timestamps the outer most block. Otherwise you get the timestamps as part of the log lines, basically duplicating the timestamp information. 
+
+```Groovy
+timestamps {
+  logstash {
+    node('somelabel') {
+      sh'''
+      echo 'Hello World!'
+      '''
+    }
+  }
+}
+```
 
 License
 =======
