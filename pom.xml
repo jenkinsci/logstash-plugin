@@ -138,6 +138,12 @@
     	<version>2.0.0-beta.5</version>
     	<scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>org.jenkins-ci.plugins.workflow</groupId>
+    	<artifactId>workflow-step-api</artifactId>
+    	<version>1.15</version>
+		<optional>true</optional>
+    </dependency>
   </dependencies>
 
   <build>
