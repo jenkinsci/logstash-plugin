@@ -40,60 +40,69 @@ import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair;
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
-
 /**
  * Build wrapper that decorates the build's logger to insert a
  *
  * @author K Jonathan Harker
  */
-public class LogstashBuildWrapper extends BuildWrapper {
+public class LogstashBuildWrapper extends BuildWrapper
+{
 
   /**
    * Create a new {@link LogstashBuildWrapper}.
    */
   @DataBoundConstructor
-  public LogstashBuildWrapper() {}
+  public LogstashBuildWrapper()
+  {}
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+  public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
+      throws IOException, InterruptedException
+  {
 
-    return new Environment() {};
+    return new Environment()
+    {
+    };
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public OutputStream decorateLogger(AbstractBuild build, OutputStream logger) {
+  public OutputStream decorateLogger(AbstractBuild build, OutputStream logger)
+  {
     LogstashWriter logstash = getLogStashWriter(build, logger);
 
     LogstashOutputStream los = new LogstashOutputStream(logger, logstash);
 
-    if (build.getProject() instanceof BuildableItemWithBuildWrappers) {
-      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers) build.getProject();
-      for (BuildWrapper wrapper: project.getBuildWrappersList()) {
-        if (wrapper instanceof MaskPasswordsBuildWrapper) {
-          List<VarPasswordPair> allPasswordPairs = new ArrayList<VarPasswordPair>();
+    if (build.getProject() instanceof BuildableItemWithBuildWrappers)
+    {
+      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers)build.getProject();
+      for (BuildWrapper wrapper : project.getBuildWrappersList())
+      {
+        if (wrapper instanceof com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper)
+        {
+          List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> allPasswordPairs = new ArrayList<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair>();
 
-          MaskPasswordsBuildWrapper maskPasswordsWrapper = (MaskPasswordsBuildWrapper) wrapper;
-          List<VarPasswordPair> jobPasswordPairs = maskPasswordsWrapper.getVarPasswordPairs();
-          if (jobPasswordPairs != null) {
+          com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper maskPasswordsWrapper = (com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper)wrapper;
+          List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> jobPasswordPairs = maskPasswordsWrapper
+              .getVarPasswordPairs();
+          if (jobPasswordPairs != null)
+          {
             allPasswordPairs.addAll(jobPasswordPairs);
           }
 
-          MaskPasswordsConfig config = MaskPasswordsConfig.getInstance();
-          List<VarPasswordPair> globalPasswordPairs = config.getGlobalVarPasswordPairs();
-          if (globalPasswordPairs != null) {
+          com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig config = com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig.getInstance();
+          List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> globalPasswordPairs = config.getGlobalVarPasswordPairs();
+          if (globalPasswordPairs != null)
+          {
             allPasswordPairs.addAll(globalPasswordPairs);
           }
 
-          return los.maskPasswords(allPasswordPairs);
+          return maskPasswords(los, allPasswordPairs);
         }
       }
     }
@@ -101,13 +110,25 @@ public class LogstashBuildWrapper extends BuildWrapper {
     return los;
   }
 
+  private OutputStream maskPasswords(OutputStream los, List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> passwords)
+  {
+    List<String> passwordStrings = new ArrayList<String>();
+    for (com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair password : passwords)
+    {
+      passwordStrings.add(password.getPassword());
+    }
+    return new com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsOutputStream(los, passwordStrings);
+  }
+
   @Override
-  public DescriptorImpl getDescriptor() {
-    return (DescriptorImpl) super.getDescriptor();
+  public DescriptorImpl getDescriptor()
+  {
+    return (DescriptorImpl)super.getDescriptor();
   }
 
   // Method to encapsulate calls for unit-testing
-  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
+  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream)
+  {
     return new LogstashWriter(build, errorStream, null, build.getCharset());
   }
 
@@ -115,9 +136,11 @@ public class LogstashBuildWrapper extends BuildWrapper {
    * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
    */
   @Extension
-  public static class DescriptorImpl extends BuildWrapperDescriptor {
+  public static class DescriptorImpl extends BuildWrapperDescriptor
+  {
 
-    public DescriptorImpl() {
+    public DescriptorImpl()
+    {
       super(LogstashBuildWrapper.class);
       load();
     }
@@ -126,7 +149,8 @@ public class LogstashBuildWrapper extends BuildWrapper {
      * {@inheritDoc}
      */
     @Override
-    public String getDisplayName() {
+    public String getDisplayName()
+    {
       return Messages.DisplayName();
     }
 
@@ -134,7 +158,8 @@ public class LogstashBuildWrapper extends BuildWrapper {
      * {@inheritDoc}
      */
     @Override
-    public boolean isApplicable(AbstractProject<?, ?> item) {
+    public boolean isApplicable(AbstractProject<?, ?> item)
+    {
       return true;
     }
   }
