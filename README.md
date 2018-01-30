@@ -30,7 +30,7 @@ Currently supported methods of input/output:
 Pipeline
 ========
 
-Logstash plugin can be used as a publisher in pipeline jobs:
+Logstash plugin can be used as a publisher in pipeline jobs to send the whole log as a single document.
 
 ```Groovy
  node('master') {
@@ -41,8 +41,9 @@ Logstash plugin can be used as a publisher in pipeline jobs:
  }
 ```
 
-Or it can be used as a regular step.
-When you combine with timestamps step, you should make the timestamps the outer most block. Otherwise you get the timestamps as part of the log lines, basically duplicating the timestamp information. 
+It can be used as a wrapper step to send each log line separately.
+
+Note: when you combine with timestamps step, you should make the timestamps the outer most block. Otherwise you get the timestamps as part of the log lines, basically duplicating the timestamp information. 
 
 ```Groovy
 timestamps {
