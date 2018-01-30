@@ -76,48 +76,7 @@ public class LogstashBuildWrapper extends BuildWrapper
   {
     LogstashWriter logstash = getLogStashWriter(build, logger);
 
-    LogstashOutputStream los = new LogstashOutputStream(logger, logstash);
-
-    if (build.getProject() instanceof BuildableItemWithBuildWrappers)
-    {
-      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers)build.getProject();
-      for (BuildWrapper wrapper : project.getBuildWrappersList())
-      {
-        if (wrapper instanceof com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper)
-        {
-          List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> allPasswordPairs = new ArrayList<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair>();
-
-          com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper maskPasswordsWrapper = (com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper)wrapper;
-          List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> jobPasswordPairs = maskPasswordsWrapper
-              .getVarPasswordPairs();
-          if (jobPasswordPairs != null)
-          {
-            allPasswordPairs.addAll(jobPasswordPairs);
-          }
-
-          com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig config = com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig.getInstance();
-          List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> globalPasswordPairs = config.getGlobalVarPasswordPairs();
-          if (globalPasswordPairs != null)
-          {
-            allPasswordPairs.addAll(globalPasswordPairs);
-          }
-
-          return maskPasswords(los, allPasswordPairs);
-        }
-      }
-    }
-
-    return los;
-  }
-
-  private OutputStream maskPasswords(OutputStream los, List<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair> passwords)
-  {
-    List<String> passwordStrings = new ArrayList<String>();
-    for (com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair password : passwords)
-    {
-      passwordStrings.add(password.getPassword());
-    }
-    return new com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsOutputStream(los, passwordStrings);
+    return new LogstashOutputStream(logger, logstash);
   }
 
   @Override
@@ -135,7 +94,8 @@ public class LogstashBuildWrapper extends BuildWrapper
   /**
    * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
    */
-  @Extension
+  // We need a high ordinal so that we are in the list of BuildWrappers before the MaskPasswords
+  @Extension(ordinal = 10000)
   public static class DescriptorImpl extends BuildWrapperDescriptor
   {
 
