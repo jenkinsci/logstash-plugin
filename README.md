@@ -50,7 +50,7 @@ timestamps {
   logstash {
     node('somelabel') {
       sh'''
-      echo 'Hello World!'
+      echo 'Hello, World!'
       '''
     }
   }
