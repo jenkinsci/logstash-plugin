@@ -1,23 +1,16 @@
 package jenkins.plugins.logstash;
 
-import hudson.EnvVars;
-import hudson.model.AbstractBuild;
-import hudson.model.Computer;
-import hudson.model.Executor;
-import hudson.model.Project;
-import hudson.model.Result;
-import hudson.model.TaskListener;
-import hudson.tasks.test.AbstractTestResultAction;
-import jenkins.plugins.logstash.persistence.BuildData;
-import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
-import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
-import net.sf.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.*;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,9 +21,28 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import hudson.EnvVars;
+import hudson.model.AbstractBuild;
+import hudson.model.Computer;
+import hudson.model.Executor;
+import hudson.model.Project;
+import hudson.model.Result;
+import hudson.model.TaskListener;
+import hudson.tasks.test.AbstractTestResultAction;
+import jenkins.plugins.logstash.persistence.BuildData;
+import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
+import net.sf.json.JSONObject;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LogstashWriterTest {
@@ -42,11 +54,7 @@ public class LogstashWriterTest {
                                              final BuildData data) {
     return new LogstashWriter(testBuild, error, null, testBuild.getCharset()) {
       @Override
-      protected LogstashIndexerDao createDao() throws InstantiationException {
-        if (indexer == null) {
-          throw new InstantiationException("DoaTestInstantiationException");
-        }
-
+      LogstashIndexerDao getIndexerDao() {
         return indexer;
       }
 
@@ -118,7 +126,6 @@ public class LogstashWriterTest {
       .thenReturn(JSONObject.fromObject("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}"));
 
     Mockito.doNothing().when(mockDao).push(Matchers.anyString());
-    when(mockDao.getIndexerType()).thenReturn(IndexerType.REDIS);
     when(mockDao.getDescription()).thenReturn("localhost:8080");
 
     errorBuffer = new ByteArrayOutputStream();
@@ -175,8 +182,7 @@ public class LogstashWriterTest {
 
   @Test
   public void constructorSuccessNoDao() throws Exception {
-    String exMessage = "InstantiationException: DoaTestInstantiationException\n" +
-      "[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n";
+    String exMessage = "[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n";
 
     // Unit under test
     LogstashWriter writer = createLogstashWriter(mockBuild, errorBuffer, "http://my-jenkins-url", null, null);
@@ -237,7 +243,6 @@ public class LogstashWriterTest {
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
-
   }
 
   @Test
@@ -266,7 +271,7 @@ public class LogstashWriterTest {
 
 
     String msg = "test";
-    String exMessage = "[logstash-plugin]: Failed to send log data to REDIS:localhost:8080.\n" +
+    String exMessage = "[logstash-plugin]: Failed to send log data: localhost:8080.\n" +
       "[logstash-plugin]: No Further logs will be sent to localhost:8080.\n" +
       "java.io.IOException: BOOM!";
 
@@ -299,11 +304,9 @@ public class LogstashWriterTest {
     //Verify calls were made to the dao logging twice, not three times.
     verify(mockDao, times(2)).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
     verify(mockDao, times(2)).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
-    verify(mockDao).getIndexerType();
     verify(mockDao, times(2)).getDescription();
     verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
-
   }
 
   @Test

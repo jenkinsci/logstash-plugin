@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.rabbitmq.client.AuthenticationFailureException;
 import com.rabbitmq.client.Channel;
@@ -48,6 +48,7 @@ public class RabbitMqDaoTest {
     int port = (int) (Math.random() * 1000);
     // Note that we can't run these tests in parallel
     dao = createDao("localhost", port, "logstash", "username", "password");
+    dao.setCharset(Charset.defaultCharset());
 
     when(mockPool.newConnection()).thenReturn(mockConnection);
 
@@ -110,11 +111,11 @@ public class RabbitMqDaoTest {
     dao = createDao("localhost", 5672, "logstash", "username", "password");
 
     // Verify results
-    assertEquals("Wrong host name", "localhost", dao.host);
-    assertEquals("Wrong port", 5672, dao.port);
-    assertEquals("Wrong key", "logstash", dao.key);
-    assertEquals("Wrong name", "username", dao.username);
-    assertEquals("Wrong password", "password", dao.password);
+    assertEquals("Wrong host name", "localhost", dao.getHost());
+    assertEquals("Wrong port", 5672, dao.getPort());
+    assertEquals("Wrong key", "logstash", dao.getQueue());
+    assertEquals("Wrong name", "username", dao.getUsername());
+    assertEquals("Wrong password", "password", dao.getPassword());
   }
 
   @Test(expected = IOException.class)
@@ -198,6 +199,7 @@ public class RabbitMqDaoTest {
   public void pushSuccessNoAuth() throws Exception {
     String json = "{ 'foo': 'bar' }";
     dao = createDao("localhost", 5672, "logstash", null, null);
+    dao.setCharset(Charset.defaultCharset());
 
     // Unit under test
     dao.push(json);

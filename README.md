@@ -30,7 +30,7 @@ Currently supported methods of input/output:
 Pipeline
 ========
 
-Logstash plugin can be used as a publisher in pipeline jobs:
+Logstash plugin can be used as a publisher in pipeline jobs to send the whole log as a single document.
 
 ```Groovy
  node('master') {
@@ -41,6 +41,21 @@ Logstash plugin can be used as a publisher in pipeline jobs:
  }
 ```
 
+It can be used as a wrapper step to send each log line separately.
+
+Note: when you combine with timestamps step, you should make the timestamps the outer most block. Otherwise you get the timestamps as part of the log lines, basically duplicating the timestamp information. 
+
+```Groovy
+timestamps {
+  logstash {
+    node('somelabel') {
+      sh'''
+      echo 'Hello, World!'
+      '''
+    }
+  }
+}
+```
 
 License
 =======
@@ -57,6 +72,7 @@ Contributing
 Adding support for new indexers
 -------------------------------
 
-* Create a new class in the package `jenkins.plugins.logstash.persistence` that extends `AbstractLogstashIndexerDao`
-* Add a new entry to the enum `IndexerType` in `LogstashIndexerDao`
-* Add a new mapping to the `INDEXER_MAP` in `IndexerDaoFactory`
+* Implement the extension point `jenkins.plugins.logstash.configuration.LogstashIndexer` that will take your configuration. 
+Override the method `shouldRefreshInstance()` where you decide if a new dao instance must be created because the configuration has changed in the meantime.
+* Create a `configure-advanced.jelly` for the UI part of your configuration.
+* Create a new class that extends `jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao`. This class will do the actual work of pushing the logs to the indexer.

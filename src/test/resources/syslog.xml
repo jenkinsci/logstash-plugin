@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jenkins.plugins.logstash.LogstashConfiguration plugin="logstash@1.4.0-SNAPSHOT">
+  <logstashIndexer class="jenkins.plugins.logstash.configuration.Syslog">
+    <host>localhost</host>
+    <port>519</port>
+    <messageFormat>RFC_3164</messageFormat>
+    <syslogProtocol>UDP</syslogProtocol>
+  </logstashIndexer>
+  <dataMigrated>true</dataMigrated>
+</jenkins.plugins.logstash.LogstashConfiguration>

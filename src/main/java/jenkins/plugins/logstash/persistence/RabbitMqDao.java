@@ -35,22 +35,38 @@ import com.rabbitmq.client.ConnectionFactory;
 /**
  * RabbitMQ Data Access Object.
  *
+ * TODO: make the charset configurable via the UI with UTF-8 being the default
+ * TODO: support TLS
+ * TODO: support vhost
+ *
  * @author Rusty Gerard
  * @since 1.0.0
  */
-public class RabbitMqDao extends AbstractLogstashIndexerDao {
+public class RabbitMqDao extends HostBasedLogstashIndexerDao {
   private final ConnectionFactory pool;
+
+  private String queue;
+  private String username;
+  private String password;
 
   //primary constructor used by indexer factory
   public RabbitMqDao(String host, int port, String key, String username, String password) {
     this(null, host, port, key, username, password);
   }
 
-  // Factored for unit testing
-  RabbitMqDao(ConnectionFactory factory, String host, int port, String key, String username, String password) {
-    super(host, port, key, username, password);
+  /*
+   * TODO: this constructor is only for testing so one can inject a mocked ConnectionFactory.
+   *       With Powermock we can intercept the creation of the ConnectionFactory and replace with a mock
+   *       making this constructor obsolete
+   */
+  RabbitMqDao(ConnectionFactory factory, String host, int port, String queue, String username, String password) {
+    super(host, port);
 
-    if (StringUtils.isBlank(key)) {
+    this.queue = queue;
+    this.username = username;
+    this.password = password;
+
+    if (StringUtils.isBlank(queue)) {
       throw new IllegalArgumentException("rabbit queue name is required");
     }
 
@@ -67,6 +83,31 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
     }
   }
 
+  public String getQueue()
+  {
+    return queue;
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
+  public String getPassword()
+  {
+      return password;
+  }
+
+
+  /*
+   * TODO: do we really need to open a connection each time?
+   *       channels are not thread-safe so we need a new channel each time but the connection
+   *       could be shared. Another idea would be to use one dao per build, reuse the channel and
+   *       synchronize the push on the channel (for pipeline builds where we can have multiple
+   *       threads writing, are freestyle projects guaranteed to be single threaded?).
+   * (non-Javadoc)
+   * @see jenkins.plugins.logstash.persistence.LogstashIndexerDao#push(java.lang.String)
+   */
   @Override
   public void push(String data) throws IOException {
     Connection connection = null;
@@ -74,31 +115,27 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
     try {
       connection = pool.newConnection();
       channel = connection.createChannel();
-
       // Ensure the queue exists
+
       try {
-        channel.queueDeclarePassive(key);
+        channel.queueDeclarePassive(queue);
       } catch (IOException e) {
         // The queue does not exist and the channel has been closed
         finalizeChannel(channel);
 
         // Create the queue
         channel = connection.createChannel();
-        channel.queueDeclare(key, true, false, false, null);
+        channel.queueDeclare(queue, true, false, false, null);
       }
 
-      channel.basicPublish("", key, null, data.getBytes(getCharset()));
+      channel.basicPublish("", queue, null, data.getBytes(getCharset()));
     } finally {
       finalizeChannel(channel);
       finalizeConnection(connection);
     }
   }
 
-  @Override
-  public IndexerType getIndexerType() {
-    return IndexerType.RABBIT_MQ;
-  }
-
+  // TODO: connection.isOpen() should be avoided (see the rabbitmq doc)
   private void finalizeConnection(Connection connection) {
     if (connection != null && connection.isOpen()) {
       try {
@@ -110,6 +147,7 @@ public class RabbitMqDao extends AbstractLogstashIndexerDao {
     }
   }
 
+  // TODO: connection.isOpen() should be avoided (see the rabbitmq doc)
   private void finalizeChannel(Channel channel) {
     if (channel != null && channel.isOpen()) {
       try {

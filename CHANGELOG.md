@@ -1,3 +1,13 @@
+
+1.4.0
+-----
+* reduce visibility of fields (#46)
+* findbugs: fix default encoding issues (#45)
+* findbugs: fix issues in BuildData (#44)
+* properly get displayname of node (#38)
+* Full project name (#37)
+* JENKINS-41324 Append `build` envVars for build and post-build injected envVars (#33)
+
 1.3.0
 -----
 * Add test error details for failed test cases (#30)
