@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jenkinsci.plugins.envinject.EnvInjectBuildWrapper;
