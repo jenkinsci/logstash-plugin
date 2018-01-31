@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -27,7 +27,7 @@ public class RedisDaoTest {
   @Mock Jedis mockJedis;
 
   RedisDao createDao(String host, int port, String key, String username, String password) {
-    return new RedisDao(mockPool, host, port, key, username, password);
+    return new RedisDao(mockPool, host, port, key, password);
   }
 
   @Before
@@ -90,11 +90,10 @@ public class RedisDaoTest {
     dao = createDao("localhost", 6379, "logstash", "username", "password");
 
     // Verify results
-    assertEquals("Wrong host name", "localhost", dao.host);
-    assertEquals("Wrong port", 6379, dao.port);
-    assertEquals("Wrong key", "logstash", dao.key);
-    assertEquals("Wrong name", "username", dao.username);
-    assertEquals("Wrong password", "password", dao.password);
+    assertEquals("Wrong host name", "localhost", dao.getHost());
+    assertEquals("Wrong port", 6379, dao.getPort());
+    assertEquals("Wrong key", "logstash", dao.getKey());
+    assertEquals("Wrong password", "password", dao.getPassword());
   }
 
   @Test(expected = IOException.class)

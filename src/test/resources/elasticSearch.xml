@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jenkins.plugins.logstash.LogstashConfiguration plugin="logstash@1.4.0-SNAPSHOT">
+  <logstashIndexer class="jenkins.plugins.logstash.configuration.ElasticSearch">
+    <uri>http://localhost:9300/logstash</uri>
+    <username></username>
+    <password>{AQAAABAAAAAQdB13xsx5UlCScGiBcVUOL0GqWYwAU5syhW9iBb6tG+4=}</password>
+  </logstashIndexer>
+  <dataMigrated>true</dataMigrated>
+</jenkins.plugins.logstash.LogstashConfiguration>

@@ -73,7 +73,6 @@ public class BuildData {
 
     public static class FailedTest {
       private final String fullName, errorDetails;
-
       public FailedTest(String fullName, String errorDetails) {
         super();
         this.fullName = fullName;

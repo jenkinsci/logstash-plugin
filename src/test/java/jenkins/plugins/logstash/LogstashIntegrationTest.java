@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -25,19 +23,19 @@ import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.model.Slave;
 import hudson.model.queue.QueueTaskFuture;
-import jenkins.plugins.logstash.LogstashInstallation.Descriptor;
-import jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao;
-import jenkins.plugins.logstash.persistence.IndexerDaoFactory;
-import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
+import jenkins.plugins.logstash.persistence.MemoryDao;
 import net.sf.json.JSONObject;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"javax.crypto.*"})
-@PrepareForTest({ IndexerDaoFactory.class, LogstashInstallation.class })
+@PrepareForTest(LogstashConfiguration.class)
 public class LogstashIntegrationTest
 {
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
+
+    @Mock
+    private LogstashConfiguration logstashConfiguration;
 
     private Slave slave;
 
@@ -45,32 +43,21 @@ public class LogstashIntegrationTest
 
     private MemoryDao memoryDao;
 
-    @Mock
-    Descriptor descriptor;
-
     @Before
     public void setup() throws Exception
     {
-        PowerMockito.mockStatic(IndexerDaoFactory.class);
-        PowerMockito.mockStatic(LogstashInstallation.class);
-        when(LogstashInstallation.getLogstashDescriptor()).thenReturn(descriptor);
-        when(descriptor.getType()).thenReturn(IndexerType.SYSLOG);
-        when(descriptor.getHost()).thenReturn("localhost");
-        when(descriptor.getPort()).thenReturn(1);
-        when(descriptor.getUsername()).thenReturn("username");
-        when(descriptor.getKey()).thenReturn("password");
-        when(descriptor.getKey()).thenReturn("key");
-
         memoryDao = new MemoryDao();
-        when(IndexerDaoFactory.getInstance(IndexerType.SYSLOG, descriptor.getHost(), descriptor.getPort(),
-            descriptor.getKey(),descriptor.getUsername(), descriptor.getPassword())).thenReturn(memoryDao);
+        PowerMockito.mockStatic(LogstashConfiguration.class);
+        when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+        when(logstashConfiguration.getIndexerInstance()).thenReturn(memoryDao);
+
         slave = jenkins.createSlave();
         slave.setLabelString("myLabel");
         project = jenkins.createFreeStyleProject();
     }
 
     @Test
-    public void test_buildWrapperOnMaster() throws Exception
+    public void buildWrapperOnMaster() throws Exception
     {
         project.getBuildWrappersList().add(new LogstashBuildWrapper());
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -87,7 +74,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void test_buildWrapperOnSlave() throws Exception
+    public void buildWrapperOnSlave() throws Exception
     {
         project.getBuildWrappersList().add(new LogstashBuildWrapper());
         project.setAssignedNode(slave);
@@ -106,7 +93,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void test_buildNotifierOnMaster() throws Exception
+    public void buildNotifierOnMaster() throws Exception
     {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -121,7 +108,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void test_buildNotifierOnSlave() throws Exception
+    public void buildNotifierOnSlave() throws Exception
     {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         project.setAssignedNode(slave);
@@ -134,34 +121,5 @@ public class LogstashIntegrationTest
         JSONObject data = firstLine.getJSONObject("data");
         assertThat(data.getString("buildHost"),equalTo(slave.getDisplayName()));
         assertThat(data.getString("buildLabel"),equalTo(slave.getLabelString()));
-    }
-
-    private static class MemoryDao extends AbstractLogstashIndexerDao
-    {
-        List<JSONObject> output = new ArrayList<>();
-
-        public MemoryDao()
-        {
-            super("localhost", 1, "key", "username", "password");
-        }
-
-        @Override
-        public IndexerType getIndexerType()
-        {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public void push(String data) throws IOException
-        {
-            JSONObject json = JSONObject.fromObject(data);
-            output.add(json);
-        }
-
-        public List<JSONObject> getOutput()
-        {
-            return output;
-        }
     }
 }

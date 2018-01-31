@@ -30,7 +30,6 @@ import hudson.model.TaskListener;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.persistence.BuildData;
-import jenkins.plugins.logstash.persistence.IndexerDaoFactory;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -65,6 +64,9 @@ public class LogstashWriter {
   private boolean connectionBroken;
   private Charset charset;
 
+  /*
+   * TODO: the charset must not be transfered to the dao. The dao is shared between different build.
+   */
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
@@ -149,10 +151,8 @@ public class LogstashWriter {
   }
 
   // Method to encapsulate calls for unit-testing
-  LogstashIndexerDao createDao() throws InstantiationException {
-    LogstashInstallation.Descriptor descriptor = LogstashInstallation.getLogstashDescriptor();
-    return IndexerDaoFactory.getInstance(descriptor.getType(), descriptor.getHost(), descriptor.getPort(),
-        descriptor.getKey(), descriptor.getUsername(), descriptor.getPassword());
+  LogstashIndexerDao getIndexerDao() {
+    return LogstashConfiguration.getInstance().getIndexerInstance();
   }
 
   BuildData getBuildData() {
@@ -163,8 +163,6 @@ public class LogstashWriter {
     }
   }
 
-  @SuppressFBWarnings(value="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
-      justification="Jenkins 2.0 will never return null. So wait for upgrade.")
   String getJenkinsUrl() {
     return Jenkins.getInstance().getRootUrl();
   }
@@ -177,7 +175,7 @@ public class LogstashWriter {
     try {
       dao.push(payload.toString());
     } catch (IOException e) {
-      String msg = "[logstash-plugin]: Failed to send log data to " + dao.getIndexerType() + ":" + dao.getDescription() + ".\n" +
+      String msg = "[logstash-plugin]: Failed to send log data: " + dao.getDescription() + ".\n" +
         "[logstash-plugin]: No Further logs will be sent to " + dao.getDescription() + ".\n" +
         ExceptionUtils.getStackTrace(e);
       logErrorMessage(msg);
@@ -192,8 +190,13 @@ public class LogstashWriter {
    */
   private LogstashIndexerDao getDaoOrNull() {
     try {
-      return createDao();
-    } catch (InstantiationException e) {
+      LogstashIndexerDao dao = getIndexerDao();
+      if (dao == null)
+      {
+        logErrorMessage("[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n");
+      }
+      return dao;
+    } catch (IllegalArgumentException e) {
       String msg =  ExceptionUtils.getMessage(e) + "\n" +
         "[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n";
 
@@ -215,4 +218,5 @@ public class LogstashWriter {
       ex.printStackTrace();
     }
   }
+
 }

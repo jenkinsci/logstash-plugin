@@ -37,6 +37,7 @@ import net.sf.json.JSONObject;
  * @since 1.0.0
  */
 public interface LogstashIndexerDao {
+  @Deprecated
   static enum IndexerType {
     REDIS,
     RABBIT_MQ,
@@ -44,6 +45,7 @@ public interface LogstashIndexerDao {
     SYSLOG
   }
 
+  @Deprecated
   static enum SyslogFormat {
 	RFC5424,
 	RFC3164
@@ -55,9 +57,7 @@ public interface LogstashIndexerDao {
 
   public void setCharset(Charset charset);
 
-  String getDescription();
-
-  IndexerType getIndexerType();
+  public String getDescription();
 
   /**
    * Sends the log data to the Logstash indexer.
@@ -67,7 +67,7 @@ public interface LogstashIndexerDao {
    * @throws java.io.IOException
    *          The data is not written to the server
    */
-  void push(String data) throws IOException;
+  public void push(String data) throws IOException;
 
   /**
    * Builds a JSON payload compatible with the Logstash schema.
@@ -80,5 +80,5 @@ public interface LogstashIndexerDao {
    *          The log data to transmit, not null
    * @return The formatted JSON object, never null
    */
-  JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines);
+  public JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines);
 }

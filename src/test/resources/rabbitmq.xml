@@ -1,0 +1,10 @@
+<jenkins.plugins.logstash.LogstashConfiguration plugin="logstash@1.4.0-SNAPSHOT">
+  <logstashIndexer class="jenkins.plugins.logstash.configuration.RabbitMq">
+    <host>localhost</host>
+    <port>5672</port>
+    <queue>logstash</queue>
+    <username></username>
+    <password>{AQAAABAAAAAQ5wlElDfWGri9VuaMh0MCBZWs1fjL31zvnxrkszfW5pA=}</password>
+  </logstashIndexer>
+  <dataMigrated>true</dataMigrated>
+</jenkins.plugins.logstash.LogstashConfiguration>

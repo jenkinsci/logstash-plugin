@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AbstractLogstashIndexerDaoTest {
@@ -66,13 +66,15 @@ public class AbstractLogstashIndexerDaoTest {
   }
 
   private AbstractLogstashIndexerDao getInstance() {
-    return new AbstractLogstashIndexerDao("localhost", -1, "", "", "") {
+    return new AbstractLogstashIndexerDao() {
+      @Override
+    public void push(String data) throws IOException {}
 
-      public IndexerType getIndexerType() {
-        return IndexerType.REDIS;
+      @Override
+      public String getDescription()
+      {
+        return "test";
       }
-
-      public void push(String data) throws IOException {}
     };
   }
 }
