@@ -49,10 +49,12 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
   private String username;
   private String password;
   private Charset charset;
+  private String virtualHost;
+
 
   //primary constructor used by indexer factory
-  public RabbitMqDao(String host, int port, String key, String username, String password, Charset charset) {
-    this(null, host, port, key, username, password, charset);
+  public RabbitMqDao(String host, int port, String key, String username, String password, Charset charset, String virtualHost) {
+    this(null, host, port, key, username, password, charset, virtualHost);
   }
 
   /*
@@ -60,13 +62,14 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
    *       With Powermock we can intercept the creation of the ConnectionFactory and replace with a mock
    *       making this constructor obsolete
    */
-  RabbitMqDao(ConnectionFactory factory, String host, int port, String queue, String username, String password, Charset charset) {
+  RabbitMqDao(ConnectionFactory factory, String host, int port, String queue, String username, String password, Charset charset, String vhost) {
     super(host, port);
 
     this.queue = queue;
     this.username = username;
     this.password = password;
     this.charset = charset;
+    this.virtualHost = vhost;
 
     if (StringUtils.isBlank(queue)) {
       throw new IllegalArgumentException("rabbit queue name is required");
@@ -78,6 +81,10 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     pool = factory == null ? new ConnectionFactory() : factory;
     pool.setHost(host);
     pool.setPort(port);
+    if (virtualHost != null)
+    {
+      pool.setVirtualHost(virtualHost);
+    }
 
     if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
       pool.setPassword(password);
@@ -100,6 +107,10 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
       return password;
   }
 
+  public String getVirtualHost()
+  {
+    return virtualHost;
+  }
 
   /*
    * TODO: do we really need to open a connection each time?

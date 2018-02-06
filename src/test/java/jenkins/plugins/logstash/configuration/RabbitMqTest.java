@@ -27,6 +27,7 @@ public class RabbitMqTest
     indexer.setPassword("password");
     indexer.setUsername("user");
     indexer.setQueue("queue");
+    indexer.setVirtualHost("vhost");
 
     indexer2 = new RabbitMq("UTF-8");
     indexer2.setHost("localhost");
@@ -34,6 +35,7 @@ public class RabbitMqTest
     indexer2.setPassword("password");
     indexer2.setUsername("user");
     indexer2.setQueue("queue");
+    indexer2.setVirtualHost("vhost");
 
     indexer3 = new RabbitMq("UTF-16");
     indexer3.setHost("localhost");
@@ -41,7 +43,8 @@ public class RabbitMqTest
     indexer3.setPassword("password");
     indexer3.setUsername("user");
     indexer3.setQueue("queue");
-}
+    indexer3.setQueue("vhost");
+  }
 
   @Test
   public void sameSettingsAreEqual()
@@ -76,4 +79,9 @@ public class RabbitMqTest
     assertThat(indexer.equals(indexer3), is(false));
   }
 
+  public void vhostChangeIsNotEqual()
+  {
+    indexer.setVirtualHost("newVhost");
+    assertThat(indexer.equals(indexer2), is(false));
+  }
 }

@@ -20,7 +20,7 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   private String username;
   private Secret password;
   private Charset charset;
-
+  private String virtualHost;
 
   @DataBoundConstructor
   public RabbitMq(String charset)
@@ -41,12 +41,27 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
     {
       charset = Charset.defaultCharset();
     }
+    if (virtualHost == null)
+    {
+      virtualHost = "/";
+    }
     return this;
   }
 
   public Charset getCharset()
   {
     return charset;
+  }
+
+  public String getVirtualHost()
+  {
+    return virtualHost;
+  }
+
+  @DataBoundSetter
+  public void setVirtualHost(String virtualHost)
+  {
+    this.virtualHost = virtualHost;
   }
 
   public String getQueue()
@@ -96,23 +111,17 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
     {
       return false;
     }
-    if (queue == null)
+    if (!StringUtils.equals(queue, other.queue))
     {
-      if (other.queue != null)
         return false;
     }
-    else if (!queue.equals(other.queue))
+    if (!StringUtils.equals(username, other.username))
     {
-      return false;
-    }
-    if (username == null)
-    {
-      if (other.username != null)
         return false;
     }
-    else if (!username.equals(other.username))
+    if (!StringUtils.equals(virtualHost, other.virtualHost))
     {
-      return false;
+        return false;
     }
     if (charset == null)
     {
@@ -136,6 +145,7 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
     result = prime * result + ((queue == null) ? 0 : queue.hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
     result = prime * result + ((charset == null) ? 0 : charset.hashCode());
+    result = prime * result + ((virtualHost == null) ? 0 : virtualHost.hashCode());
     result = prime * result + Secret.toString(password).hashCode();
     return result;
   }
@@ -143,7 +153,7 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   @Override
   public RabbitMqDao createIndexerInstance()
   {
-    return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password), charset);
+    return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password), charset, getVirtualHost());
   }
 
   @Extension
