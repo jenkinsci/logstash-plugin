@@ -1,0 +1,25 @@
+version: '2'
+services:
+  elk:
+    image: sebp/elk:es240_l240_k460
+    ports:
+    - "127.0.0.1:5000:5000"
+    - "127.0.0.1:5044:5044"
+    - "127.0.0.1:5601:5601"
+    - "127.0.0.1:9200:9200"
+# TODO preconfigure view via logstash* & @timestamp
+  jenkins:
+    build: .
+    ports:
+     - "127.0.0.1:8080:8080"
+    expose:
+     - "50000"
+    links:
+     - elk
+  agent:
+    image: cloudbees/jnlp-slave-with-java-build-tools
+    links:
+     - elk
+     - jenkins
+# TODO there is no -noreconnect yet this does not work when first started; you need to relaunch it; work around with wait-for-it: https://docs.docker.com/compose/startup-order/
+    command: -url http://jenkins:8080/ b4178553de10d5551ff6d19cc1f0665d0ee6fff211bc0b57ec7c4c5617e23bb8 remote

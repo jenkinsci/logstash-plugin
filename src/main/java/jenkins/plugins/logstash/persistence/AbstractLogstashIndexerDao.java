@@ -24,8 +24,13 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import hudson.model.Run;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +46,8 @@ import net.sf.json.JSONObject;
  * @since 1.0.0
  */
 public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
+  private static volatile String localhost;
+
   private Charset charset;
 
   /**
@@ -71,10 +78,23 @@ public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
     payload.put("message", logLines);
     payload.put("source", "jenkins");
     payload.put("source_host", jenkinsUrl);
+    if (localhost == null) {
+      try {
+        localhost = InetAddress.getLocalHost().getHostName();
+      } catch (UnknownHostException x) {
+        localhost = "?";
+      }
+    }
+    payload.put("sender", localhost);
     payload.put("@buildTimestamp", buildData.getTimestamp());
     payload.put("@timestamp", BuildData.getDateFormatter().format(Calendar.getInstance().getTime()));
     payload.put("@version", 1);
 
     return payload;
   }
+
+   @Override
+   public Collection<String> pullLogs(Run run, long sinceMs, long toMs) throws IOException {
+     throw new IOException("Destination does not support data read: " + this.getClass());
+   }
 }

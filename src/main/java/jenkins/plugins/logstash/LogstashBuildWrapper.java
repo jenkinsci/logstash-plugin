@@ -43,13 +43,19 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
+import hudson.EnvVars;
+import hudson.FilePath;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import jenkins.tasks.SimpleBuildWrapper;
 
 /**
  * Build wrapper that decorates the build's logger to insert a
+ * {@code LogstashNote} on each output line.
  *
  * @author K Jonathan Harker
  */
-public class LogstashBuildWrapper extends BuildWrapper {
+public class LogstashBuildWrapper extends SimpleBuildWrapper {
 
   /**
    * Create a new {@link LogstashBuildWrapper}.
@@ -57,58 +63,16 @@ public class LogstashBuildWrapper extends BuildWrapper {
   @DataBoundConstructor
   public LogstashBuildWrapper() {}
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-
-    return new Environment() {};
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public OutputStream decorateLogger(AbstractBuild build, OutputStream logger) {
-    LogstashWriter logstash = getLogStashWriter(build, logger);
-
-    LogstashOutputStream los = new LogstashOutputStream(logger, logstash);
-
-    if (build.getProject() instanceof BuildableItemWithBuildWrappers) {
-      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers) build.getProject();
-      for (BuildWrapper wrapper: project.getBuildWrappersList()) {
-        if (wrapper instanceof MaskPasswordsBuildWrapper) {
-          List<VarPasswordPair> allPasswordPairs = new ArrayList<VarPasswordPair>();
-
-          MaskPasswordsBuildWrapper maskPasswordsWrapper = (MaskPasswordsBuildWrapper) wrapper;
-          List<VarPasswordPair> jobPasswordPairs = maskPasswordsWrapper.getVarPasswordPairs();
-          if (jobPasswordPairs != null) {
-            allPasswordPairs.addAll(jobPasswordPairs);
-          }
-
-          MaskPasswordsConfig config = MaskPasswordsConfig.getInstance();
-          List<VarPasswordPair> globalPasswordPairs = config.getGlobalVarPasswordPairs();
-          if (globalPasswordPairs != null) {
-            allPasswordPairs.addAll(globalPasswordPairs);
-          }
-
-          return los.maskPasswords(allPasswordPairs);
-        }
-      }
+    @Override
+    public void setUp(Context context, Run<?, ?> build, FilePath workspace, 
+            Launcher launcher, TaskListener listener, EnvVars initialEnvironment) 
+            throws IOException, InterruptedException {
+        // Do nothing
     }
-
-    return los;
-  }
 
   @Override
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl) super.getDescriptor();
-  }
-
-  // Method to encapsulate calls for unit-testing
-  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
-    return new LogstashWriter(build, errorStream, null, build.getCharset());
   }
 
   /**
@@ -129,7 +93,7 @@ public class LogstashBuildWrapper extends BuildWrapper {
     public String getDisplayName() {
       return Messages.DisplayName();
     }
-
+    
     /**
      * {@inheritDoc}
      */

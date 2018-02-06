@@ -46,6 +46,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Rusty Gerard
  * @since 1.0.0
  */
+// TODO this should be GlobalConfiguration, not ToolInstallation!
 public class LogstashInstallation extends ToolInstallation {
   private static final long serialVersionUID = -5730780734005293851L;
 
