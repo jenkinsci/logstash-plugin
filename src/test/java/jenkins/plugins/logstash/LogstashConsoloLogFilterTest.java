@@ -6,10 +6,15 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 import hudson.model.AbstractBuild;
+import hudson.model.Descriptor;
+import hudson.model.Project;
+import hudson.tasks.BuildWrapper;
+import hudson.util.DescribableList;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import jenkins.plugins.logstash.persistence.BuildData;
 
@@ -21,12 +26,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LogstashBuildWrapperTest {
+public class LogstashConsoloLogFilterTest {
   // Extension of the unit under test that avoids making calls to statics or constructors
-  static class MockLogstashBuildWrapper extends LogstashBuildWrapper {
+  static class MockLogstashConsoloeLogFilter extends LogstashConsoleLogFilter {
     LogstashWriter writer;
 
-    MockLogstashBuildWrapper(LogstashWriter writer) {
+    MockLogstashConsoloeLogFilter(LogstashWriter writer) {
       super();
       this.writer = writer;
     }
@@ -46,13 +51,20 @@ public class LogstashBuildWrapperTest {
 
   ByteArrayOutputStream buffer;
 
-  @Mock AbstractBuild<?, ?> mockBuild;
+  @Mock AbstractBuild mockBuild;
+  @Mock Project mockProject;
   @Mock BuildData mockBuildData;
   @Mock LogstashWriter mockWriter;
 
+  private volatile DescribableList<BuildWrapper,Descriptor<BuildWrapper>> buildWrappers;
+
+
   @Before
   public void before() throws Exception {
+    buildWrappers = new DescribableList<BuildWrapper,Descriptor<BuildWrapper>>(mockProject);
     when(mockWriter.isConnectionBroken()).thenReturn(false);
+    when(mockBuild.getProject()).thenReturn(mockProject);
+    when(mockProject.getBuildWrappersList()).thenReturn(buildWrappers);
 
     buffer = new ByteArrayOutputStream();
   }
@@ -66,7 +78,8 @@ public class LogstashBuildWrapperTest {
 
   @Test
   public void decorateLoggerSuccess() throws Exception {
-    MockLogstashBuildWrapper buildWrapper = new MockLogstashBuildWrapper(mockWriter);
+    buildWrappers.add(new LogstashBuildWrapper());
+    MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
 
     // Unit under test
     OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);
@@ -80,10 +93,24 @@ public class LogstashBuildWrapperTest {
   }
 
   @Test
+  public void decorateLoggerSuccessNoLogstashBuildWrapper() throws Exception {
+    MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
+
+    // Unit under test
+    OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);
+
+    // Verify results
+    assertNotNull("Result was null", result);
+    assertTrue("Result is not the right type", result == buffer);
+    assertEquals("Results don't match", "", buffer.toString());
+  }
+
+  @Test
   public void decorateLoggerSuccessBadWriter() throws Exception {
+    buildWrappers.add(new LogstashBuildWrapper());
     when(mockWriter.isConnectionBroken()).thenReturn(true);
 
-    MockLogstashBuildWrapper buildWrapper = new MockLogstashBuildWrapper(mockWriter);
+    MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
 
     // Unit under test
     OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);

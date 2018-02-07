@@ -24,24 +24,22 @@
 
 package jenkins.plugins.logstash;
 
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.BuildableItemWithBuildWrappers;
-import hudson.tasks.BuildWrapper;
-import hudson.tasks.BuildWrapperDescriptor;
-
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.tasks.BuildWrapper;
+import hudson.tasks.BuildWrapperDescriptor;
+
 /**
- * Build wrapper that decorates the build's logger to insert a
+ * Build wrapper that only indicates to the ConsoleLogFilter
+ * that it should forward log to an indexer. Keep this for backward compatibility.
+ * Better approach would be a JobProperty.
  *
  * @author K Jonathan Harker
  */
@@ -62,33 +60,15 @@ public class LogstashBuildWrapper extends BuildWrapper
   public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
       throws IOException, InterruptedException
   {
-
     return new Environment()
     {
     };
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public OutputStream decorateLogger(AbstractBuild build, OutputStream logger)
-  {
-    LogstashWriter logstash = getLogStashWriter(build, logger);
-
-    return new LogstashOutputStream(logger, logstash);
   }
 
   @Override
   public DescriptorImpl getDescriptor()
   {
     return (DescriptorImpl)super.getDescriptor();
-  }
-
-  // Method to encapsulate calls for unit-testing
-  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream)
-  {
-    return new LogstashWriter(build, errorStream, null, build.getCharset());
   }
 
   /**
