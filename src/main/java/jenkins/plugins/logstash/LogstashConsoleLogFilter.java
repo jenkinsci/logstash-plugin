@@ -2,8 +2,7 @@ package jenkins.plugins.logstash;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.Serializable;
 
 import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
@@ -13,30 +12,54 @@ import hudson.model.Run;
 import hudson.tasks.BuildWrapper;
 
 @Extension(ordinal = 1000)
-public class LogstashConsoleLogFilter extends ConsoleLogFilter
+public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serializable
 {
 
-  @Override
-  public OutputStream decorateLogger(AbstractBuild build, OutputStream logger) throws IOException, InterruptedException
+  private transient Run<?, ?> run;
+  public LogstashConsoleLogFilter() {};
+
+  public LogstashConsoleLogFilter(Run<?, ?> run)
   {
-    if (isLogstashEnabled(build))
+    this.run = run;
+  }
+  private static final long serialVersionUID = 1L;
+
+  @Override
+  public OutputStream decorateLogger(Run build, OutputStream logger) throws IOException, InterruptedException
+  {
+    if (build != null && build instanceof AbstractBuild<?, ?>)
     {
-      LogstashWriter logstash = getLogStashWriter(build, logger);
+      if (isLogstashEnabled(build))
+      {
+        LogstashWriter logstash = getLogStashWriter(build, logger);
+        return new LogstashOutputStream(logger, logstash);
+      }
+      else
+      {
+        return logger;
+      }
+    }
+    if (run != null)
+    {
+      LogstashWriter logstash = getLogStashWriter(run, logger);
       return new LogstashOutputStream(logger, logstash);
     }
-    return logger;
+    else
+    {
+      return logger;
+    }
   }
 
-  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream)
+  LogstashWriter getLogStashWriter(Run<?, ?> build, OutputStream errorStream)
   {
     return new LogstashWriter(build, errorStream, null, build.getCharset());
   }
 
-  private boolean isLogstashEnabled(AbstractBuild<?, ?> build)
+  private boolean isLogstashEnabled(Run<?, ?> build)
   {
-    if (build.getProject() instanceof BuildableItemWithBuildWrappers)
+    if (build.getParent() instanceof BuildableItemWithBuildWrappers)
     {
-      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers)build.getProject();
+      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers)build.getParent();
       for (BuildWrapper wrapper : project.getBuildWrappersList())
       {
         if (wrapper instanceof LogstashBuildWrapper)

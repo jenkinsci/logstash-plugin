@@ -1,8 +1,6 @@
 package jenkins.plugins.logstash.pipeline;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
 
 import javax.annotation.Nonnull;
 
@@ -16,11 +14,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
-import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import jenkins.YesNoMaybe;
-import jenkins.plugins.logstash.LogstashOutputStream;
-import jenkins.plugins.logstash.LogstashWriter;
+import jenkins.plugins.logstash.LogstashConsoleLogFilter;
 
 /**
  * Pipeline plug-in step for logstash.
@@ -88,31 +84,6 @@ public class LogstashStep extends AbstractStepImpl {
     @Override
     public boolean takesImplicitBlockArgument() {
       return true;
-    }
-  }
-
-  private static class LogstashConsoleLogFilter extends ConsoleLogFilter
-      implements Serializable {
-
-    private static final long serialVersionUID = 1;
-    private transient Run<?, ?> run;
-
-    /**
-     * Create a new {@link LogstashConsoleLogFilter} for the given build.
-     *
-     * @param build
-     */
-    LogstashConsoleLogFilter(Run<?, ?> run) {
-        this.run = run;
-    }
-
-    /** {@inheritDoc} */
-    @SuppressWarnings("rawtypes")
-    @Override
-    public OutputStream decorateLogger(AbstractBuild _ignore, OutputStream logger)
-        throws IOException, InterruptedException {
-        LogstashWriter writer = new LogstashWriter(run, logger, null, run.getCharset());
-      return new LogstashOutputStream(logger, writer);
     }
   }
 }

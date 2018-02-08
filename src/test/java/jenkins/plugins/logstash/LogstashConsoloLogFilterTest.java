@@ -8,13 +8,13 @@ import static org.mockito.Mockito.verify;
 import hudson.model.AbstractBuild;
 import hudson.model.Descriptor;
 import hudson.model.Project;
+import hudson.model.Run;
 import hudson.tasks.BuildWrapper;
 import hudson.util.DescribableList;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import jenkins.plugins.logstash.persistence.BuildData;
 
@@ -37,7 +37,7 @@ public class LogstashConsoloLogFilterTest {
     }
 
     @Override
-    LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
+    LogstashWriter getLogStashWriter(Run<?, ?> build, OutputStream errorStream) {
       // Simulate bad Writer
       if(writer.isConnectionBroken()) {
         try {
@@ -63,7 +63,7 @@ public class LogstashConsoloLogFilterTest {
   public void before() throws Exception {
     buildWrappers = new DescribableList<BuildWrapper,Descriptor<BuildWrapper>>(mockProject);
     when(mockWriter.isConnectionBroken()).thenReturn(false);
-    when(mockBuild.getProject()).thenReturn(mockProject);
+    when(mockBuild.getParent()).thenReturn(mockProject);
     when(mockProject.getBuildWrappersList()).thenReturn(buildWrappers);
 
     buffer = new ByteArrayOutputStream();
