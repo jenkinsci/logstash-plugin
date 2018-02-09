@@ -1,7 +1,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:block>
     <f:entry title="${%Max lines}" field="maxLines">
-      <f:number default="1000" value="${instance.maxLines}" checkUrl="'descriptorByName/LogstashInstallation/checkInteger?value='+escape(this.value)" />
+      <f:number default="1000" value="${instance.maxLines}" clazz="required number"/>
     </f:entry>
     <f:entry title="${%Can fail build}" field="failBuild">
       <f:checkbox checked="${instance.failBuild}" />
