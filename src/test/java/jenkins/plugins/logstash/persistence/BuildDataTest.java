@@ -387,7 +387,6 @@ public class BuildDataTest {
       when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
 
       BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-      buildData.toJson();
 
       Assert.assertEquals(buildData.getRootFullProjectName(), "parent/RootBuildDataTest");
 
