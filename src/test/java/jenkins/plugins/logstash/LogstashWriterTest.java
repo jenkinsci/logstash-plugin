@@ -135,6 +135,7 @@ public class LogstashWriterTest {
     verifyNoMoreInteractions(mockDao);
     verifyNoMoreInteractions(mockBuild);
     verifyNoMoreInteractions(mockBuildData);
+    verifyNoMoreInteractions(mockTestResultAction);
     verifyNoMoreInteractions(mockProject);
     errorBuffer.close();
   }
