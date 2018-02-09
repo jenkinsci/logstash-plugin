@@ -171,6 +171,7 @@ public class LogstashWriter {
    * Write a list of lines to the indexer as one Logstash payload.
    */
   private void write(List<String> lines) {
+    buildData.updateResult();
     JSONObject payload = dao.buildPayload(buildData, jenkinsUrl, lines);
     try {
       dao.push(payload.toString());

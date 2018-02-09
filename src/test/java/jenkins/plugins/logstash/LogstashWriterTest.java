@@ -81,6 +81,7 @@ public class LogstashWriterTest {
 
   @Mock LogstashIndexerDao mockDao;
   @Mock AbstractBuild mockBuild;
+  @Mock AbstractTestResultAction mockTestResultAction;
   @Mock Project mockProject;
 
   @Mock BuildData mockBuildData;
@@ -94,6 +95,7 @@ public class LogstashWriterTest {
   @Before
   public void before() throws Exception {
 
+    when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("LogstashNotifierTest");
     when(mockBuild.getProject()).thenReturn(mockProject);
     when(mockBuild.getParent()).thenReturn(mockProject);
@@ -103,6 +105,7 @@ public class LogstashWriterTest {
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
+    when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "Log truncated..."));
     when(mockBuild.getEnvironment(null)).thenReturn(new EnvVars());
     when(mockBuild.getExecutor()).thenReturn(mockExecutor);
@@ -110,6 +113,10 @@ public class LogstashWriterTest {
     when(mockExecutor.getOwner()).thenReturn(mockComputer);
     when(mockComputer.getNode()).thenReturn(null);
 
+    when(mockTestResultAction.getTotalCount()).thenReturn(0);
+    when(mockTestResultAction.getSkipCount()).thenReturn(0);
+    when(mockTestResultAction.getFailCount()).thenReturn(0);
+    when(mockTestResultAction.getFailedTests()).thenReturn(Collections.emptyList());
 
     when(mockProject.getName()).thenReturn("LogstashWriterTest");
     when(mockProject.getFullName()).thenReturn("parent/LogstashWriterTest");
@@ -139,6 +146,7 @@ public class LogstashWriterTest {
     // Verify that the BuildData constructor is what is being called here.
     // This also lets us verify that in the instantiation failure cases we do not construct BuildData.
     verify(mockBuild).getId();
+    verify(mockBuild, times(2)).getResult();
     verify(mockBuild, times(2)).getParent();
     verify(mockBuild, times(2)).getProject();
     verify(mockBuild, times(1)).getStartTimeInMillis();
@@ -146,6 +154,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getFullDisplayName();
     verify(mockBuild).getDescription();
     verify(mockBuild).getUrl();
+    verify(mockBuild).getAction(AbstractTestResultAction.class);
     verify(mockBuild).getExecutor();
     verify(mockBuild, times(2)).getNumber();
     verify(mockBuild).getTimestamp();
@@ -156,6 +165,11 @@ public class LogstashWriterTest {
     verify(mockBuild).getEnvironment(null);
     verify(mockBuild).getCharset();
     verify(mockDao).setCharset(Charset.defaultCharset());
+
+    verify(mockTestResultAction).getTotalCount();
+    verify(mockTestResultAction).getSkipCount();
+    verify(mockTestResultAction).getFailCount();
+    verify(mockTestResultAction, times(1)).getFailedTests();
 
     verify(mockProject, times(2)).getName();
     verify(mockProject, times(2)).getFullName();
@@ -227,6 +241,7 @@ public class LogstashWriterTest {
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
+    verify(mockBuildData).updateResult();
   }
 
   @Test
@@ -246,6 +261,7 @@ public class LogstashWriterTest {
     verify(mockDao).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).setCharset(Charset.defaultCharset());
+    verify(mockBuildData).updateResult();
   }
 
   @Test
@@ -291,6 +307,7 @@ public class LogstashWriterTest {
     verify(mockDao, times(2)).getDescription();
     verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
+    verify(mockBuildData, times(2)).updateResult();
   }
 
   @Test
@@ -314,6 +331,7 @@ public class LogstashWriterTest {
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), logLinesCaptor.capture());
     verify(mockDao).setCharset(Charset.defaultCharset());
+    verify(mockBuildData).updateResult();
     List<String> actualLogLines = logLinesCaptor.getValue();
 
     assertThat("The exception was not sent to Logstash", actualLogLines.get(0), containsString(expectedErrorLines.get(0)));

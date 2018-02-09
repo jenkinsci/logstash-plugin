@@ -258,9 +258,10 @@ public class BuildData {
     buildNum = build.getNumber();
     buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
     timestamp = DATE_FORMATTER.format(build.getTimestamp().getTime());
+    updateResult();
   }
 
-  private void updateResult()
+  public void updateResult()
   {
     if (result == null && build.getResult() != null)
     {
@@ -276,7 +277,6 @@ public class BuildData {
   @Override
   public String toString() {
     Gson gson = new GsonBuilder().create();
-    updateResult();
     return gson.toJson(this);
   }
 

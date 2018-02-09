@@ -170,7 +170,6 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-    buildData.toJson();
 
     // build.getDuration() is always 0 in Notifiers
     Assert.assertEquals("Incorrect buildDuration", 60L, buildData.getBuildDuration());
@@ -192,7 +191,6 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-    buildData.toJson();
 
     // build.getDuration() is always 0 in Notifiers
     Assert.assertEquals("Incorrect buildDuration", 60L, buildData.getBuildDuration());
@@ -215,7 +213,6 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-    buildData.toJson();
 
     // build.getDuration() is always 0 in Notifiers
     Assert.assertEquals("Incorrect buildDuration", 60L, buildData.getBuildDuration());
@@ -242,7 +239,6 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-    buildData.toJson();
 
     TestData testResults = buildData.getTestResults();
 
@@ -263,7 +259,6 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-    buildData.toJson();
     TestData testResults = buildData.getTestResults();
 
     Assert.assertEquals("Incorrect test results", null, testResults);
@@ -301,7 +296,6 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-    buildData.toJson();
 
     // Verify results
     Assert.assertEquals("Wrong number of environment variables", 2, buildData.getBuildVariables().size());
@@ -342,7 +336,6 @@ public class BuildDataTest {
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-    buildData.toJson();
 
     // Verify results
     Assert.assertEquals("Wrong number of environment variables", 1, buildData.getBuildVariables().size());
@@ -380,7 +373,6 @@ public class BuildDataTest {
       when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
 
       BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
-      buildData.toJson();
 
       Assert.assertEquals(buildData.getFullProjectName(), "parent/BuildDataTest");
 
