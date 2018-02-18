@@ -68,7 +68,8 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   private String username;
   private String password;
-
+  private String mimeType;
+  
 
   //primary constructor used by indexer factory
   public ElasticSearchDao(URI uri, String username, String password) {
@@ -111,7 +112,6 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   {
     return uri;
   }
-
   public String getHost()
   {
     return uri.getHost();
@@ -141,17 +141,27 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   {
     return uri.getPath();
   }
-
+  
+  public String getMimeType() {
+    return this.mimeType;
+  }
+  
+  public void setMimeType(String mimeType) {
+    this.mimeType = mimeType;
+  }
+  
   String getAuth()
   {
     return auth;
   }
 
-  protected HttpPost getHttpPost(String data) {
-    HttpPost postRequest;
-    postRequest = new HttpPost(uri);
-    StringEntity input = new StringEntity(data, ContentType.APPLICATION_JSON);
-
+  HttpPost getHttpPost(String data) {
+    HttpPost postRequest = new HttpPost(uri);
+    String mimeType = this.getMimeType();
+    // char encoding is set to UTF_8 since this request posts a JSON string
+    StringEntity input = new StringEntity(data, StandardCharsets.UTF_8);
+    mimeType = (mimeType != null) ? mimeType : ContentType.APPLICATION_JSON.toString();
+    input.setContentType(mimeType);
     postRequest.setEntity(input);
     if (auth != null) {
       postRequest.addHeader("Authorization", "Basic " + auth);

@@ -60,7 +60,6 @@ public class LogstashInstallation extends ToolInstallation {
 
   @Extension
   public static final class Descriptor extends ToolDescriptor<LogstashInstallation> {
-
     private transient IndexerType type;
     private transient SyslogFormat syslogFormat;
     private transient SyslogProtocol syslogProtocol;
@@ -110,6 +109,7 @@ public class LogstashInstallation extends ToolInstallation {
     {
       return port;
     }
+
 
     public String getUsername()
     {
