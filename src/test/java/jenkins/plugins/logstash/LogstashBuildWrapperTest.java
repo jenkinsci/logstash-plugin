@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LogstashBuildWrapperTest {
@@ -74,7 +74,7 @@ public class LogstashBuildWrapperTest {
     // Verify results
     assertNotNull("Result was null", result);
     assertTrue("Result is not the right type", result instanceof LogstashOutputStream);
-    assertSame("Result has wrong writer", mockWriter, ((LogstashOutputStream) result).logstash);
+    assertSame("Result has wrong writer", mockWriter, ((LogstashOutputStream) result).getLogstashWriter());
     assertEquals("Results don't match", "", buffer.toString());
     verify(mockWriter).isConnectionBroken();
   }
@@ -91,7 +91,7 @@ public class LogstashBuildWrapperTest {
     // Verify results
     assertNotNull("Result was null", result);
     assertTrue("Result is not the right type", result instanceof LogstashOutputStream);
-    assertSame("Result has wrong writer", mockWriter, ((LogstashOutputStream) result).logstash);
+    assertSame("Result has wrong writer", mockWriter, ((LogstashOutputStream) result).getLogstashWriter());
     assertEquals("Error was not written", "Mocked Constructor failure", buffer.toString());
     verify(mockWriter).isConnectionBroken();
   }

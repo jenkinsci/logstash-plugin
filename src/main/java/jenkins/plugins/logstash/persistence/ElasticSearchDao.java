@@ -40,16 +40,18 @@ import org.apache.http.client.utils.URIBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Logger;
 
 import com.google.common.collect.Range;
 
-import jenkins.model.Jenkins;
-import jenkins.plugins.logstash.LogstashInstallation;
-import jenkins.plugins.logstash.LogstashInstallation.Descriptor;
+import jenkins.plugins.logstash.configuration.ElasticSearch;
+
 
 /**
  * Elastic Search Data Access Object.
@@ -58,41 +60,45 @@ import jenkins.plugins.logstash.LogstashInstallation.Descriptor;
  * @since 1.0.4
  */
 public class ElasticSearchDao extends AbstractLogstashIndexerDao {
-  final HttpClientBuilder clientBuilder;
-  final URI uri;
-  final String auth;
-  final Range<Integer> successCodes = closedOpen(200,300);
-  private final static Logger log = Logger.getLogger(ElasticSearchDao.class.getName());
-  
+
+  private final HttpClientBuilder clientBuilder;
+  private final URI uri;
+  private final String auth;
+  private final Range<Integer> successCodes = closedOpen(200,300);
+
+  private String username;
+  private String password;
+
+
   //primary constructor used by indexer factory
-  public ElasticSearchDao(String host, int port, String key, String username, String password) {
-    this(null, host, port, key, username, password);
+  public ElasticSearchDao(URI uri, String username, String password) {
+    this(null, uri, username, password);
   }
 
   // Factored for unit testing
-  ElasticSearchDao(HttpClientBuilder factory, String host, int port, String key, String username, String password) {
-    super(host, port, key, username, password);
+  ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password) {
 
-    if (StringUtils.isBlank(key)) {
-      throw new IllegalArgumentException("elastic index name is required");
+    if (uri == null)
+    {
+      throw new IllegalArgumentException("uri field must not be empty");
     }
 
-    try {
-      uri = new URIBuilder(host)
-        .setPort(port)
-        // Normalizer will remove extra starting slashes, but missing slash will cause annoying failures
-        .setPath("/" + key)
-        .build();
-    } catch (URISyntaxException e) {
-      throw new IllegalArgumentException("Could not create uri", e);
-    }
+    this.uri = uri;
+    this.username = username;
+    this.password = password;
 
-    if(StringUtils.isBlank(uri.getScheme())) {
-      throw new IllegalArgumentException("host field must specify scheme, such as 'http://'");
+
+    try
+    {
+      uri.toURL();
+    }
+    catch (MalformedURLException e)
+    {
+      throw new IllegalArgumentException(e);
     }
 
     if (StringUtils.isNotBlank(username)) {
-      auth = Base64.encodeBase64String((username + ":" + StringUtils.defaultString(password)).getBytes());
+      auth = Base64.encodeBase64String((username + ":" + StringUtils.defaultString(password)).getBytes(StandardCharsets.UTF_8));
     } else {
       auth = null;
     }
@@ -100,23 +106,52 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     clientBuilder = factory == null ? HttpClientBuilder.create() : factory;
   }
 
-  HttpPost getHttpPost(String data) {
-    String mimeType = null;
-    try {
-      Descriptor logstashPluginConfig = (Descriptor) Jenkins.getInstance().getDescriptor(LogstashInstallation.class);
-      mimeType = logstashPluginConfig.mimeType;
-    } catch (NullPointerException e) {
-      log.warning("Unable to read mimetype from jenkins logstash plugin configuration");
-    }
-    return getHttpPost(data, mimeType);
+
+  public URI getUri()
+  {
+    return uri;
   }
-  // Re-factored for unit-testing
-  HttpPost getHttpPost(String data, String mimeType) {
-    HttpPost postRequest = new HttpPost(uri);
-    // char encoding is set to UTF_8 since this request posts a JSON string
-    StringEntity input = new StringEntity(data, StandardCharsets.UTF_8);
-    mimeType = (mimeType != null) ? mimeType : ContentType.APPLICATION_JSON.toString();
-    input.setContentType(mimeType);
+
+  public String getHost()
+  {
+    return uri.getHost();
+  }
+
+  public String getScheme()
+  {
+    return uri.getScheme();
+  }
+
+  public int getPort()
+  {
+    return uri.getPort();
+  }
+
+  public String getUsername()
+  {
+    return username;
+  }
+
+  public String getPassword()
+  {
+      return password;
+  }
+
+  public String getKey()
+  {
+    return uri.getPath();
+  }
+
+  String getAuth()
+  {
+    return auth;
+  }
+
+  protected HttpPost getHttpPost(String data) {
+    HttpPost postRequest;
+    postRequest = new HttpPost(uri);
+    StringEntity input = new StringEntity(data, ContentType.APPLICATION_JSON);
+
     postRequest.setEntity(input);
     if (auth != null) {
       postRequest.addHeader("Authorization", "Basic " + auth);
@@ -152,7 +187,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     PrintStream stream = null;
     try {
       byteStream = new ByteArrayOutputStream();
-      stream = new PrintStream(byteStream);
+      stream = new PrintStream(byteStream, true, StandardCharsets.UTF_8.name());
 
       try {
         stream.print("HTTP error code: ");
@@ -165,7 +200,11 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
         stream.println(ExceptionUtils.getStackTrace(e));
       }
       stream.flush();
-      return byteStream.toString();
+      return byteStream.toString(StandardCharsets.UTF_8.name());
+    }
+    catch (UnsupportedEncodingException e)
+    {
+      return ExceptionUtils.getStackTrace(e);
     } finally {
       if (stream != null) {
         stream.close();
@@ -174,5 +213,8 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   }
 
   @Override
-  public IndexerType getIndexerType() { return IndexerType.ELASTICSEARCH; }
+  public String getDescription()
+  {
+    return uri.toString();
+  }
 }

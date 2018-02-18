@@ -43,13 +43,19 @@ import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsOutputStream;
  * @author Rusty Gerard
  */
 public class LogstashOutputStream extends LineTransformationOutputStream {
-  final OutputStream delegate;
-  final LogstashWriter logstash;
+  private final OutputStream delegate;
+  private final LogstashWriter logstash;
 
   public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash) {
     super();
     this.delegate = delegate;
     this.logstash = logstash;
+  }
+
+  // for testing purposes
+  LogstashWriter getLogstashWriter()
+  {
+    return logstash;
   }
 
   public MaskPasswordsOutputStream maskPasswords(List<VarPasswordPair> passwords) {
@@ -66,7 +72,7 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
     this.flush();
 
     if(!logstash.isConnectionBroken()) {
-      String line = new String(b, 0, len).trim();
+      String line = new String(b, 0, len, logstash.getCharset()).trim();
       line = ConsoleNote.removeNotes(line);
       logstash.write(line);
     }
