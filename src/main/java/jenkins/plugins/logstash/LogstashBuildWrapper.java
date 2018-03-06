@@ -37,9 +37,11 @@ import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
 
 /**
- * Build wrapper that only indicates to the ConsoleLogFilter
- * that it should forward log to an indexer. Keep this for backward compatibility.
- * Better approach would be a JobProperty.
+ *
+ * This BuildWrapper is only a marker and has no other functionality.
+ * The {@link LogstashConsoleLogFilter} uses this BuildWrapper to decide if it should send the log to an indexer.
+ * We have to keep this for backward compatibility as in the past this BuildWrapper was used instead.
+ * Using a ConsoleLogFilter allows to remove the dependency to the maskpasswords plugin.
  *
  * @author K Jonathan Harker
  */
