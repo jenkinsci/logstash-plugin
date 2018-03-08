@@ -1,6 +1,5 @@
 package jenkins.plugins.logstash;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -35,12 +34,23 @@ public class LogstashConfiguration extends GlobalConfiguration
   private static final Logger LOGGER = Logger.getLogger(LogstashConfiguration.class.getName());
   private LogstashIndexer<?> logstashIndexer;
   private boolean dataMigrated = false;
+  private boolean enableGlobally = false;
   private transient LogstashIndexer<?> activeIndexer;
 
   public LogstashConfiguration()
   {
     load();
     activeIndexer = logstashIndexer;
+  }
+
+  public boolean isEnableGlobally()
+  {
+    return enableGlobally;
+  }
+
+  public void setEnableGlobally(boolean enableGlobally)
+  {
+    this.enableGlobally = enableGlobally;
   }
 
   /**

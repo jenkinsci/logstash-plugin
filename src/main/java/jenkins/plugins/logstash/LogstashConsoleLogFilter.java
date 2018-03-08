@@ -57,6 +57,12 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
 
   private boolean isLogstashEnabled(Run<?, ?> build)
   {
+    LogstashConfiguration configuration = LogstashConfiguration.getInstance();
+    if (configuration.isEnableGlobally())
+    {
+      return true;
+    }
+
     if (build.getParent() instanceof BuildableItemWithBuildWrappers)
     {
       BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers)build.getParent();
