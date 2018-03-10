@@ -45,6 +45,7 @@ import hudson.tasks.BuildWrapperDescriptor;
  *
  * @author K Jonathan Harker
  */
+@Deprecated
 public class LogstashBuildWrapper extends BuildWrapper
 {
 
@@ -76,8 +77,7 @@ public class LogstashBuildWrapper extends BuildWrapper
   /**
    * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
    */
-  // We need a high ordinal so that we are in the list of BuildWrappers before the MaskPasswords
-  @Extension(ordinal = 10000)
+  @Extension
   public static class DescriptorImpl extends BuildWrapperDescriptor
   {
 
@@ -102,7 +102,7 @@ public class LogstashBuildWrapper extends BuildWrapper
     @Override
     public boolean isApplicable(AbstractProject<?, ?> item)
     {
-      return true;
+      return false;
     }
   }
 }

@@ -69,7 +69,7 @@ public class LogstashIntegrationTest
     @Test
     public void buildWrapperOnMaster() throws Exception
     {
-        project.getBuildWrappersList().add(new LogstashBuildWrapper());
+        project.addProperty(new LogstashJobProperty());
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
         FreeStyleBuild build = f.get();
         assertThat(build.getResult(), equalTo(Result.SUCCESS));
@@ -86,7 +86,7 @@ public class LogstashIntegrationTest
     @Test
     public void buildWrapperOnSlave() throws Exception
     {
-        project.getBuildWrappersList().add(new LogstashBuildWrapper());
+        project.addProperty(new LogstashJobProperty());
         project.setAssignedNode(slave);
 
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -134,7 +134,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void passwordsAreMaskedWithWrongOrderOfBuildWrappers() throws Exception
+    public void passwordsAreMaskedWithMaskpasswordsBuildWrapper() throws Exception
     {
       EnvInjectJobPropertyInfo info = new EnvInjectJobPropertyInfo(null, "PWD=myPassword", null, null, false, null);
       EnvInjectBuildWrapper e = new EnvInjectBuildWrapper(info);
@@ -144,35 +144,7 @@ public class LogstashIntegrationTest
       pwdPairs.add(pwdPair);
       MaskPasswordsBuildWrapper maskPwdWrapper = new MaskPasswordsBuildWrapper(pwdPairs);
 
-      // Here the wrapper are in the wrong order, but it should still work
-      project.getBuildWrappersList().add(maskPwdWrapper);
-      project.getBuildWrappersList().add(e);
-      project.getBuildWrappersList().add(new LogstashBuildWrapper());
-      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
-
-      FreeStyleBuild build = f.get();
-      assertThat(build.getResult(), equalTo(Result.SUCCESS));
-      List<JSONObject> dataLines = memoryDao.getOutput();
-      for (JSONObject line: dataLines)
-      {
-        JSONArray message = line.getJSONArray("message");
-        String logline = (String) message.get(0);
-        assertThat(logline,not(containsString("myPassword")));
-      }
-    }
-
-    @Test
-    public void passwordsAreMaskedWithCorrectOrderOfBuildWrappers() throws Exception
-    {
-      EnvInjectJobPropertyInfo info = new EnvInjectJobPropertyInfo(null, "PWD=myPassword", null, null, false, null);
-      EnvInjectBuildWrapper e = new EnvInjectBuildWrapper(info);
-
-      List<VarPasswordPair> pwdPairs = new ArrayList<>();
-      VarPasswordPair pwdPair = new VarPasswordPair("PWD", "myPassword");
-      pwdPairs.add(pwdPair);
-      MaskPasswordsBuildWrapper maskPwdWrapper = new MaskPasswordsBuildWrapper(pwdPairs);
-
-      project.getBuildWrappersList().add(new LogstashBuildWrapper());
+      project.addProperty(new LogstashJobProperty());
       project.getBuildWrappersList().add(maskPwdWrapper);
       project.getBuildWrappersList().add(e);
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -189,7 +161,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void passwordsAreMaskedWithoutMaskPasswordsBuildWrapper() throws Exception
+    public void passwordsAreMaskedWithGlobalMaskPasswordsConfiguration() throws Exception
     {
       MaskPasswordsConfig config = MaskPasswordsConfig.getInstance();
       config.setGlobalVarEnabledGlobally(true);
@@ -199,7 +171,7 @@ public class LogstashIntegrationTest
       EnvInjectBuildWrapper e = new EnvInjectBuildWrapper(info);
 
       project.getBuildWrappersList().add(e);
-      project.getBuildWrappersList().add(new LogstashBuildWrapper());
+      project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
       FreeStyleBuild build = f.get();

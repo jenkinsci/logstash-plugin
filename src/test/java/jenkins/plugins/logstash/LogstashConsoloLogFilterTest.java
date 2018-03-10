@@ -62,23 +62,19 @@ public class LogstashConsoloLogFilterTest {
   ByteArrayOutputStream buffer;
 
   @Mock AbstractBuild mockBuild;
-  @Mock Project mockProject;
+  @Mock Project<?, ?> mockProject;
   @Mock BuildData mockBuildData;
   @Mock LogstashWriter mockWriter;
 
-  private volatile DescribableList<BuildWrapper,Descriptor<BuildWrapper>> buildWrappers;
-
-
   @Before
   public void before() throws Exception {
-    buildWrappers = new DescribableList<BuildWrapper,Descriptor<BuildWrapper>>(mockProject);
     PowerMockito.mockStatic(LogstashConfiguration.class);
     when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
     when(logstashConfiguration.isEnableGlobally()).thenReturn(false);
 
     when(mockWriter.isConnectionBroken()).thenReturn(false);
     when(mockBuild.getParent()).thenReturn(mockProject);
-    when(mockProject.getBuildWrappersList()).thenReturn(buildWrappers);
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(new LogstashJobProperty());
 
     buffer = new ByteArrayOutputStream();
   }
@@ -91,12 +87,11 @@ public class LogstashConsoloLogFilterTest {
   }
 
   @Test
-  public void decorateLoggerSuccessBuildWrapper() throws Exception {
-    buildWrappers.add(new LogstashBuildWrapper());
-    MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
+  public void decorateLoggerSuccess() throws Exception {
+    MockLogstashConsoloeLogFilter consoleLogFilter = new MockLogstashConsoloeLogFilter(mockWriter);
 
     // Unit under test
-    OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
 
     // Verify results
     assertNotNull("Result was null", result);
@@ -108,10 +103,12 @@ public class LogstashConsoloLogFilterTest {
 
   @Test
   public void decorateLoggerSuccessLogstashNotEnabled() throws Exception {
-    MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(null);
+
+    MockLogstashConsoloeLogFilter consoleLogFilter = new MockLogstashConsoloeLogFilter(mockWriter);
 
     // Unit under test
-    OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
 
     // Verify results
     assertNotNull("Result was null", result);
@@ -121,13 +118,12 @@ public class LogstashConsoloLogFilterTest {
 
   @Test
   public void decorateLoggerSuccessBadWriter() throws Exception {
-    buildWrappers.add(new LogstashBuildWrapper());
     when(mockWriter.isConnectionBroken()).thenReturn(true);
 
-    MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
+    MockLogstashConsoloeLogFilter consoleLogFilter = new MockLogstashConsoloeLogFilter(mockWriter);
 
     // Unit under test
-    OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
 
     // Verify results
     assertNotNull("Result was null", result);
