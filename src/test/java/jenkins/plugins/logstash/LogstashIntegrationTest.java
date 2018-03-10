@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -10,6 +11,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.time.FastDateFormat;
 import org.jenkinsci.plugins.envinject.EnvInjectBuildWrapper;
 import org.jenkinsci.plugins.envinject.EnvInjectJobPropertyInfo;
 import org.junit.Before;
@@ -60,6 +62,7 @@ public class LogstashIntegrationTest
         PowerMockito.mockStatic(LogstashConfiguration.class);
         when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
         when(logstashConfiguration.getIndexerInstance()).thenReturn(memoryDao);
+        when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
 
         slave = jenkins.createSlave();
         slave.setLabelString("myLabel");
@@ -231,4 +234,37 @@ public class LogstashIntegrationTest
       assertThat(lastLine.getJSONArray("message").get(0).toString(),equalTo("Finished: SUCCESS"));
     }
 
+    @Test
+    public void milliSecondTimestamps() throws Exception
+    {
+      when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+      project.getBuildWrappersList().add(new LogstashBuildWrapper());
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.SUCCESS));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      for (JSONObject line: dataLines)
+      {
+        String timestamp = line.getString("@timestamp");
+        assertThat(timestamp,matchesPattern("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{4}$"));
+      }
+    }
+
+    @Test
+    public void secondTimestamps() throws Exception
+    {
+      when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
+      project.getBuildWrappersList().add(new LogstashBuildWrapper());
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.SUCCESS));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      for (JSONObject line: dataLines)
+      {
+        String timestamp = line.getString("@timestamp");
+        assertThat(timestamp,matchesPattern("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{4}$"));
+      }
+    }
 }

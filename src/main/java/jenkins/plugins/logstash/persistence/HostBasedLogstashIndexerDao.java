@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import jenkins.plugins.logstash.LogstashConfiguration;
 import net.sf.json.JSONObject;
 
 /**
@@ -78,7 +79,7 @@ public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexe
     payload.put("source", "jenkins");
     payload.put("source_host", jenkinsUrl);
     payload.put("@buildTimestamp", buildData.getTimestamp());
-    payload.put("@timestamp", BuildData.getDateFormatter().format(Calendar.getInstance().getTime()));
+    payload.put("@timestamp", LogstashConfiguration.getInstance().getDateFormatter().format(Calendar.getInstance().getTime()));
     payload.put("@version", 1);
 
     return payload;

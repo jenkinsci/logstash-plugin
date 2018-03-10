@@ -1,10 +1,13 @@
 package jenkins.plugins.logstash;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.util.Date;
 
+import org.apache.commons.lang.time.FastDateFormat;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 
@@ -54,5 +57,15 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/syslog.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(SyslogDao.class));
+  }
+
+  @Test
+  public void millSecondsConfigured()
+  {
+    LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq.xml");
+    LogstashConfiguration configuration = new LogstashConfigurationForTest();
+    assertThat(configuration.isMilliSecondTimestamps(),equalTo(true));
+    FastDateFormat formatter = configuration.getDateFormatter();
+    assertThat(formatter.format(new Date(118,02,10,22,22)), matchesPattern("2018-03-10T22:22:00.000[+-]\\d{4}"));
   }
 }

@@ -34,6 +34,7 @@ import hudson.model.Run;
 import hudson.model.Node;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
+import jenkins.plugins.logstash.LogstashConfiguration;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,7 +52,6 @@ import java.lang.invoke.MethodHandles;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.FastDateFormat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -64,7 +64,6 @@ import com.google.gson.GsonBuilder;
  */
 public class BuildData {
   // ISO 8601 date format
-  private transient static final FastDateFormat DATE_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
     private int totalCount, skipCount, failCount, passCount;
@@ -263,7 +262,7 @@ public class BuildData {
     }
 
     buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
-    timestamp = DATE_FORMATTER.format(build.getTimestamp().getTime());
+    timestamp = LogstashConfiguration.getInstance().getDateFormatter().format(build.getTimestamp().getTime());
   }
 
   @Override
@@ -378,7 +377,7 @@ public class BuildData {
   }
 
   public void setTimestamp(Calendar timestamp) {
-    this.timestamp = DATE_FORMATTER.format(timestamp.getTime());
+    this.timestamp = LogstashConfiguration.getInstance().getDateFormatter().format(timestamp.getTime());
   }
 
   public String getRootProjectName() {
@@ -435,10 +434,5 @@ public class BuildData {
 
   public void setTestResults(TestData testResults) {
     this.testResults = testResults;
-  }
-
-  public static FastDateFormat getDateFormatter()
-  {
-    return DATE_FORMATTER;
   }
 }

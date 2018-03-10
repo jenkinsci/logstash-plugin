@@ -1,7 +1,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import static net.sf.json.test.JSONAssert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,22 +9,35 @@ import java.util.Arrays;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.time.FastDateFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import jenkins.plugins.logstash.LogstashConfiguration;
+
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.crypto.*"})
+@PrepareForTest(LogstashConfiguration.class)
 public class AbstractLogstashIndexerDaoTest {
   static final String EMPTY_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
   static final String ONE_LINE_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[\"LINE 1\"],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
   static final String TWO_LINE_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[\"LINE 1\", \"LINE 2\"],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
 
   @Mock BuildData mockBuildData;
+  @Mock LogstashConfiguration logstashConfiguration;
 
   @Before
   public void before() throws Exception {
+    PowerMockito.mockStatic(LogstashConfiguration.class);
+    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
+
     when(mockBuildData.toJson()).thenReturn(JSONObject.fromObject("{}"));
     when(mockBuildData.getTimestamp()).thenReturn("2000-01-01");
   }
