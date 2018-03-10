@@ -24,15 +24,6 @@ public class LogstashItemListener extends ItemListener
   private static Logger LOGGER = Logger.getLogger(LogstashItemListener.class.getName());
 
   @Override
-  public void onCreated(Item item)
-  {
-    if (item instanceof BuildableItemWithBuildWrappers)
-    {
-      convertBuildWrapperToJobProperty((BuildableItemWithBuildWrappers)item);
-    }
-  }
-
-  @Override
   public void onLoaded()
   {
     for (BuildableItemWithBuildWrappers item : Jenkins.getInstance().getAllItems(BuildableItemWithBuildWrappers.class))
@@ -41,7 +32,7 @@ public class LogstashItemListener extends ItemListener
     }
   }
 
-  private void convertBuildWrapperToJobProperty(BuildableItemWithBuildWrappers item)
+  static void convertBuildWrapperToJobProperty(BuildableItemWithBuildWrappers item)
   {
     DescribableList<BuildWrapper, Descriptor<BuildWrapper>> wrappers = item.getBuildWrappersList();
     LogstashBuildWrapper logstashBuildWrapper = wrappers.get(LogstashBuildWrapper.class);

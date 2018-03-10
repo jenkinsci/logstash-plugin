@@ -10,6 +10,10 @@ import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import net.sf.json.JSONObject;
 
+/**
+ * This JobProperty is a marker to decide if logs should be sent to an indexer.
+ *
+ */
 public class LogstashJobProperty extends JobProperty<Job<?, ?>>
 {
 

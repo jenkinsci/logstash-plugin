@@ -64,6 +64,7 @@ public class LogstashBuildWrapperConversionTest
     try
     {
       request.setRequestBody("<?xml version='1.0' encoding='UTF-8'?>\n<project>\n" +
+          "<properties/>" +
           "<buildWrappers>" +
           "<jenkins.plugins.logstash.LogstashBuildWrapper/>" +
           "</buildWrappers>" +

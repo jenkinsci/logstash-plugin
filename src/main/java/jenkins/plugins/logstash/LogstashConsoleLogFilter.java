@@ -8,9 +8,7 @@ import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildableItemWithBuildWrappers;
 import hudson.model.Run;
-import hudson.tasks.BuildWrapper;
 
 @Extension(ordinal = 1000)
 public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serializable

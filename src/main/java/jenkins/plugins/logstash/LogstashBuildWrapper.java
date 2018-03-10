@@ -38,10 +38,9 @@ import hudson.tasks.BuildWrapperDescriptor;
 
 /**
  *
- * This BuildWrapper is only a marker and has no other functionality.
- * The {@link LogstashConsoleLogFilter} uses this BuildWrapper to decide if it should send the log to an indexer.
- * We have to keep this for backward compatibility as in the past this BuildWrapper was used instead.
- * Using a ConsoleLogFilter allows to remove the dependency to the maskpasswords plugin.
+ * This BuildWrapper is not used anymore.
+ * We just keep it to be able to convert projects that have the BuildWrapper configured at startup or when posting the xml via the rest api
+ * to the JobProperty.
  *
  * @author K Jonathan Harker
  */

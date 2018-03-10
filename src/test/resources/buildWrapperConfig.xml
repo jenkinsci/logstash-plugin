@@ -2,6 +2,7 @@
 <project>
   <actions/>
   <description></description>
+  <properties/>
   <keepDependencies>false</keepDependencies>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
