@@ -2,16 +2,27 @@ package jenkins.plugins.logstash;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.text.MessageFormat;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
+
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.FormEncodingType;
+import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebRequest;
 
 import hudson.model.Project;
 
@@ -28,19 +39,51 @@ public class LogstashBuildWrapperConversionTest
   @Test
   public void existingJobIsConvertedAtStartup()
   {
-    Project<?, ?> item = (Project<?, ?>) j.getInstance().getItem("test");
+    Project<?, ?> project = (Project<?, ?>)j.getInstance().getItem("test");
+    checkNoBuildWrapper(project);
+  }
 
-    assertThat(item.getBuildWrappersList().get(LogstashBuildWrapper.class), equalTo(null));
-    assertThat(item.getProperty(LogstashJobProperty.class), not(equalTo(null)));
+  @Before
+  public void setup()
+  {
+    j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
   }
 
   @Test
   public void buildWrapperIsConvertedToJobPropertyWhenPostingXML() throws IOException
   {
-    MockFolder folder = j.createFolder("folder");
-    FileInputStream xml = new FileInputStream("src/test/resources/buildWrapperConfig.xml");
-    Project<?, ?> item = (Project<?, ?>) folder.createProjectFromXML("converted", xml);
-    assertThat(item.getBuildWrappersList().get(LogstashBuildWrapper.class), equalTo(null));
-    assertThat(item.getProperty(LogstashJobProperty.class), not(equalTo(null)));
+    j.jenkins.setCrumbIssuer(null);
+    String newJobName = "newJob";
+    URL apiURL = new URL(MessageFormat.format(
+        "{0}createItem?name={1}",
+        j.getURL().toString(), newJobName));
+    WebRequest request = new WebRequest(apiURL, HttpMethod.POST);
+    request.setAdditionalHeader("Content-Type", "application/xml");
+
+    int result = -1;
+    try
+    {
+      request.setRequestBody("<?xml version='1.0' encoding='UTF-8'?>\n<project>\n" +
+          "<buildWrappers>" +
+          "<jenkins.plugins.logstash.LogstashBuildWrapper/>" +
+          "</buildWrappers>" +
+          "</project>");
+      result = j.createWebClient().getPage(request).getWebResponse().getStatusCode();
+    }
+    catch (FailingHttpStatusCodeException e)
+    {
+      result = e.getResponse().getStatusCode();
+    }
+
+    assertEquals("Creating job should succeed.", 200, result);
+    Project<?, ?> project = (Project<?, ?>)j.getInstance().getItem(newJobName);
+    checkNoBuildWrapper(project);
+
+  }
+
+  private void checkNoBuildWrapper(Project<?, ?> project)
+  {
+    assertThat(project.getBuildWrappersList().get(LogstashBuildWrapper.class), equalTo(null));
+    assertThat(project.getProperty(LogstashJobProperty.class), not(equalTo(null)));
   }
 }
