@@ -107,7 +107,7 @@ public class LogstashConsoloLogFilterTest {
   }
 
   @Test
-  public void decorateLoggerSuccessNoLogstashBuildWrapper() throws Exception {
+  public void decorateLoggerSuccessLogstashNotEnabled() throws Exception {
     MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
 
     // Unit under test
