@@ -49,12 +49,15 @@ import static java.util.logging.Level.WARNING;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import net.sf.json.JSONObject;
+import javax.annotation.CheckForNull;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * POJO for mapping build info to JSON.
@@ -94,6 +97,9 @@ public class BuildData {
       this(null);
     }
 
+    @SuppressFBWarnings(
+      value="URF_UNREAD_FIELD",
+      justification="TODO: not sure how to fix this")
     public TestData(Action action) {
       AbstractTestResultAction<?> testResultAction = null;
       if (action instanceof AbstractTestResultAction) {
@@ -152,7 +158,7 @@ public class BuildData {
   }
 
   private String id;
-  private String result;
+  @CheckForNull private String result;
   private String projectName;
   private String fullProjectName;
   private String displayName;
@@ -229,6 +235,11 @@ public class BuildData {
     }
   }
 
+  // ISO 8601 date format
+  public static String formatDateIso(Date date) {
+    return DATE_FORMATTER.format(date);
+  }
+
   private void initData(Run<?, ?> build, Date currentTime) {
 
     Executor executor = build.getExecutor();
@@ -263,7 +274,7 @@ public class BuildData {
     }
 
     buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
-    timestamp = DATE_FORMATTER.format(build.getTimestamp().getTime());
+    timestamp = formatDateIso(build.getTime());
   }
 
   @Override
@@ -378,7 +389,7 @@ public class BuildData {
   }
 
   public void setTimestamp(Calendar timestamp) {
-    this.timestamp = DATE_FORMATTER.format(timestamp.getTime());
+    this.timestamp = formatDateIso(timestamp.getTime());
   }
 
   public String getRootProjectName() {

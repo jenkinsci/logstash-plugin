@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.InOrder;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SuppressWarnings("resource")
@@ -121,5 +122,18 @@ public class LogstashOutputStreamTest {
     // Verify results
     assertEquals("Results don't match", msg, buffer.toString());
     verify(mockWriter).isConnectionBroken();
+  }
+
+  @Test
+  public void writerClosedBeforeDelegate() throws Exception {
+    ByteArrayOutputStream mockBuffer = Mockito.spy(buffer);
+    new LogstashOutputStream(mockBuffer, mockWriter).close();
+
+    InOrder inOrder = Mockito.inOrder(mockBuffer, mockWriter);
+    inOrder.verify(mockWriter).close();
+    inOrder.verify(mockBuffer).close();
+
+    // Verify results
+    assertEquals("Results don't match", "", buffer.toString());
   }
 }

@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class BuildDataTest {
     when(mockBuild.getDescription()).thenReturn("Mock project for testing BuildData");
     when(mockBuild.getParent()).thenReturn(mockProject);
     when(mockBuild.getNumber()).thenReturn(123456);
-    when(mockBuild.getTimestamp()).thenReturn(new GregorianCalendar());
+    when(mockBuild.getTime()).thenReturn(new Date());
     when(mockBuild.getRootBuild()).thenReturn(mockBuild);
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
@@ -132,7 +131,7 @@ public class BuildDataTest {
     verify(mockBuild).getAction(AbstractTestResultAction.class);
     verify(mockBuild).getExecutor();
     verify(mockBuild).getNumber();
-    verify(mockBuild).getTimestamp();
+    verify(mockBuild).getTime();
     verify(mockBuild, times(4)).getRootBuild();
     verify(mockBuild).getBuildVariables();
     verify(mockBuild).getSensitiveBuildVariables();

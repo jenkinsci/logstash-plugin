@@ -74,7 +74,6 @@ public class LogstashInstallation extends ToolInstallation {
       load();
     }
 
-
     @Override
     public String getDisplayName() {
       return Messages.DisplayName();

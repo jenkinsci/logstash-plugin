@@ -26,11 +26,14 @@ package jenkins.plugins.logstash.persistence;
 
 import java.nio.charset.Charset;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
 import net.sf.json.JSONObject;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Abstract data access object for Logstash indexers.
