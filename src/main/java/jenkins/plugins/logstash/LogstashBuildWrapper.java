@@ -24,100 +24,65 @@
 
 package jenkins.plugins.logstash;
 
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.BuildableItemWithBuildWrappers;
-import hudson.tasks.BuildWrapper;
-import hudson.tasks.BuildWrapperDescriptor;
-
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair;
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
+import hudson.Extension;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.tasks.BuildWrapper;
+import hudson.tasks.BuildWrapperDescriptor;
 
 /**
- * Build wrapper that decorates the build's logger to insert a
+ *
+ * This BuildWrapper is only a marker and has no other functionality.
+ * The {@link LogstashConsoleLogFilter} uses this BuildWrapper to decide if it should send the log to an indexer.
+ * We have to keep this for backward compatibility as in the past this BuildWrapper was used instead.
+ * Using a ConsoleLogFilter allows to remove the dependency to the maskpasswords plugin.
  *
  * @author K Jonathan Harker
  */
-public class LogstashBuildWrapper extends BuildWrapper {
+public class LogstashBuildWrapper extends BuildWrapper
+{
 
   /**
    * Create a new {@link LogstashBuildWrapper}.
    */
   @DataBoundConstructor
-  public LogstashBuildWrapper() {}
+  public LogstashBuildWrapper()
+  {}
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-
-    return new Environment() {};
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public OutputStream decorateLogger(AbstractBuild build, OutputStream logger) {
-    LogstashWriter logstash = getLogStashWriter(build, logger);
-
-    LogstashOutputStream los = new LogstashOutputStream(logger, logstash);
-
-    if (build.getProject() instanceof BuildableItemWithBuildWrappers) {
-      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers) build.getProject();
-      for (BuildWrapper wrapper: project.getBuildWrappersList()) {
-        if (wrapper instanceof MaskPasswordsBuildWrapper) {
-          List<VarPasswordPair> allPasswordPairs = new ArrayList<VarPasswordPair>();
-
-          MaskPasswordsBuildWrapper maskPasswordsWrapper = (MaskPasswordsBuildWrapper) wrapper;
-          List<VarPasswordPair> jobPasswordPairs = maskPasswordsWrapper.getVarPasswordPairs();
-          if (jobPasswordPairs != null) {
-            allPasswordPairs.addAll(jobPasswordPairs);
-          }
-
-          MaskPasswordsConfig config = MaskPasswordsConfig.getInstance();
-          List<VarPasswordPair> globalPasswordPairs = config.getGlobalVarPasswordPairs();
-          if (globalPasswordPairs != null) {
-            allPasswordPairs.addAll(globalPasswordPairs);
-          }
-
-          return los.maskPasswords(allPasswordPairs);
-        }
-      }
-    }
-
-    return los;
+  public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
+      throws IOException, InterruptedException
+  {
+    return new Environment()
+    {
+    };
   }
 
   @Override
-  public DescriptorImpl getDescriptor() {
-    return (DescriptorImpl) super.getDescriptor();
-  }
-
-  // Method to encapsulate calls for unit-testing
-  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
-    return new LogstashWriter(build, errorStream, null, build.getCharset());
+  public DescriptorImpl getDescriptor()
+  {
+    return (DescriptorImpl)super.getDescriptor();
   }
 
   /**
    * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
    */
-  @Extension
-  public static class DescriptorImpl extends BuildWrapperDescriptor {
+  // We need a high ordinal so that we are in the list of BuildWrappers before the MaskPasswords
+  @Extension(ordinal = 10000)
+  public static class DescriptorImpl extends BuildWrapperDescriptor
+  {
 
-    public DescriptorImpl() {
+    public DescriptorImpl()
+    {
       super(LogstashBuildWrapper.class);
       load();
     }
@@ -126,7 +91,8 @@ public class LogstashBuildWrapper extends BuildWrapper {
      * {@inheritDoc}
      */
     @Override
-    public String getDisplayName() {
+    public String getDisplayName()
+    {
       return Messages.DisplayName();
     }
 
@@ -134,7 +100,8 @@ public class LogstashBuildWrapper extends BuildWrapper {
      * {@inheritDoc}
      */
     @Override
-    public boolean isApplicable(AbstractProject<?, ?> item) {
+    public boolean isApplicable(AbstractProject<?, ?> item)
+    {
       return true;
     }
   }
