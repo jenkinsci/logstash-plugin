@@ -36,6 +36,10 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     return uri;
   }
 
+  @Override
+ public void validate() throws MimeTypeParseException {
+    new MimeType(this.mimeType);
+  }
 
   /*
    * We use URL for the setter as stapler can autoconvert a string to a URL but not to a URI

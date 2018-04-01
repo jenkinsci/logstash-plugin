@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.activation.MimeTypeParseException;
 import javax.annotation.CheckForNull;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -171,6 +172,10 @@ public class LogstashConfiguration extends GlobalConfiguration
   @Override
   public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException
   {
+    
+    // Keep a reference to the current configuration to revert back in case of an exception.
+    LogstashIndexer<?> previousIndexer = logstashIndexer;
+    
     // when we bind the stapler request we get a new instance of logstashIndexer.
     // logstashIndexer is holder for the dao instance.
     // To avoid that we get a new dao instance in case there was no change in configuration
@@ -180,6 +185,19 @@ public class LogstashConfiguration extends GlobalConfiguration
     {
       activeIndexer = logstashIndexer;
     }
+    
+    try {
+      // validate 
+      logstashIndexer.validate();
+    } catch (Exception ex) {
+      // You are here which means user is trying to save invalid indexer configuration.
+      // Exception will be thrown here so that it gets displayed on UI. 
+      // But before that revert back to original configuration (in-memory) 
+      // so that when user refreshes the configuration page, last saved settings will be displayed again.
+      logstashIndexer = previousIndexer;
+      throw new IllegalArgumentException(ex);
+    }
+    
     save();
     return true;
   }
