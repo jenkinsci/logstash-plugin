@@ -67,7 +67,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void buildWrapperOnMaster() throws Exception
+    public void dataIsSetWhenEnabledViaJobPropertyOnMaster() throws Exception
     {
         project.addProperty(new LogstashJobProperty());
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -84,7 +84,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void buildWrapperOnSlave() throws Exception
+    public void dataIsSetWhenEnabledViaJobPropertyOnSlave() throws Exception
     {
         project.addProperty(new LogstashJobProperty());
         project.setAssignedNode(slave);
@@ -103,7 +103,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void buildNotifierOnMaster() throws Exception
+    public void dataIsSetForNotifierOnMaster() throws Exception
     {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -118,7 +118,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void buildNotifierOnSlave() throws Exception
+    public void dataIsSetForNotifierOnSlave() throws Exception
     {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         project.setAssignedNode(slave);
