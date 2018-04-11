@@ -7,11 +7,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.time.FastDateFormat;
 import org.jenkinsci.plugins.envinject.EnvInjectBuildWrapper;
 import org.jenkinsci.plugins.envinject.EnvInjectJobPropertyInfo;
 import org.junit.Before;
@@ -60,9 +60,11 @@ public class LogstashIntegrationTest
     {
         memoryDao = new MemoryDao();
         PowerMockito.mockStatic(LogstashConfiguration.class);
+
         when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
         when(logstashConfiguration.getIndexerInstance()).thenReturn(memoryDao);
-        when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
+        PowerMockito.doCallRealMethod().when(logstashConfiguration).setMilliSecondTimestamps(any(Boolean.class));
+        when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
         slave = jenkins.createSlave();
         slave.setLabelString("myLabel");
@@ -237,7 +239,7 @@ public class LogstashIntegrationTest
     @Test
     public void milliSecondTimestamps() throws Exception
     {
-      when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+      logstashConfiguration.setMilliSecondTimestamps(true);
       project.getBuildWrappersList().add(new LogstashBuildWrapper());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
@@ -254,7 +256,7 @@ public class LogstashIntegrationTest
     @Test
     public void secondTimestamps() throws Exception
     {
-      when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
+      logstashConfiguration.setMilliSecondTimestamps(false);
       project.getBuildWrappersList().add(new LogstashBuildWrapper());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 

@@ -33,8 +33,8 @@ import net.sf.json.JSONObject;
 public class LogstashConfiguration extends GlobalConfiguration
 {
   private static final Logger LOGGER = Logger.getLogger(LogstashConfiguration.class.getName());
-
-  private transient FastDateFormat dateFormatter;
+  private static final FastDateFormat MILLIS_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  private static final FastDateFormat LEGACY_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
 
   private LogstashIndexer<?> logstashIndexer;
   private boolean dataMigrated = false;
@@ -66,27 +66,17 @@ public class LogstashConfiguration extends GlobalConfiguration
   public void setMilliSecondTimestamps(boolean milliSecondTimestamps)
   {
     this.milliSecondTimestamps = milliSecondTimestamps;
-    createDateFormatter();
   }
 
   public FastDateFormat getDateFormatter()
   {
-    if (dateFormatter == null)
-    {
-      createDateFormatter();
-    }
-    return dateFormatter;
-  }
-
-  private void createDateFormatter()
-  {
     if (milliSecondTimestamps)
     {
-      dateFormatter = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+      return MILLIS_FORMATTER;
     }
     else
     {
-      dateFormatter = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
+      return LEGACY_FORMATTER;
     }
   }
 
