@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import static net.sf.json.test.JSONAssert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class AbstractLogstashIndexerDaoTest {
   public void before() throws Exception {
     PowerMockito.mockStatic(LogstashConfiguration.class);
     when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
-    when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
+    when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuildData.toJson()).thenReturn(JSONObject.fromObject("{}"));
     when(mockBuildData.getTimestamp()).thenReturn("2000-01-01");

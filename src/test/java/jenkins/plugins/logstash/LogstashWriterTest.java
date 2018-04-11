@@ -106,7 +106,7 @@ public class LogstashWriterTest {
 
     PowerMockito.mockStatic(LogstashConfiguration.class);
     when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
-    when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
+    when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("LogstashNotifierTest");

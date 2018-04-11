@@ -1,5 +1,6 @@
 package jenkins.plugins.logstash.persistence;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,7 +81,7 @@ public class BuildDataTest {
 
     PowerMockito.mockStatic(LogstashConfiguration.class);
     when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
-    when(logstashConfiguration.getDateFormatter()).thenReturn(FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ"));
+    when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("BuildData Test");
