@@ -55,8 +55,6 @@ public interface LogstashIndexerDao {
 	UDP
   }
 
-  public void setCharset(Charset charset);
-
   public String getDescription();
 
   /**

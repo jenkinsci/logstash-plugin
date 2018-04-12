@@ -20,14 +20,14 @@ public class RabbitMqTest
   @Before
   public void setup()
   {
-    indexer = new RabbitMq();
+    indexer = new RabbitMq("UTF-8");
     indexer.setHost("localhost");
     indexer.setPort(4567);
     indexer.setPassword("password");
     indexer.setUsername("user");
     indexer.setQueue("queue");
 
-    indexer2 = new RabbitMq();
+    indexer2 = new RabbitMq("UTF-8");
     indexer2.setHost("localhost");
     indexer2.setPort(4567);
     indexer2.setPassword("password");

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -29,7 +30,7 @@ public class RabbitMqDaoTest {
   @Mock Channel mockChannel;
 
   RabbitMqDao createDao(String host, int port, String key, String username, String password) {
-    RabbitMqDao factory = new RabbitMqDao(mockPool, host, port, key, username, password);
+    RabbitMqDao factory = new RabbitMqDao(mockPool, host, port, key, username, password, StandardCharsets.UTF_8);
     verify(mockPool, atLeastOnce()).setHost(host);
     verify(mockPool, atLeastOnce()).setPort(port);
 
@@ -37,8 +38,6 @@ public class RabbitMqDaoTest {
       verify(mockPool, atLeastOnce()).setUsername(username);
       verify(mockPool, atLeastOnce()).setPassword(password);
     }
-
-    factory.setCharset(Charset.defaultCharset());
 
     return factory;
   }
@@ -48,7 +47,6 @@ public class RabbitMqDaoTest {
     int port = (int) (Math.random() * 1000);
     // Note that we can't run these tests in parallel
     dao = createDao("localhost", port, "logstash", "username", "password");
-    dao.setCharset(Charset.defaultCharset());
 
     when(mockPool.newConnection()).thenReturn(mockConnection);
 
@@ -199,7 +197,6 @@ public class RabbitMqDaoTest {
   public void pushSuccessNoAuth() throws Exception {
     String json = "{ 'foo': 'bar' }";
     dao = createDao("localhost", 5672, "logstash", null, null);
-    dao.setCharset(Charset.defaultCharset());
 
     // Unit under test
     dao.push(json);

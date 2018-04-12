@@ -156,8 +156,8 @@ public class LogstashConfiguration extends GlobalConfiguration
             }
             break;
           case RABBIT_MQ:
-            LOGGER.log(Level.INFO, "Migrating logstash configuration for  RabbitMQ");
-            RabbitMq rabbitMq = new RabbitMq();
+            LOGGER.log(Level.INFO, "Migrating logstash configuration for RabbitMQ");
+            RabbitMq rabbitMq = new RabbitMq("");
             rabbitMq.setHost(descriptor.getHost());
             rabbitMq.setPort(descriptor.getPort());
             rabbitMq.setQueue(descriptor.getKey());

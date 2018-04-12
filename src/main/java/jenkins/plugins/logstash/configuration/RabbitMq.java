@@ -1,5 +1,7 @@
 package jenkins.plugins.logstash.configuration;
 
+import java.nio.charset.Charset;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -17,10 +19,34 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   private String queue;
   private String username;
   private Secret password;
+  private Charset charset;
+
 
   @DataBoundConstructor
-  public RabbitMq()
+  public RabbitMq(String charset)
   {
+    if (charset == null || charset.isEmpty())
+    {
+      this.charset = Charset.defaultCharset();
+    }
+    else
+    {
+      this.charset = Charset.forName(charset);
+    }
+  }
+
+  protected Object readResolve()
+  {
+    if (charset == null)
+    {
+      charset = Charset.defaultCharset();
+    }
+    return this;
+  }
+
+  public Charset getCharset()
+  {
+    return charset;
   }
 
   public String getQueue()
@@ -105,7 +131,7 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   @Override
   public RabbitMqDao createIndexerInstance()
   {
-    return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password));
+    return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password), charset);
   }
 
   @Extension

@@ -39,7 +39,6 @@ import net.sf.json.JSONObject;
 public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexerDao {
   private final String host;
   private final int port;
-  private Charset charset;
 
   public HostBasedLogstashIndexerDao(String host, int port) {
     this.host = host;
@@ -47,28 +46,6 @@ public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexe
     if (StringUtils.isBlank(host)) {
       throw new IllegalArgumentException("host name is required");
     }
-  }
-
-  /**
-   * Sets the charset used to push data to the indexer
-   *
-   *@param charset The charset to push data
-   */
-  @Override
-  public void setCharset(Charset charset)
-  {
-    this.charset = charset;
-  }
-
-  /**
-   * Gets the configured charset used to push data to the indexer
-   *
-   * @return charste to push data
-   */
-  @Override
-  public Charset getCharset()
-  {
-    return charset;
   }
 
   @Override

@@ -24,7 +24,6 @@
 
 package jenkins.plugins.logstash.persistence;
 
-import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.List;
 
@@ -34,34 +33,10 @@ import net.sf.json.JSONObject;
 /**
  * Abstract data access object for Logstash indexers.
  *
- * TODO: a charset is only required for RabbitMq currently (ES as well but there it is currently configured via the ContentType),
- *   so better move this to the corresponding classes.
  * @author Rusty Gerard
  * @since 1.0.0
  */
 public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
-  private Charset charset;
-
-  /**
-   * Sets the charset used to push data to the indexer
-   *
-   *@param charset The charset to push data
-   */
-  @Override
-  public void setCharset(Charset charset)
-  {
-    this.charset = charset;
-  }
-
-  /**
-   * Gets the configured charset used to push data to the indexer
-   *
-   * @return charste to push data
-   */
-  public Charset getCharset()
-  {
-    return charset;
-  }
 
   @Override
   public JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines) {

@@ -179,7 +179,6 @@ public class LogstashWriterTest {
     verify(mockBuild).getEnvironments();
     verify(mockBuild).getEnvironment(null);
     verify(mockBuild).getCharset();
-    verify(mockDao).setCharset(Charset.defaultCharset());
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -254,7 +253,6 @@ public class LogstashWriterTest {
 
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
-    verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
   }
 
@@ -274,7 +272,6 @@ public class LogstashWriterTest {
 
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
-    verify(mockDao).setCharset(Charset.defaultCharset());
   }
 
   @Test
@@ -318,7 +315,6 @@ public class LogstashWriterTest {
     verify(mockDao, times(2)).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
     verify(mockDao, times(2)).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao, times(2)).getDescription();
-    verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
   }
 
@@ -342,7 +338,6 @@ public class LogstashWriterTest {
       "java.io.IOException: Unable to read log file");
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), logLinesCaptor.capture());
-    verify(mockDao).setCharset(Charset.defaultCharset());
     List<String> actualLogLines = logLinesCaptor.getValue();
 
     assertThat("The exception was not sent to Logstash", actualLogLines.get(0), containsString(expectedErrorLines.get(0)));

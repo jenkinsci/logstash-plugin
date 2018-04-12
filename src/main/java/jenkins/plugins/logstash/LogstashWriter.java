@@ -64,9 +64,6 @@ public class LogstashWriter {
   private boolean connectionBroken;
   private Charset charset;
 
-  /*
-   * TODO: the charset must not be transfered to the dao. The dao is shared between different build.
-   */
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
@@ -79,7 +76,6 @@ public class LogstashWriter {
     } else {
       this.jenkinsUrl = getJenkinsUrl();
       this.buildData = getBuildData();
-      dao.setCharset(charset);
     }
   }
 
