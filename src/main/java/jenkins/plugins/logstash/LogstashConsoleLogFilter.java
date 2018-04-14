@@ -7,9 +7,8 @@ import java.io.Serializable;
 import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.AbstractBuild;
-import hudson.model.BuildableItemWithBuildWrappers;
+import hudson.model.AbstractProject;
 import hudson.model.Run;
-import hudson.tasks.BuildWrapper;
 
 @Extension(ordinal = 1000)
 public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serializable
@@ -63,15 +62,12 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
       return true;
     }
 
-    if (build.getParent() instanceof BuildableItemWithBuildWrappers)
+    if (build.getParent() instanceof AbstractProject)
     {
-      BuildableItemWithBuildWrappers project = (BuildableItemWithBuildWrappers)build.getParent();
-      for (BuildWrapper wrapper : project.getBuildWrappersList())
+      AbstractProject<?, ?> project = (AbstractProject<?, ?>)build.getParent();
+      if (project.getProperty(LogstashJobProperty.class) != null)
       {
-        if (wrapper instanceof LogstashBuildWrapper)
-        {
-          return true;
-        }
+        return true;
       }
     }
     return false;
