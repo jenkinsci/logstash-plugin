@@ -181,10 +181,6 @@ public class LogstashConfiguration extends GlobalConfiguration
     // To avoid that we get a new dao instance in case there was no change in configuration
     // we compare it to the currently active configuration.
     staplerRequest.bindJSON(this, json);
-    if (!Objects.equals(logstashIndexer, activeIndexer))
-    {
-      activeIndexer = logstashIndexer;
-    }
     
     try {
       // validate 
@@ -196,6 +192,11 @@ public class LogstashConfiguration extends GlobalConfiguration
       // so that when user refreshes the configuration page, last saved settings will be displayed again.
       logstashIndexer = previousIndexer;
       throw new IllegalArgumentException(ex);
+    }
+    
+    if (!Objects.equals(logstashIndexer, activeIndexer))
+    {
+      activeIndexer = logstashIndexer;
     }
     
     save();
