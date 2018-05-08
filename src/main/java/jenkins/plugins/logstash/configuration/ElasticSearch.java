@@ -118,6 +118,10 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     {
       return false;
     }
+    else if (!mimeType.equals(other.mimeType))
+    {
+      return false;
+    }
     return true;
   }
 

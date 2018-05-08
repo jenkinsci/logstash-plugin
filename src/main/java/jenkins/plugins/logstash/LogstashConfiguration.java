@@ -173,9 +173,6 @@ public class LogstashConfiguration extends GlobalConfiguration
   public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException
   {
     
-    // Keep a reference to the current configuration to revert back in case of an exception.
-    LogstashIndexer<?> previousIndexer = logstashIndexer;
-    
     // when we bind the stapler request we get a new instance of logstashIndexer.
     // logstashIndexer is holder for the dao instance.
     // To avoid that we get a new dao instance in case there was no change in configuration
@@ -190,7 +187,7 @@ public class LogstashConfiguration extends GlobalConfiguration
       // Exception will be thrown here so that it gets displayed on UI. 
       // But before that revert back to original configuration (in-memory) 
       // so that when user refreshes the configuration page, last saved settings will be displayed again.
-      logstashIndexer = previousIndexer;
+      logstashIndexer = activeIndexer;
       throw new IllegalArgumentException(ex);
     }
     
