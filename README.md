@@ -76,4 +76,5 @@ Adding support for new indexers
 * Implement the extension point `jenkins.plugins.logstash.configuration.LogstashIndexer` that will take your configuration. 
 * Implement `equals()` and `hashCode()`so the plugin can compare new configuration with existing configuration.
 * Create a `configure-advanced.jelly` for the UI part of your configuration.
+* Create a `help.jelly` with more details about indexer.
 * Create a new class that extends `jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao` or `jenkins.plugins.logstash.persistence.HostBasedLogstashIndexer`. This class will do the actual work of pushing the logs to the indexer.

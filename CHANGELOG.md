@@ -3,7 +3,7 @@
 * [JENKINS-49960] use a Jobproperty instead of a BuildWrapper (#55) :warning:
 * [JENKINS-33635] option to enable logstash globally (#54)
 * remove dependency to maskpasswords (#48)
-* [JENKINS-49451] Fix logstash Notifier setp (#53)
+* [JENKINS-49451] Fix logstash Notifier step (#53)
 * add a pipeline step with block (#51)
 * move configuration from ToolInstallation to GlobalConfiguration (#43) :warning: 
 

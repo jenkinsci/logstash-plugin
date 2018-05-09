@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+  Allows to push to Elastic Search or any indexer that accepts POST requests, e.g. Valo.io or Logstash with an HTTP input.
+</j:jelly>

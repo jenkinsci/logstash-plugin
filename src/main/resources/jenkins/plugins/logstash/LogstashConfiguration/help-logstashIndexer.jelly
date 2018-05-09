@@ -1,0 +1,11 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+  <h3>Supported Indexers</h3>
+  <p>
+    <j:forEach var="descriptor" items="${app.getPlugin('logstash').allIndexers}">
+        <dl>
+            <dt>${descriptor.displayName}</dt>
+            <dd><st:include class="${descriptor.clazz}" page="help.jelly" optional="true"/></dd>
+        </dl>
+    </j:forEach>
+</p></j:jelly>
