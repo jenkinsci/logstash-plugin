@@ -11,7 +11,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -23,6 +25,10 @@ import com.rabbitmq.client.ConnectionFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LogstashDaoTest {
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   LogstashDao dao;
 
   LogstashDao createDao(String host, int port) {
@@ -33,24 +39,18 @@ public class LogstashDaoTest {
     return factory;
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void constructorFailNullHost() throws Exception {
-    try {
-      createDao(null, 9000);
-    } catch (IllegalArgumentException e) {
-      assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
-      throw e;
-    }
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("host name is required");
+    createDao(null, 9000);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void constructorFailEmptyHost() throws Exception {
-    try {
-      createDao(" ", 9000);
-    } catch (IllegalArgumentException e) {
-      assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
-      throw e;
-    }
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("host name is required");
+    createDao(" ", 9000);
   }
 
   @Test

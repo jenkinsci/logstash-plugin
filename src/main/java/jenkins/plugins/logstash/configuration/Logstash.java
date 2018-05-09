@@ -26,7 +26,7 @@ public class Logstash extends HostBasedLogstashIndexer<LogstashDao>
     @Override
     public String getDisplayName()
     {
-      return "Logstash";
+      return "Logstash TCP";
     }
 
     @Override
