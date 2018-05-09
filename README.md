@@ -4,7 +4,7 @@ Jenkins Logstash Plugin
 Travis: [![Build Status](https://travis-ci.org/jenkinsci/logstash-plugin.svg?branch=master)](https://travis-ci.org/jenkinsci/logstash-plugin)
 Jenkins: [![Build Status](https://ci.jenkins.io/job/Plugins/job/logstash-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/logstash-plugin/job/master/)
 
-This plugin adds support for sending a job's console log to Logstash indexers such as ElasticSearch, RabbitMQ, or Redis.
+This plugin adds support for sending a job's console log to Logstash indexers such as [Elastic Search](https://www.elastic.co/products/elasticsearch), [Logstash](https://www.elastic.co/de/products/logstash), [RabbitMQ](https://www.rabbitmq.com), [Redis](https://redis.io/) or to Syslog.
 
 * see [Jenkins wiki](https://wiki.jenkins-ci.org/display/JENKINS/Logstash+Plugin) for detailed feature descriptions
 * use [JIRA](https://issues.jenkins-ci.org) to report issues / feature requests
@@ -23,6 +23,7 @@ Configure
 Currently supported methods of input/output:
 
 * ElasticSearch {REST API}
+* Logstash TCP input
 * Redis {format => 'json_event'}
 * RabbitMQ {mechanism => PLAIN}
 * Syslog {format => cee/json ([RFC-5424](https://tools.ietf.org/html/rfc5424),[RFC-3164](https://tools.ietf.org/html/rfc3164)), protocol => UDP}
@@ -73,6 +74,6 @@ Adding support for new indexers
 -------------------------------
 
 * Implement the extension point `jenkins.plugins.logstash.configuration.LogstashIndexer` that will take your configuration. 
-Override the method `shouldRefreshInstance()` where you decide if a new dao instance must be created because the configuration has changed in the meantime.
+* Implement `equals()` and `hashCode()`so the plugin can compare new configuration with existing configuration.
 * Create a `configure-advanced.jelly` for the UI part of your configuration.
-* Create a new class that extends `jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao`. This class will do the actual work of pushing the logs to the indexer.
+* Create a new class that extends `jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao` or `jenkins.plugins.logstash.persistence.HostBasedLogstashIndexer`. This class will do the actual work of pushing the logs to the indexer.
