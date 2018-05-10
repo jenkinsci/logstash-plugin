@@ -38,8 +38,6 @@ import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogProtocol;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * POJO for storing global configurations shared between components.
  *

@@ -35,8 +35,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -153,7 +151,7 @@ public class LogstashWriter {
 
   BuildData getBuildData() {
     if (build instanceof AbstractBuild) {
-      return new BuildData((AbstractBuild) build, new Date(), listener);
+      return new BuildData((AbstractBuild<?, ?>) build, new Date(), listener);
     } else {
       return new BuildData(build, new Date(), listener);
     }

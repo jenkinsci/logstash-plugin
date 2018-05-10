@@ -44,6 +44,7 @@ public class LogstashItemListener extends ItemListener
   static void convertBuildWrapperToJobProperty(BuildableItemWithBuildWrappers item)
   {
     DescribableList<BuildWrapper, Descriptor<BuildWrapper>> wrappers = item.getBuildWrappersList();
+    @SuppressWarnings("deprecation")
     LogstashBuildWrapper logstashBuildWrapper = wrappers.get(LogstashBuildWrapper.class);
     if (logstashBuildWrapper != null && item instanceof AbstractProject<?, ?>)
     {

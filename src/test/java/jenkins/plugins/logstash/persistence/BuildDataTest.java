@@ -1,6 +1,5 @@
 package jenkins.plugins.logstash.persistence;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,7 +14,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.commons.lang.time.FastDateFormat;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

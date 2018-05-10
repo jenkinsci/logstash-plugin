@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,9 +46,8 @@ public class ElasticSearchDaoTest {
 
   @Before
   public void before() throws Exception {
-    int port = (int) (Math.random() * 1000);
     dao = createDao("http://localhost:8200/logstash", "username", "password");
-    
+
     when(mockClientBuilder.build()).thenReturn(mockHttpClient);
     when(mockHttpClient.execute(any(HttpPost.class))).thenReturn(mockResponse);
     when(mockResponse.getStatusLine()).thenReturn(mockStatusLine);
@@ -196,7 +194,7 @@ public class ElasticSearchDaoTest {
         e.getMessage().contains("Something bad happened.") && e.getMessage().contains("HTTP error code: 500"));
         throw e;
     }
-    
+
   }
   @Test
   public void getHttpPostSuccessWithUserInput() throws Exception {

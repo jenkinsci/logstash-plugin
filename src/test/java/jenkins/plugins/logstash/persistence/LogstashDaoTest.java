@@ -1,27 +1,12 @@
 package jenkins.plugins.logstash.persistence;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
-import java.io.IOException;
-import java.net.SocketException;
-import java.nio.charset.Charset;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.rabbitmq.client.AuthenticationFailureException;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LogstashDaoTest {
@@ -33,9 +18,6 @@ public class LogstashDaoTest {
 
   LogstashDao createDao(String host, int port) {
     LogstashDao factory = new LogstashDao(host, port);
-
-    factory.setCharset(Charset.defaultCharset());
-
     return factory;
   }
 

@@ -3,7 +3,6 @@ package jenkins.plugins.logstash.configuration;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -51,12 +50,12 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
   /**
    * Purpose of this method is to validate the inputs (if required) and if found
    * erroneous throw an exception so that it will be bubbled up to the UI.
-   * 
+   *
    * @throws Exception
    */
   public void validate() throws Exception {
   }
-    
+
 
 
   /**
@@ -70,7 +69,7 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
   @SuppressWarnings("unchecked")
   public static DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>> all()
   {
-    return (DescriptorExtensionList) Jenkins.getInstance().getDescriptorList(LogstashIndexer.class);
+    return (DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>>) Jenkins.getInstance().getDescriptorList(LogstashIndexer.class);
   }
 
   public static abstract class LogstashIndexerDescriptor extends Descriptor<LogstashIndexer<?>>

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.apache.commons.lang.time.FastDateFormat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

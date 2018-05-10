@@ -212,7 +212,7 @@ public class LogstashIntegrationTest
     public void milliSecondTimestamps() throws Exception
     {
       logstashConfiguration.setMilliSecondTimestamps(true);
-      project.getBuildWrappersList().add(new LogstashBuildWrapper());
+      project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
       FreeStyleBuild build = f.get();
@@ -229,7 +229,7 @@ public class LogstashIntegrationTest
     public void secondTimestamps() throws Exception
     {
       logstashConfiguration.setMilliSecondTimestamps(false);
-      project.getBuildWrappersList().add(new LogstashBuildWrapper());
+      project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
       FreeStyleBuild build = f.get();

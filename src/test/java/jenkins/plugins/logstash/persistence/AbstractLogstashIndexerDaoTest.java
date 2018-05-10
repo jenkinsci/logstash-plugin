@@ -1,7 +1,6 @@
 package jenkins.plugins.logstash.persistence;
 
 import static net.sf.json.test.JSONAssert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.IOException;
@@ -10,7 +9,6 @@ import java.util.Arrays;
 
 import net.sf.json.JSONObject;
 
-import org.apache.commons.lang.time.FastDateFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
