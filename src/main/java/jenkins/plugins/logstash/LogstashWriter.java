@@ -42,6 +42,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import javax.annotation.CheckForNull;
+
 /**
  * A writer that wraps all Logstash DAOs.  Handles error reporting and per build connection state.
  * Each call to write (one line or multiple lines) sends a Logstash payload to the DAO.
@@ -49,6 +53,7 @@ import java.util.List;
  *
  * @author Rusty Gerard
  * @author Liam Newman
+ * @author Aleksandar Kostadinov
  * @since 1.0.5
  */
 public class LogstashWriter {
@@ -62,11 +67,23 @@ public class LogstashWriter {
   private boolean connectionBroken;
   private Charset charset;
 
+  @CheckForNull
+  private final LogstashPayloadProcessor payloadProcessor;
+
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener) {
+    this(run, error, listener, null);
+  }
+
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
+	    this(run, error, listener, charset, null);
+	  }
+  
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, LogstashPayloadProcessor payloadProcessor) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
     this.listener = listener;
     this.charset = charset;
+    this.payloadProcessor = payloadProcessor;
     this.dao = this.getDaoOrNull();
     if (this.dao == null) {
       this.jenkinsUrl = "";
@@ -165,8 +182,36 @@ public class LogstashWriter {
    * Write a list of lines to the indexer as one Logstash payload.
    */
   private void write(List<String> lines) {
+    write(dao.buildPayload(buildData, jenkinsUrl, lines));
+  }
+
+  /**
+   * Write JSONObject payload to the Logstash indexer.
+   * @since 1.0.5
+   */
+  private void write(JSONObject payload) {
     buildData.updateResult();
-    JSONObject payload = dao.buildPayload(buildData, jenkinsUrl, lines);
+    if (payloadProcessor != null) {
+      JSONObject processedPayload = payload;
+      try {
+        processedPayload = payloadProcessor.process(payload);
+      } catch (Exception e) {
+        String msg =  ExceptionUtils.getMessage(e) + "\n" +
+          "[logstash-plugin]: Error in payload processing.\n";
+
+        logErrorMessage(msg);
+      }
+      if (processedPayload != null) { writeRaw(processedPayload); }
+    } else {
+      writeRaw(payload);
+    }
+  }
+
+  /**
+   * Write JSONObject payload to the Logstash indexer.
+   * @since 1.0.5
+   */
+  private void writeRaw(JSONObject payload) {
     try {
       dao.push(payload.toString());
     } catch (IOException e) {
@@ -203,6 +248,9 @@ public class LogstashWriter {
   /**
    * Write error message to errorStream and set connectionBroken to true.
    */
+  @SuppressFBWarnings(
+    value="DM_DEFAULT_ENCODING",
+    justification="TODO: not sure how to fix this")
   private void logErrorMessage(String msg) {
     try {
       connectionBroken = true;
@@ -214,4 +262,23 @@ public class LogstashWriter {
     }
   }
 
+
+  /**
+   * Signal payload processor that there will be no more lines
+   */
+  public void close() {
+    if (payloadProcessor != null) {
+      JSONObject payload = null;
+      try {
+        // calling finish() is mandatory to avoid memory leaks
+        payload = payloadProcessor.finish();
+      } catch (Exception e) {
+        String msg =  ExceptionUtils.getMessage(e) + "\n" +
+          "[logstash-plugin]: Error with payload processor on finish.\n";
+
+        logErrorMessage(msg);
+      }
+      if (payload != null) writeRaw(payload);
+    }
+  }
 }

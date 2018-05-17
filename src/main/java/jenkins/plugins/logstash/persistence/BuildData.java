@@ -50,11 +50,14 @@ import static java.util.logging.Level.WARNING;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import net.sf.json.JSONObject;
+import javax.annotation.CheckForNull;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * POJO for mapping build info to JSON.
@@ -93,6 +96,9 @@ public class BuildData {
       this(null);
     }
 
+    @SuppressFBWarnings(
+      value="URF_UNREAD_FIELD",
+      justification="TODO: not sure how to fix this")
     public TestData(Action action) {
       AbstractTestResultAction<?> testResultAction = null;
       if (action instanceof AbstractTestResultAction) {
@@ -151,7 +157,7 @@ public class BuildData {
   }
 
   private String id;
-  private String result;
+  @CheckForNull private String result;
   private String projectName;
   private String fullProjectName;
   private String displayName;
@@ -256,7 +262,7 @@ public class BuildData {
     url = build.getUrl();
     buildNum = build.getNumber();
     buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
-    timestamp = LogstashConfiguration.getInstance().getDateFormatter().format(build.getTimestamp().getTime());
+    timestamp = LogstashConfiguration.getInstance().getDateFormatter().format(build.getTime());
     updateResult();
   }
 

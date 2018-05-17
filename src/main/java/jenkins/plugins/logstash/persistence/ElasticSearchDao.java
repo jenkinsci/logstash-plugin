@@ -52,6 +52,7 @@ import com.google.common.collect.Range;
 
 import jenkins.plugins.logstash.configuration.ElasticSearch;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Elastic Search Data Access Object.
@@ -77,6 +78,9 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   }
 
   // Factored for unit testing
+  @SuppressFBWarnings(
+    value="DM_DEFAULT_ENCODING",
+    justification="TODO: not sure how to fix this")
   ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password) {
 
     if (uri == null)
@@ -192,6 +196,9 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     }
   }
 
+  @SuppressFBWarnings(
+    value="DM_DEFAULT_ENCODING",
+    justification="TODO: not sure how to fix this")
   private String getErrorMessage(CloseableHttpResponse response) {
     ByteArrayOutputStream byteStream = null;
     PrintStream stream = null;

@@ -1,0 +1,37 @@
+<p>
+  With this script you can filter, modify and/or group messages that are sent to the
+  configured logstash backend. The following variables are available during execution:
+  <ul>
+    <li><strong>payload</strong> - JSONObject contaning the payload to be persisted.</li>
+    <li><strong>console</strong> - a class to output messages to build log without persisting them. It also works in a sandbox: <code>console.println("my logged message")</code>.</li>
+  </ul>
+</p>
+<p>
+  The script will be executed once per each line of build console output with
+  the variable <code>payload</code> set to the complete JSON payload to be
+  sent including message, timestamp, build url, etc.
+  The line text in particular will be present under the <code>"message"</code>
+  key as an array with a single string element.
+</p>
+<p>
+  Once script completes execution, the <code>payload</code> variable will be read out
+  of current Binding and passed down to the Logstash backend to be persisted. If
+  <code>payload</code> is set to <code>null</code> by the script, then nothing will be
+  persisted.
+</p>
+<p>
+  The script within a build will be executed always using the same Binding.
+  This means that variables can be saved between script invocations.
+</p>
+<p>
+  At the end of the build a payload == null will be submitted. You can use this to
+  output any messages that you have cached for grouping or other purposes.
+</p>
+<p>
+  Example script to filter out some console messages by pattern:
+  <pre><code>
+    if (payload &amp;&amp; payload["message"][0] =~ /my needless pattern/) {
+      payload = null
+    }
+  </code></pre>
+</p>

@@ -25,6 +25,7 @@
 package jenkins.plugins.logstash;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -35,8 +36,14 @@ import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript;
+
+import javax.annotation.CheckForNull;
+
+import org.kohsuke.stapler.DataBoundSetter;
 
 /**
+ * Logstash note on each output line.
  *
  * This BuildWrapper is not used anymore.
  * We just keep it to be able to convert projects that have the BuildWrapper configured at startup or when posting the xml via the rest api
@@ -48,12 +55,20 @@ import hudson.tasks.BuildWrapperDescriptor;
 public class LogstashBuildWrapper extends BuildWrapper
 {
 
+  @CheckForNull
+  private SecureGroovyScript secureGroovyScript;
+
   /**
    * Create a new {@link LogstashBuildWrapper}.
    */
   @DataBoundConstructor
   public LogstashBuildWrapper()
   {}
+
+  @DataBoundSetter
+  public void setSecureGroovyScript(@CheckForNull SecureGroovyScript script) {
+    this.secureGroovyScript = script != null ? script.configuringWithNonKeyItem() : null;
+  }
 
   /**
    * {@inheritDoc}
@@ -71,6 +86,21 @@ public class LogstashBuildWrapper extends BuildWrapper
   public DescriptorImpl getDescriptor()
   {
     return (DescriptorImpl)super.getDescriptor();
+  }
+
+  @CheckForNull
+  public SecureGroovyScript getSecureGroovyScript() {
+    return secureGroovyScript;
+  }
+
+  // Method to encapsulate calls for unit-testing
+  LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
+    LogstashScriptProcessor processor = null;
+    if (secureGroovyScript != null) {
+      processor = new LogstashScriptProcessor(secureGroovyScript, errorStream);
+    }
+
+    return new LogstashWriter(build, errorStream, null, build.getCharset(), processor);
   }
 
   /**

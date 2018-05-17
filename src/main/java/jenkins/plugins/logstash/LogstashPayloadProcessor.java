@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2014 Rusty Gerard
+ * Copyright 2017 Red Hat inc, and individual contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,37 +22,29 @@
  * THE SOFTWARE.
  */
 
-package jenkins.plugins.logstash.persistence;
+package jenkins.plugins.logstash;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import jenkins.plugins.logstash.LogstashConfiguration;
 import net.sf.json.JSONObject;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
- * Abstract data access object for Logstash indexers.
+ * Interface describing processors of persisted payload.
  *
- * @author Rusty Gerard
- * @since 1.0.0
+ * @author Aleksandar Kostadinov
+ * @since 1.4.0
  */
-public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao {
+public interface LogstashPayloadProcessor {
+  /**
+   * Modifies a JSON payload compatible with the Logstash schema.
+   *
+   * @param payload the JSON payload that has been constructed so far.
+   * @return The formatted JSON object, can be null to ignore this payload.
+   */
+  JSONObject process(JSONObject payload) throws Exception;
 
-  @Override
-  public JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines) {
-    JSONObject payload = new JSONObject();
-    payload.put("data", buildData.toJson());
-    payload.put("message", logLines);
-    payload.put("source", "jenkins");
-    payload.put("source_host", jenkinsUrl);
-    payload.put("@buildTimestamp", buildData.getTimestamp());
-    payload.put("@timestamp", LogstashConfiguration.getInstance().getDateFormatter().format(Calendar.getInstance().getTime()));
-    payload.put("@version", 1);
-
-    return payload;
-  }
-
+  /**
+   * Finalizes any operations, for example returns cashed lines at end of build.
+   *
+   * @return A formatted JSON object, can be null when it has nothing.
+   */
+  JSONObject finish() throws Exception;
 }
