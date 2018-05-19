@@ -59,8 +59,8 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
     this.flush();
 
     if(!logstash.isConnectionBroken()) {
-      String line = new String(b, 0, len, logstash.getCharset()).trim();
-      line = ConsoleNote.removeNotes(line);
+      String line = new String(b, 0, len, logstash.getCharset());
+      line = ConsoleNote.removeNotes(line).trim();
       logstash.write(line);
     }
   }
