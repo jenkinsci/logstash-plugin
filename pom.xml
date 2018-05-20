@@ -157,6 +157,12 @@
     	<version>2.0.0.0</version>
     	<scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>org.jenkins-ci.plugins</groupId>
+    	<artifactId>ansicolor</artifactId>
+    	<version>0.5.2</version>
+    	<scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

@@ -5,6 +5,7 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,11 +30,13 @@ import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair;
 
+import hudson.model.Cause;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.model.Slave;
 import hudson.model.queue.QueueTaskFuture;
+import hudson.plugins.ansicolor.AnsiColorBuildWrapper;
 import net.sf.json.JSONArray;
 import jenkins.plugins.logstash.persistence.MemoryDao;
 import net.sf.json.JSONObject;
@@ -240,5 +243,21 @@ public class LogstashIntegrationTest
         String timestamp = line.getString("@timestamp");
         assertThat(timestamp,matchesPattern("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{4}$"));
       }
+    }
+
+    @Test
+    public void ansiColorAnnotationsAreNotIncluded() throws Exception
+    {
+      AnsiColorBuildWrapper ansi = new AnsiColorBuildWrapper("vga");
+      project.addProperty(new LogstashJobProperty());
+      project.getBuildWrappersList().add(ansi);
+      Cause cause = new Cause.UserIdCause();
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0, cause);
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.SUCCESS));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      JSONObject firstLine = dataLines.get(0);
+      assertThat(firstLine.getJSONArray("message").get(0).toString(),not(startsWith("[8mha")));
     }
 }
