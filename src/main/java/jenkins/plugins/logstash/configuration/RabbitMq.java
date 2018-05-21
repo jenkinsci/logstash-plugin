@@ -114,6 +114,17 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
     {
       return false;
     }
+    if (charset == null)
+    {
+      if (other.charset != null)
+      {
+        return false;
+      }
+    } else if (!charset.equals(other.charset))
+    {
+      return false;
+    }
+
     return true;
   }
 
@@ -124,6 +135,7 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
     int result = super.hashCode();
     result = prime * result + ((queue == null) ? 0 : queue.hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
+    result = prime * result + ((charset == null) ? 0 : charset.hashCode());
     result = prime * result + Secret.toString(password).hashCode();
     return result;
   }

@@ -16,6 +16,7 @@ public class RabbitMqTest
 
   private RabbitMq indexer;
   private RabbitMq indexer2;
+  private RabbitMq indexer3;
 
   @Before
   public void setup()
@@ -33,7 +34,14 @@ public class RabbitMqTest
     indexer2.setPassword("password");
     indexer2.setUsername("user");
     indexer2.setQueue("queue");
-  }
+
+    indexer3 = new RabbitMq("UTF-16");
+    indexer3.setHost("localhost");
+    indexer3.setPort(4567);
+    indexer3.setPassword("password");
+    indexer3.setUsername("user");
+    indexer3.setQueue("queue");
+}
 
   @Test
   public void sameSettingsAreEqual()
@@ -60,6 +68,12 @@ public class RabbitMqTest
   {
     indexer.setQueue("newQueue");
     assertThat(indexer.equals(indexer2), is(false));
+  }
+
+  @Test
+  public void charsetChangeIsNotEqual()
+  {
+    assertThat(indexer.equals(indexer3), is(false));
   }
 
 }
