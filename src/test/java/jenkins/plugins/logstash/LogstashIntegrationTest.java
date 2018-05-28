@@ -147,14 +147,14 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void buildWrapperUpdatesResult() throws Exception
+    public void buildJobPropertyUpdatesResult() throws Exception
     {
-      project.getBuildWrappersList().add(new LogstashBuildWrapper());
+      project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      assertThat(dataLines.size(), is(3));
+      assertThat(dataLines.size(), is(4));
       JSONObject firstLine = dataLines.get(0);
       JSONObject lastLine = dataLines.get(dataLines.size()-1);
       JSONObject data = firstLine.getJSONObject("data");
@@ -163,7 +163,8 @@ public class LogstashIntegrationTest
       data.getString("result");
       data = lastLine.getJSONObject("data");
       assertThat(data.getString("result"),equalTo("SUCCESS"));
-  
+    }
+
     @Test
     public void passwordsAreMaskedWithMaskpasswordsBuildWrapper() throws Exception
     {

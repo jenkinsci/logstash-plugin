@@ -271,7 +271,6 @@ public class LogstashWriterTest {
 
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
-    verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuildData).updateResult();
   }
 
@@ -340,7 +339,6 @@ public class LogstashWriterTest {
       "java.io.IOException: Unable to read log file");
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), logLinesCaptor.capture());
-    verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuildData).updateResult();
 
     List<String> actualLogLines = logLinesCaptor.getValue();
