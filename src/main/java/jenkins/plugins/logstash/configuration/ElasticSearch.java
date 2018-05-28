@@ -5,6 +5,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -21,6 +24,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   private String username;
   private Secret password;
   private URI uri;
+  private String mimeType;
 
   @DataBoundConstructor
   public ElasticSearch()
@@ -32,6 +36,10 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     return uri;
   }
 
+  @Override
+ public void validate() throws MimeTypeParseException {
+    new MimeType(this.mimeType);
+  }
 
   /*
    * We use URL for the setter as stapler can autoconvert a string to a URL but not to a URI
@@ -68,7 +76,16 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   {
     this.password = Secret.fromString(password);
   }
-
+  
+  @DataBoundSetter
+  public void setMimeType(String mimeType) {
+    this.mimeType = mimeType;
+  }
+  
+  public String getMimeType() {
+    return mimeType;
+  }
+  
   @Override
   public boolean equals(Object obj)
   {
@@ -101,6 +118,10 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     {
       return false;
     }
+    else if (!mimeType.equals(other.mimeType))
+    {
+      return false;
+    }
     return true;
   }
 
@@ -118,7 +139,9 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   @Override
   public ElasticSearchDao createIndexerInstance()
   {
-    return new ElasticSearchDao(getUri(), username, Secret.toString(password));
+    ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password));
+    esDao.setMimeType(getMimeType());
+    return esDao;
   }
 
   @Extension
@@ -160,6 +183,18 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       catch (MalformedURLException | URISyntaxException e)
       {
         return FormValidation.error(e.getMessage());
+      }
+      return FormValidation.ok();
+    }
+    public FormValidation doCheckMimeType(@QueryParameter("value") String value) {
+      if (StringUtils.isBlank(value)) {
+        return FormValidation.error(Messages.ValueIsRequired());
+      }
+      try {
+        //This is simply to check validity of the given mimeType
+        new MimeType(value);
+      } catch (MimeTypeParseException e) {
+        return FormValidation.error(Messages.ProvideValidMimeType());
       }
       return FormValidation.ok();
     }

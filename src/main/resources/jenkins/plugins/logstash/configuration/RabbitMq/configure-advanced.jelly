@@ -9,4 +9,10 @@
     <f:entry title="${%Queue}" field="queue">
       <f:textbox default="logstash"/>
     </f:entry>
+    <f:entry title="${%Charset}" field="charset">
+      <f:textbox default="UTF-8"/>
+    </f:entry>
+    <f:entry title="${%Virtual Host}" field="virtualHost">
+      <f:textbox default="/"/>
+    </f:entry>
 </j:jelly>

@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+  Syslog {format => cee/json (RFC-5424,RFC-3164), protocol => UDP}
+</j:jelly>

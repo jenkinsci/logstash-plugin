@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,7 +46,6 @@ public class ElasticSearchDaoTest {
 
   @Before
   public void before() throws Exception {
-    int port = (int) (Math.random() * 1000);
     dao = createDao("http://localhost:8200/logstash", "username", "password");
 
     when(mockClientBuilder.build()).thenReturn(mockHttpClient);
@@ -197,5 +195,23 @@ public class ElasticSearchDaoTest {
         throw e;
     }
 
+  }
+  @Test
+  public void getHttpPostSuccessWithUserInput() throws Exception {
+    String json = "{ 'foo': 'bar' }";
+    String mimeType = "application/json";
+    dao = createDao("http://localhost:8200/jenkins/logstash", "username", "password");
+    dao.setMimeType(mimeType);
+    HttpPost post = dao.getHttpPost(json);
+    HttpEntity entity = post.getEntity();
+    assertEquals("Content type do not match", mimeType, entity.getContentType().getValue());
+  }
+  @Test
+  public void getHttpPostWithFallbackInput() throws Exception {
+    String json = "{ 'foo': 'bar' }";
+    dao = createDao("http://localhost:8200/jenkins/logstash", "username", "password");
+    HttpPost post = dao.getHttpPost(json);
+    HttpEntity entity = post.getEntity();
+    assertEquals("Content type do not match", ContentType.APPLICATION_JSON.toString(), entity.getContentType().getValue());
   }
 }

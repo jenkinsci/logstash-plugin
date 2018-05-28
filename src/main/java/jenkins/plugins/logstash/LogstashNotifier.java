@@ -37,13 +37,14 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
-
+import hudson.util.FormValidation;
 import jenkins.tasks.SimpleBuildStep;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.jenkinsci.Symbol;
 
 /**
@@ -61,6 +62,16 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
   public LogstashNotifier(int maxLines, boolean failBuild) {
     this.maxLines = maxLines;
     this.failBuild = failBuild;
+  }
+
+  public int getMaxLines()
+  {
+    return maxLines;
+  }
+
+  public boolean isFailBuild()
+  {
+    return failBuild;
   }
 
   @Override
@@ -111,5 +122,19 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
     public String getDisplayName() {
       return Messages.DisplayName();
     }
+
+    /*
+     * Form validation methods
+     */
+    public FormValidation doCheckMaxLines(@QueryParameter("value") String value) {
+      try {
+        Integer.parseInt(value);
+      } catch (NumberFormatException e) {
+        return FormValidation.error(Messages.ValueIsInt());
+      }
+
+      return FormValidation.ok();
+    }
+
   }
 }

@@ -4,7 +4,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,8 +23,11 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
@@ -38,12 +41,15 @@ import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
+import jenkins.plugins.logstash.LogstashConfiguration;
 import jenkins.plugins.logstash.persistence.BuildData.TestData;
 import net.sf.json.JSONObject;
 import net.sf.json.test.JSONAssert;
 
 @SuppressWarnings("rawtypes")
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.crypto.*"})
+@PrepareForTest(LogstashConfiguration.class)
 public class BuildDataTest {
 
   static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"fullProjectName\":\"parent/BuildDataTest\","
@@ -66,10 +72,15 @@ public class BuildDataTest {
   @Mock TaskListener mockListener;
   @Mock Computer mockComputer;
   @Mock Executor mockExecutor;
-
+  @Mock LogstashConfiguration logstashConfiguration;
 
   @Before
   public void before() throws Exception {
+
+    PowerMockito.mockStatic(LogstashConfiguration.class);
+    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
+
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("BuildData Test");
     when(mockBuild.getFullDisplayName()).thenReturn("BuildData Test #123456");

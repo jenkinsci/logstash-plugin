@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import jenkins.plugins.logstash.LogstashConfiguration;
 import net.sf.json.JSONObject;
 
 /**
@@ -38,7 +39,6 @@ import net.sf.json.JSONObject;
 public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexerDao {
   private final String host;
   private final int port;
-  private Charset charset;
 
   public HostBasedLogstashIndexerDao(String host, int port) {
     this.host = host;
@@ -46,28 +46,6 @@ public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexe
     if (StringUtils.isBlank(host)) {
       throw new IllegalArgumentException("host name is required");
     }
-  }
-
-  /**
-   * Sets the charset used to push data to the indexer
-   *
-   *@param charset The charset to push data
-   */
-  @Override
-  public void setCharset(Charset charset)
-  {
-    this.charset = charset;
-  }
-
-  /**
-   * Gets the configured charset used to push data to the indexer
-   *
-   * @return charste to push data
-   */
-  @Override
-  public Charset getCharset()
-  {
-    return charset;
   }
 
   @Override
@@ -78,7 +56,7 @@ public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexe
     payload.put("source", "jenkins");
     payload.put("source_host", jenkinsUrl);
     payload.put("@buildTimestamp", buildData.getTimestamp());
-    payload.put("@timestamp", BuildData.getDateFormatter().format(Calendar.getInstance().getTime()));
+    payload.put("@timestamp", LogstashConfiguration.getInstance().getDateFormatter().format(Calendar.getInstance().getTime()));
     payload.put("@version", 1);
 
     return payload;

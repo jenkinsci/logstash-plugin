@@ -5,12 +5,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,10 +29,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
@@ -44,7 +48,9 @@ import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
 import net.sf.json.JSONObject;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.crypto.*"})
+@PrepareForTest(LogstashConfiguration.class)
 public class LogstashWriterTest {
   // Extension of the unit under test that avoids making calls to getInstance() to get the DAO singleton
   static LogstashWriter createLogstashWriter(final AbstractBuild<?, ?> testBuild,
@@ -83,6 +89,8 @@ public class LogstashWriterTest {
   @Mock AbstractBuild mockBuild;
   @Mock AbstractTestResultAction mockTestResultAction;
   @Mock Project mockProject;
+  @Mock LogstashConfiguration logstashConfiguration;
+
 
   @Mock BuildData mockBuildData;
   @Mock TaskListener mockListener;
@@ -94,6 +102,10 @@ public class LogstashWriterTest {
 
   @Before
   public void before() throws Exception {
+
+    PowerMockito.mockStatic(LogstashConfiguration.class);
+    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
     when(mockBuild.getDisplayName()).thenReturn("LogstashNotifierTest");
@@ -121,10 +133,10 @@ public class LogstashWriterTest {
     when(mockProject.getName()).thenReturn("LogstashWriterTest");
     when(mockProject.getFullName()).thenReturn("parent/LogstashWriterTest");
 
-    when(mockDao.buildPayload(Matchers.any(BuildData.class), Matchers.anyString(), Matchers.anyListOf(String.class)))
+    when(mockDao.buildPayload(any(BuildData.class), anyString(), anyListOf(String.class)))
       .thenReturn(JSONObject.fromObject("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}"));
 
-    Mockito.doNothing().when(mockDao).push(Matchers.anyString());
+    Mockito.doNothing().when(mockDao).push(anyString());
     when(mockDao.getDescription()).thenReturn("localhost:8080");
 
     errorBuffer = new ByteArrayOutputStream();
@@ -165,7 +177,6 @@ public class LogstashWriterTest {
     verify(mockBuild).getEnvironments();
     verify(mockBuild).getEnvironment(null);
     verify(mockBuild).getCharset();
-    verify(mockDao).setCharset(Charset.defaultCharset());
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
@@ -238,9 +249,8 @@ public class LogstashWriterTest {
     // No error output
     assertEquals("Results don't match", "", errorBuffer.toString());
 
-    verify(mockDao).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
+    verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
-    verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
     verify(mockBuildData).updateResult();
   }
@@ -259,7 +269,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getLog(3);
     verify(mockBuild).getCharset();
 
-    verify(mockDao).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
+    verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuildData).updateResult();
@@ -303,10 +313,9 @@ public class LogstashWriterTest {
     assertEquals("Results don't match", "", errorBuffer.toString());
 
     //Verify calls were made to the dao logging twice, not three times.
-    verify(mockDao, times(2)).buildPayload(Matchers.eq(mockBuildData), Matchers.eq("http://my-jenkins-url"), Matchers.anyListOf(String.class));
+    verify(mockDao, times(2)).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
     verify(mockDao, times(2)).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao, times(2)).getDescription();
-    verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuild).getCharset();
     verify(mockBuildData, times(2)).updateResult();
   }
@@ -333,6 +342,7 @@ public class LogstashWriterTest {
     verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), logLinesCaptor.capture());
     verify(mockDao).setCharset(Charset.defaultCharset());
     verify(mockBuildData).updateResult();
+
     List<String> actualLogLines = logLinesCaptor.getValue();
 
     assertThat("The exception was not sent to Logstash", actualLogLines.get(0), containsString(expectedErrorLines.get(0)));

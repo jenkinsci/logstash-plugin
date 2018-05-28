@@ -25,6 +25,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -35,7 +36,6 @@ import com.rabbitmq.client.ConnectionFactory;
 /**
  * RabbitMQ Data Access Object.
  *
- * TODO: make the charset configurable via the UI with UTF-8 being the default
  * TODO: support TLS
  * TODO: support vhost
  *
@@ -48,10 +48,13 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
   private String queue;
   private String username;
   private String password;
+  private Charset charset;
+  private String virtualHost;
+
 
   //primary constructor used by indexer factory
-  public RabbitMqDao(String host, int port, String key, String username, String password) {
-    this(null, host, port, key, username, password);
+  public RabbitMqDao(String host, int port, String key, String username, String password, Charset charset, String virtualHost) {
+    this(null, host, port, key, username, password, charset, virtualHost);
   }
 
   /*
@@ -59,12 +62,14 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
    *       With Powermock we can intercept the creation of the ConnectionFactory and replace with a mock
    *       making this constructor obsolete
    */
-  RabbitMqDao(ConnectionFactory factory, String host, int port, String queue, String username, String password) {
+  RabbitMqDao(ConnectionFactory factory, String host, int port, String queue, String username, String password, Charset charset, String vhost) {
     super(host, port);
 
     this.queue = queue;
     this.username = username;
     this.password = password;
+    this.charset = charset;
+    this.virtualHost = vhost;
 
     if (StringUtils.isBlank(queue)) {
       throw new IllegalArgumentException("rabbit queue name is required");
@@ -76,6 +81,10 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     pool = factory == null ? new ConnectionFactory() : factory;
     pool.setHost(host);
     pool.setPort(port);
+    if (virtualHost != null)
+    {
+      pool.setVirtualHost(virtualHost);
+    }
 
     if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
       pool.setPassword(password);
@@ -98,6 +107,10 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
       return password;
   }
 
+  public String getVirtualHost()
+  {
+    return virtualHost;
+  }
 
   /*
    * TODO: do we really need to open a connection each time?
@@ -128,7 +141,7 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
         channel.queueDeclare(queue, true, false, false, null);
       }
 
-      channel.basicPublish("", queue, null, data.getBytes(getCharset()));
+      channel.basicPublish("", queue, null, data.getBytes(charset));
     } finally {
       finalizeChannel(channel);
       finalizeConnection(connection);

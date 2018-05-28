@@ -1,12 +1,9 @@
 package jenkins.plugins.logstash.configuration;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -32,11 +29,13 @@ public class ElasticSearchTest
     indexer.setUri(url);
     indexer.setPassword("password");
     indexer.setUsername("user");
+    indexer.setMimeType("application/json");
 
     indexer2 = new ElasticSearch();
     indexer2.setUri(url);
     indexer2.setPassword("password");
     indexer2.setUsername("user");
+    indexer2.setMimeType("application/json");
 }
 
   @Test

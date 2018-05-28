@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -28,17 +29,16 @@ public class RabbitMqDaoTest {
   @Mock Connection mockConnection;
   @Mock Channel mockChannel;
 
-  RabbitMqDao createDao(String host, int port, String key, String username, String password) {
-    RabbitMqDao factory = new RabbitMqDao(mockPool, host, port, key, username, password);
+  RabbitMqDao createDao(String host, int port, String key, String username, String password, String vhost) {
+    RabbitMqDao factory = new RabbitMqDao(mockPool, host, port, key, username, password, StandardCharsets.UTF_8, vhost);
     verify(mockPool, atLeastOnce()).setHost(host);
     verify(mockPool, atLeastOnce()).setPort(port);
+    verify(mockPool, atLeastOnce()).setVirtualHost(vhost);
 
     if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
       verify(mockPool, atLeastOnce()).setUsername(username);
       verify(mockPool, atLeastOnce()).setPassword(password);
     }
-
-    factory.setCharset(Charset.defaultCharset());
 
     return factory;
   }
@@ -47,8 +47,7 @@ public class RabbitMqDaoTest {
   public void before() throws Exception {
     int port = (int) (Math.random() * 1000);
     // Note that we can't run these tests in parallel
-    dao = createDao("localhost", port, "logstash", "username", "password");
-    dao.setCharset(Charset.defaultCharset());
+    dao = createDao("localhost", port, "logstash", "username", "password", "/");
 
     when(mockPool.newConnection()).thenReturn(mockConnection);
 
@@ -68,7 +67,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullHost() throws Exception {
     try {
-      createDao(null, 5672, "logstash", "username", "password");
+      createDao(null, 5672, "logstash", "username", "password", "/");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -78,7 +77,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyHost() throws Exception {
     try {
-      createDao(" ", 5672, "logstash", "username", "password");
+      createDao(" ", 5672, "logstash", "username", "password", "/");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "host name is required", e.getMessage());
       throw e;
@@ -88,7 +87,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailNullKey() throws Exception {
     try {
-      createDao("localhost", 5672, null, "username", "password");
+      createDao("localhost", 5672, null, "username", "password", "/");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "rabbit queue name is required", e.getMessage());
       throw e;
@@ -98,7 +97,7 @@ public class RabbitMqDaoTest {
   @Test(expected = IllegalArgumentException.class)
   public void constructorFailEmptyKey() throws Exception {
     try {
-      createDao("localhost", 5672, " ", "username", "password");
+      createDao("localhost", 5672, " ", "username", "password", "/");
     } catch (IllegalArgumentException e) {
       assertEquals("Wrong error message was thrown", "rabbit queue name is required", e.getMessage());
       throw e;
@@ -108,7 +107,7 @@ public class RabbitMqDaoTest {
   @Test
   public void constructorSuccess() throws Exception {
     // Unit under test
-    dao = createDao("localhost", 5672, "logstash", "username", "password");
+    dao = createDao("localhost", 5672, "logstash", "username", "password", "/");
 
     // Verify results
     assertEquals("Wrong host name", "localhost", dao.getHost());
@@ -116,6 +115,7 @@ public class RabbitMqDaoTest {
     assertEquals("Wrong key", "logstash", dao.getQueue());
     assertEquals("Wrong name", "username", dao.getUsername());
     assertEquals("Wrong password", "password", dao.getPassword());
+    assertEquals("Wrong vhost", "/", dao.getVirtualHost());
   }
 
   @Test(expected = IOException.class)
@@ -198,8 +198,7 @@ public class RabbitMqDaoTest {
   @Test
   public void pushSuccessNoAuth() throws Exception {
     String json = "{ 'foo': 'bar' }";
-    dao = createDao("localhost", 5672, "logstash", null, null);
-    dao.setCharset(Charset.defaultCharset());
+    dao = createDao("localhost", 5672, "logstash", null, null, "/");
 
     // Unit under test
     dao.push(json);

@@ -35,8 +35,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -64,9 +62,6 @@ public class LogstashWriter {
   private boolean connectionBroken;
   private Charset charset;
 
-  /*
-   * TODO: the charset must not be transfered to the dao. The dao is shared between different build.
-   */
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
@@ -79,7 +74,6 @@ public class LogstashWriter {
     } else {
       this.jenkinsUrl = getJenkinsUrl();
       this.buildData = getBuildData();
-      dao.setCharset(charset);
     }
   }
 
@@ -157,7 +151,7 @@ public class LogstashWriter {
 
   BuildData getBuildData() {
     if (build instanceof AbstractBuild) {
-      return new BuildData((AbstractBuild) build, new Date(), listener);
+      return new BuildData((AbstractBuild<?, ?>) build, new Date(), listener);
     } else {
       return new BuildData(build, new Date(), listener);
     }

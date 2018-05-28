@@ -23,19 +23,28 @@
  */
 package jenkins.plugins.logstash;
 
+import hudson.DescriptorExtensionList;
 import hudson.Plugin;
+import hudson.model.Descriptor;
+import jenkins.plugins.logstash.configuration.LogstashIndexer;
 
 import java.util.logging.Logger;
 
-/*
- * TODO: do we really need this class?
- *       All it does is printing a message at startup of Jenkins.
- */
 public class PluginImpl extends Plugin {
   private final static Logger LOG = Logger.getLogger(PluginImpl.class.getName());
 
+  /*
+   * TODO: do we really need this method?
+   *       All it does is printing a message at startup of Jenkins.
+   */
   @Override
   public void start() throws Exception {
     LOG.info("Logstash: a logstash agent to send jenkins logs to a logstash indexer.");
   }
+
+  public DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>> getAllIndexers()
+  {
+    return LogstashIndexer.all();
+  }
 }
+

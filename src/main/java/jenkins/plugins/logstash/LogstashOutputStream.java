@@ -29,11 +29,6 @@ import hudson.console.LineTransformationOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper.VarPasswordPair;
-import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsOutputStream;
 
 /**
  * Output stream that writes each line to the provided delegate output stream
@@ -58,22 +53,14 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
     return logstash;
   }
 
-  public MaskPasswordsOutputStream maskPasswords(List<VarPasswordPair> passwords) {
-    List<String> passwordStrings = new ArrayList<String>();
-    for (VarPasswordPair password: passwords) {
-      passwordStrings.add(password.getPassword());
-    }
-    return new MaskPasswordsOutputStream(this, passwordStrings);
-  }
-
   @Override
   protected void eol(byte[] b, int len) throws IOException {
     delegate.write(b, 0, len);
     this.flush();
 
     if(!logstash.isConnectionBroken()) {
-      String line = new String(b, 0, len, logstash.getCharset()).trim();
-      line = ConsoleNote.removeNotes(line);
+      String line = new String(b, 0, len, logstash.getCharset());
+      line = ConsoleNote.removeNotes(line).trim();
       logstash.write(line);
     }
   }
