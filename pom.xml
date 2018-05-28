@@ -33,7 +33,7 @@
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/logstash-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/logstash-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/logstash-plugin</url>
+    <url>https://wiki.jenkins.io/display/JENKINS/Logstash+Plugin</url>
     <tag>HEAD</tag>
   </scm>
 
