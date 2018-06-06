@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<jenkins.plugins.logstash.LogstashConfiguration plugin="logstash@1.4.0-SNAPSHOT">
+    <logstashIndexer class="jenkins.plugins.logstash.configuration.Logzio">
+        <host>https://listener.logz.io:8071</host>
+        <username></username>
+        <password></password>
+        <key>{AQAAABAAAAAQAwaAxyveddM0PF+kR0dYFAymdth9PpitQnvJW0SR6JU=}</key>
+    </logstashIndexer>
+    <dataMigrated>true</dataMigrated>
+</jenkins.plugins.logstash.LogstashConfiguration>

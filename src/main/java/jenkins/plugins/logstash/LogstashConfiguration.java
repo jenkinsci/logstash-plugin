@@ -25,6 +25,7 @@ import jenkins.plugins.logstash.configuration.LogstashIndexer;
 import jenkins.plugins.logstash.configuration.RabbitMq;
 import jenkins.plugins.logstash.configuration.Redis;
 import jenkins.plugins.logstash.configuration.Syslog;
+import jenkins.plugins.logstash.configuration.Logzio;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
 import net.sf.json.JSONObject;
@@ -183,6 +184,13 @@ public class LogstashConfiguration extends GlobalConfiguration
                 break;
             }
             logstashIndexer = syslog;
+            break;
+          case LOGZIO:
+            LOGGER.log(Level.INFO, "Migrating logstash configuration for Logz.io");
+            Logzio logz = new Logzio();
+            logz.setHost(descriptor.getHost());
+            logz.setKey(descriptor.getKey());
+            logstashIndexer = logz;
             break;
           default:
             LOGGER.log(Level.INFO, "unknown logstash Indexer type: " + type);

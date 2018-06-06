@@ -30,6 +30,7 @@ import jenkins.plugins.logstash.configuration.LogstashIndexer;
 import jenkins.plugins.logstash.configuration.RabbitMq;
 import jenkins.plugins.logstash.configuration.Redis;
 import jenkins.plugins.logstash.configuration.Syslog;
+import jenkins.plugins.logstash.configuration.Logzio;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogFormat;
 
@@ -138,4 +139,18 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     assertThat(es.getUsername(), equalTo("user"));
   }
 
+  @Test
+  public void logzioMigration()
+  {
+    when(descriptor.getType()).thenReturn(IndexerType.LOGZIO);
+    when(descriptor.getHost()).thenReturn("https://listener.logz.io:8071");
+    when(descriptor.getKey()).thenReturn("key");
+    configuration.migrateData();
+    LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
+    assertThat(indexer, IsInstanceOf.instanceOf(Logzio.class));
+    assertThat(configuration.isMilliSecondTimestamps(),equalTo(false));
+    Logzio logz = (Logzio) indexer;
+    assertThat(logz.getKey(), equalTo("key"));
+    assertThat(logz.getHost(), equalTo("https://listener.logz.io:8071"));
+  }
 }

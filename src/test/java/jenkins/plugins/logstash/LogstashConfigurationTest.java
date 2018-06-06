@@ -15,6 +15,7 @@ import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 import jenkins.plugins.logstash.persistence.RabbitMqDao;
 import jenkins.plugins.logstash.persistence.RedisDao;
 import jenkins.plugins.logstash.persistence.SyslogDao;
+import jenkins.plugins.logstash.persistence.LogzioDao;
 
 public class LogstashConfigurationTest extends LogstashConfigurationTestBase
 {
@@ -57,6 +58,14 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/syslog.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(SyslogDao.class));
+  }
+
+  @Test
+  public void logzioIsProperlyConfigured()
+  {
+    LogstashConfigurationTestBase.configFile = new File("src/test/resources/logzio.xml");
+    LogstashConfiguration configuration = new LogstashConfigurationForTest();
+    assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(LogzioDao.class));
   }
 
   @Test

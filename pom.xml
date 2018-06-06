@@ -6,10 +6,10 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipIntegrationTests>true</skipIntegrationTests>
     <jenkins-test-harness.version>2.23</jenkins-test-harness.version>
-    <java.level>7</java.level>
+    <java.level>8</java.level>
     <jenkins.version>2.7.4</jenkins.version>
   </properties>
-  
+
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
@@ -109,6 +109,17 @@
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.logz.sender</groupId>
+      <artifactId>logzio-sender</artifactId>
+      <version>1.0.9</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.wnameless</groupId>
+      <artifactId>json-flattener</artifactId>
+      <version>0.5.0</version>
+    </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -196,8 +207,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
 
