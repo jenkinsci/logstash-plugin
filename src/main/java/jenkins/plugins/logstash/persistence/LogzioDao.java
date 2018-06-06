@@ -67,7 +67,7 @@ public class LogzioDao extends AbstractLogstashIndexerDao {
     }
 
     @Override
-    public void push(String data) {
+    public void push(String data) throws IOException{
         JSONObject jsonData = JSONObject.fromObject(data);
         JSONArray logMessages = jsonData.getJSONArray("message");
         for (Object logMsg : logMessages) {
