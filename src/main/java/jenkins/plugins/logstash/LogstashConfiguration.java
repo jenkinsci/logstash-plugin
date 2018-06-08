@@ -37,6 +37,7 @@ public class LogstashConfiguration extends GlobalConfiguration
   private static final FastDateFormat LEGACY_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
 
   private LogstashIndexer<?> logstashIndexer;
+  private Boolean enabled;
   private boolean dataMigrated = false;
   private boolean enableGlobally = false;
   private boolean milliSecondTimestamps = true;
@@ -45,7 +46,28 @@ public class LogstashConfiguration extends GlobalConfiguration
   public LogstashConfiguration()
   {
     load();
+    if (enabled == null)
+    {
+      if (logstashIndexer == null)
+      {
+        enabled = false;
+      }
+      else
+      {
+        enabled = true;
+      }
+    }
     activeIndexer = logstashIndexer;
+  }
+
+  public boolean isEnabled()
+  {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled)
+  {
+    this.enabled = enabled;
   }
 
   public boolean isEnableGlobally()
@@ -124,6 +146,7 @@ public class LogstashConfiguration extends GlobalConfiguration
       if (descriptor.getType() != null)
       {
         IndexerType type = descriptor.getType();
+        enabled = true;
         switch (type)
         {
           case REDIS:
@@ -186,6 +209,7 @@ public class LogstashConfiguration extends GlobalConfiguration
             break;
           default:
             LOGGER.log(Level.INFO, "unknown logstash Indexer type: " + type);
+            enabled = false;
             break;
         }
         milliSecondTimestamps = false;

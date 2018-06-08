@@ -88,6 +88,12 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
   }
 
   private boolean perform(Run<?, ?> run, TaskListener listener) {
+    LogstashConfiguration configuration = LogstashConfiguration.getInstance();
+    if (!configuration.isEnabled())
+    {
+      return true;
+    }
+
     PrintStream errorPrintStream = listener.getLogger();
     LogstashWriter logstash = getLogStashWriter(run, errorPrintStream, listener);
     logstash.writeBuildLog(maxLines);

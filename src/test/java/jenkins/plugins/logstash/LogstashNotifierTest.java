@@ -3,6 +3,8 @@ package jenkins.plugins.logstash;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
@@ -25,12 +27,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @SuppressWarnings("rawtypes")
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.crypto.*"})
+@PrepareForTest(LogstashConfiguration.class)
 public class LogstashNotifierTest {
+
   // Extension of the unit under test that avoids making calls to Jenkins.getInstance() to get the DAO singleton
   static class MockLogstashNotifier extends LogstashNotifier {
     LogstashWriter writer;
@@ -76,6 +84,9 @@ public class LogstashNotifierTest {
   @Mock Launcher mockLauncher;
   @Mock BuildListener mockListener;
   @Mock AbstractProject mockProject;
+  @Mock private LogstashConfiguration logstashConfiguration;
+
+
 
   ByteArrayOutputStream errorBuffer;
   PrintStream errorStream;
@@ -87,6 +98,11 @@ public class LogstashNotifierTest {
   public void before() throws Exception {
     errorBuffer = new ByteArrayOutputStream();
     errorStream = new PrintStream(errorBuffer, true);
+
+    PowerMockito.mockStatic(LogstashConfiguration.class);
+    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(logstashConfiguration.isEnabled()).thenReturn(true);
+
 
     when(mockProject.assignBuildNumber()).thenReturn(1);
     mockRun = new MockRun(mockProject);

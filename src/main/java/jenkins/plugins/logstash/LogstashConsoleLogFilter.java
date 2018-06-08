@@ -26,6 +26,12 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
   @Override
   public OutputStream decorateLogger(Run build, OutputStream logger) throws IOException, InterruptedException
   {
+    LogstashConfiguration configuration = LogstashConfiguration.getInstance();
+    if (!configuration.isEnabled())
+    {
+      return logger;
+    }
+
     if (build != null && build instanceof AbstractBuild<?, ?>)
     {
       if (isLogstashEnabled(build))

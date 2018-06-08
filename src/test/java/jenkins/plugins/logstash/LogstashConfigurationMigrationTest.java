@@ -62,6 +62,14 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
+  public void NoConfigMigration()
+  {
+    when(descriptor.getType()).thenReturn(null);
+    configuration.migrateData();
+    assertThat(configuration.isEnabled(),equalTo(false));
+  }
+
+  @Test
   public void redisMigration()
   {
     when(descriptor.getType()).thenReturn(IndexerType.REDIS);
@@ -69,6 +77,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
     assertThat(indexer, IsInstanceOf.instanceOf(Redis.class));
     assertThat(configuration.isMilliSecondTimestamps(),equalTo(false));
+    assertThat(configuration.isEnabled(),equalTo(true));
     Redis redis = (Redis) indexer;
     assertThat(redis.getHost(),equalTo("localhost"));
     assertThat(redis.getPort(),is(4567));
@@ -85,6 +94,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
     assertThat(indexer, IsInstanceOf.instanceOf(Syslog.class));
     assertThat(configuration.isMilliSecondTimestamps(),equalTo(false));
+    assertThat(configuration.isEnabled(),equalTo(true));
     Syslog syslog = (Syslog) indexer;
     assertThat(syslog.getHost(),equalTo("localhost"));
     assertThat(syslog.getPort(),is(4567));
@@ -100,6 +110,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
     assertThat(indexer, IsInstanceOf.instanceOf(Syslog.class));
     assertThat(configuration.isMilliSecondTimestamps(),equalTo(false));
+    assertThat(configuration.isEnabled(),equalTo(true));
     Syslog syslog = (Syslog) indexer;
     assertThat(syslog.getHost(),equalTo("localhost"));
     assertThat(syslog.getPort(),is(4567));
@@ -115,6 +126,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
     assertThat(indexer, IsInstanceOf.instanceOf(ElasticSearch.class));
     assertThat(configuration.isMilliSecondTimestamps(),equalTo(false));
+    assertThat(configuration.isEnabled(),equalTo(true));
     ElasticSearch es = (ElasticSearch) indexer;
     URI uri = new URI("http://localhost:4567/logstash");
     assertThat(es.getUri(),equalTo(uri));
@@ -130,6 +142,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
     assertThat(indexer, IsInstanceOf.instanceOf(RabbitMq.class));
     assertThat(configuration.isMilliSecondTimestamps(),equalTo(false));
+    assertThat(configuration.isEnabled(),equalTo(true));
     RabbitMq es = (RabbitMq) indexer;
     assertThat(es.getHost(),equalTo("localhost"));
     assertThat(es.getPort(),is(4567));
