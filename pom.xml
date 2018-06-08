@@ -33,7 +33,7 @@
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/logstash-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/logstash-plugin.git</developerConnection>
-    <url>https://wiki.jenkins.io/display/JENKINS/Logstash+Plugin</url>
+    <url>https://github.com/jenkinsci/logstash-plugin</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -55,7 +55,7 @@
   <version>2.0.1-SNAPSHOT</version>
   <name>Logstash</name>
   <description>A Logstash agent to send Jenkins logs to a Logstash indexer.</description>
-  <url>https://plugins.jenkins.io/logstash</url>
+  <url>https://wiki.jenkins.io/display/JENKINS/Logstash+Plugin</url>
 
   <dependencies>
     <dependency>
