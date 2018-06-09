@@ -146,7 +146,6 @@ public class LogstashConfiguration extends GlobalConfiguration
       if (descriptor.getType() != null)
       {
         IndexerType type = descriptor.getType();
-        enabled = true;
         switch (type)
         {
           case REDIS:
@@ -157,6 +156,7 @@ public class LogstashConfiguration extends GlobalConfiguration
             redis.setKey(descriptor.getKey());
             redis.setPassword(descriptor.getPassword());
             logstashIndexer = redis;
+            enabled = true;
             break;
           case ELASTICSEARCH:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search");
@@ -171,9 +171,11 @@ public class LogstashConfiguration extends GlobalConfiguration
               es.setUsername(descriptor.getUsername());
               es.setPassword(descriptor.getPassword());
               logstashIndexer = es;
+              enabled = true;
             }
             catch (URISyntaxException e)
             {
+              enabled = false;
               LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search failed: " + e.toString());
             }
             break;
@@ -186,6 +188,7 @@ public class LogstashConfiguration extends GlobalConfiguration
             rabbitMq.setUsername(descriptor.getUsername());
             rabbitMq.setPassword(descriptor.getPassword());
             logstashIndexer = rabbitMq;
+            enabled = true;
             break;
           case SYSLOG:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for  SYSLOG");
@@ -206,6 +209,7 @@ public class LogstashConfiguration extends GlobalConfiguration
                 break;
             }
             logstashIndexer = syslog;
+            enabled = true;
             break;
           default:
             LOGGER.log(Level.INFO, "unknown logstash Indexer type: " + type);
