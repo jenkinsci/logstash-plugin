@@ -1,4 +1,4 @@
-<jenkins.plugins.logstash.LogstashConfiguration plugin="logstash@1.4.0-SNAPSHOT">
+<jenkins.plugins.logstash.LogstashConfiguration plugin="logstash@2.0.1-SNAPSHOT">
   <logstashIndexer class="jenkins.plugins.logstash.configuration.RabbitMq">
     <host>localhost</host>
     <port>5672</port>

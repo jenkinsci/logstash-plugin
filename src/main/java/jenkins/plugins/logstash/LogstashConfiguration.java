@@ -62,7 +62,7 @@ public class LogstashConfiguration extends GlobalConfiguration
 
   public boolean isEnabled()
   {
-    return enabled;
+    return enabled == null ? false: enabled;
   }
 
   public void setEnabled(boolean enabled)
