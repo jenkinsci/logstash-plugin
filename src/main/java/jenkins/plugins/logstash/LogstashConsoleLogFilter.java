@@ -3,6 +3,8 @@ package jenkins.plugins.logstash;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
@@ -13,6 +15,8 @@ import hudson.model.Run;
 @Extension(ordinal = 1000)
 public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serializable
 {
+
+  private static Logger LOGGER = Logger.getLogger(LogstashConsoleLogFilter.class.getName());
 
   private transient Run<?, ?> run;
   public LogstashConsoleLogFilter() {};
@@ -29,6 +33,7 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
     LogstashConfiguration configuration = LogstashConfiguration.getInstance();
     if (!configuration.isEnabled())
     {
+      LOGGER.log(Level.FINE, "Logstash is disabled. Logs will not be forwarded.");
       return logger;
     }
 

@@ -41,6 +41,8 @@ import hudson.util.FormValidation;
 import jenkins.tasks.SimpleBuildStep;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -54,6 +56,8 @@ import org.jenkinsci.Symbol;
  * @since 1.0.0
  */
 public class LogstashNotifier extends Notifier implements SimpleBuildStep {
+
+  private static Logger LOGGER = Logger.getLogger(LogstashNotifier.class.getName());
 
   private int maxLines;
   private boolean failBuild;
@@ -91,6 +95,7 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
     LogstashConfiguration configuration = LogstashConfiguration.getInstance();
     if (!configuration.isEnabled())
     {
+      LOGGER.log(Level.FINE, "Logstash is disabled. Logs will not be forwarded.");
       return true;
     }
 
