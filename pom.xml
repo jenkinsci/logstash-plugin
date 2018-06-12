@@ -6,14 +6,14 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipIntegrationTests>true</skipIntegrationTests>
     <jenkins-test-harness.version>2.23</jenkins-test-harness.version>
-    <java.level>7</java.level>
-    <jenkins.version>2.7.4</jenkins.version>
+    <java.level>8</java.level>
+    <jenkins.version>2.60.3</jenkins.version>
   </properties>
   
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>2.15</version>
+    <version>3.2</version>
   </parent>
 
   <repositories>
@@ -119,7 +119,19 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>structs</artifactId>
-      <version>1.2</version>
+      <version>1.14</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.jenkins-ci.plugins.workflow</groupId>
+    	<artifactId>workflow-step-api</artifactId>
+    	<version>2.15</version>
+  		<optional>true</optional>
+    </dependency>
+    <dependency>
+    	<groupId>org.jenkins-ci.plugins</groupId>
+    	<artifactId>script-security</artifactId>
+    	<version>1.39</version>
+    	<scope>test</scope>
     </dependency>
     <dependency>
     	<groupId>org.powermock</groupId>
@@ -140,16 +152,10 @@
     	<scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.jenkins-ci.plugins</groupId>
-    	<artifactId>envinject</artifactId>
-    	<version>2.1.5</version>
-    	<scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>org.jenkins-ci.plugins.workflow</groupId>
-    	<artifactId>workflow-step-api</artifactId>
-    	<version>1.15</version>
-  		<optional>true</optional>
+       <groupId>org.jenkins-ci.plugins</groupId>
+       <artifactId>envinject</artifactId>
+       <version>2.1.5</version>
+       <scope>test</scope>
     </dependency>
     <dependency>
     	<groupId>org.hamcrest</groupId>
@@ -163,7 +169,37 @@
     	<version>0.5.2</version>
     	<scope>test</scope>
     </dependency>
-  </dependencies>
+	<dependency>
+        <groupId>org.jenkins-ci.plugins.workflow</groupId>
+        <artifactId>workflow-cps</artifactId>
+        <version>2.45</version>
+        <scope>test</scope>
+     </dependency>
+     <dependency>
+        <groupId>org.jenkins-ci.plugins.workflow</groupId>
+        <artifactId>workflow-job</artifactId>
+        <version>2.12.2</version>
+        <scope>test</scope>
+     </dependency>
+     <dependency>
+        <groupId>org.jenkins-ci.plugins.workflow</groupId>
+        <artifactId>workflow-basic-steps</artifactId>
+        <version>2.7</version>
+        <scope>test</scope>
+     </dependency>
+     <dependency>
+        <groupId>org.jenkins-ci.plugins.workflow</groupId>
+        <artifactId>workflow-scm-step</artifactId>
+        <version>2.6</version>
+        <scope>test</scope>
+	 </dependency>
+     <dependency>
+        <groupId>org.jenkins-ci.plugins.workflow</groupId>
+        <artifactId>workflow-durable-task-step</artifactId>
+        <version>2.19</version>
+        <scope>test</scope>
+	 </dependency>
+</dependencies>
 
   <build>
     <plugins>

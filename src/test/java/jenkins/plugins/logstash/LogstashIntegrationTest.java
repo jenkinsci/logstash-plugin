@@ -7,8 +7,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +17,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsConfig;
@@ -39,20 +31,15 @@ import hudson.model.Slave;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.ansicolor.AnsiColorBuildWrapper;
 import net.sf.json.JSONArray;
+import jenkins.plugins.logstash.configuration.MemoryIndexer;
 import jenkins.plugins.logstash.persistence.MemoryDao;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.crypto.*"})
-@PrepareForTest(LogstashConfiguration.class)
 public class LogstashIntegrationTest
 {
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
-
-    @Mock
-    private LogstashConfiguration logstashConfiguration;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -67,12 +54,9 @@ public class LogstashIntegrationTest
     public void setup() throws Exception
     {
         memoryDao = new MemoryDao();
-        PowerMockito.mockStatic(LogstashConfiguration.class);
-
-        when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
-        when(logstashConfiguration.getIndexerInstance()).thenReturn(memoryDao);
-        PowerMockito.doCallRealMethod().when(logstashConfiguration).setMilliSecondTimestamps(any(Boolean.class));
-        when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
+        LogstashConfiguration config = LogstashConfiguration.getInstance();
+        MemoryIndexer indexer = new MemoryIndexer(memoryDao);
+        config.setActiveIndexer(indexer);
 
         slave = jenkins.createSlave();
         slave.setLabelString("myLabel");
@@ -220,7 +204,7 @@ public class LogstashIntegrationTest
     @Test
     public void enableGlobally() throws Exception
     {
-      when(logstashConfiguration.isEnableGlobally()).thenReturn(true);
+      LogstashConfiguration.getInstance().setEnableGlobally(true);
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
       FreeStyleBuild build = f.get();
@@ -238,7 +222,8 @@ public class LogstashIntegrationTest
     @Test
     public void milliSecondTimestamps() throws Exception
     {
-      logstashConfiguration.setMilliSecondTimestamps(true);
+
+      LogstashConfiguration.getInstance().setMilliSecondTimestamps(true);
       project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
@@ -255,7 +240,7 @@ public class LogstashIntegrationTest
     @Test
     public void secondTimestamps() throws Exception
     {
-      logstashConfiguration.setMilliSecondTimestamps(false);
+      LogstashConfiguration.getInstance().setMilliSecondTimestamps(false);
       project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 

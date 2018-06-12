@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.CheckForNull;
 
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.syslog.MessageFormat;
@@ -107,6 +109,14 @@ public class LogstashConfiguration extends GlobalConfiguration
       return activeIndexer.getInstance();
     }
     return null;
+  }
+
+
+  // for testing only
+  @Restricted(NoExternalUse.class)
+  void setActiveIndexer(LogstashIndexer<?> activeIndexer)
+  {
+    this.activeIndexer = activeIndexer;
   }
 
   public List<?> getIndexerTypes()
