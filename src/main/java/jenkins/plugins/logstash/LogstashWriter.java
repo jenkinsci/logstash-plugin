@@ -42,8 +42,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import javax.annotation.CheckForNull;
 
 /**
@@ -77,7 +75,7 @@ public class LogstashWriter {
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
 	    this(run, error, listener, charset, null);
 	  }
-  
+
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, LogstashPayloadProcessor payloadProcessor) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
@@ -248,9 +246,6 @@ public class LogstashWriter {
   /**
    * Write error message to errorStream and set connectionBroken to true.
    */
-  @SuppressFBWarnings(
-    value="DM_DEFAULT_ENCODING",
-    justification="TODO: not sure how to fix this")
   private void logErrorMessage(String msg) {
     try {
       connectionBroken = true;

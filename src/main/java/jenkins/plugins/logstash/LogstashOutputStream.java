@@ -30,8 +30,6 @@ import hudson.console.LineTransformationOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Output stream that writes each line to the provided delegate output stream
  * and also sends it to an indexer for logstash to consume.
@@ -56,9 +54,6 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
   }
 
   @Override
-  @SuppressFBWarnings(
-    value="DM_DEFAULT_ENCODING",
-    justification="TODO: not sure how to fix this")
   protected void eol(byte[] b, int len) throws IOException {
     delegate.write(b, 0, len);
     this.flush();

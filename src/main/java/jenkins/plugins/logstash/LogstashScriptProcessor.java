@@ -25,7 +25,7 @@
 package jenkins.plugins.logstash;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 
@@ -38,8 +38,6 @@ import net.sf.json.JSONObject;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This class is handling custom groovy script processing of JSON payload.
@@ -58,7 +56,7 @@ public class LogstashScriptProcessor implements LogstashPayloadProcessor{
   private final SecureGroovyScript script;
 
   @Nonnull
-  private final OutputStream consoleOut;
+  private final OutputStreamWriter consoleWriter;
 
   /** Groovy binding for script execution */
   @Nonnull
@@ -68,9 +66,9 @@ public class LogstashScriptProcessor implements LogstashPayloadProcessor{
   @Nonnull
   private final ClassLoader classLoader;
 
-  public LogstashScriptProcessor(SecureGroovyScript script, OutputStream consoleOut) {
+  public LogstashScriptProcessor(SecureGroovyScript script, OutputStreamWriter consoleWriter) {
     this.script = script;
-    this.consoleOut = consoleOut;
+    this.consoleWriter = consoleWriter;
 
     // TODO: should we put variables in the binding like manager, job, etc.?
     binding = new Binding();
@@ -84,13 +82,9 @@ public class LogstashScriptProcessor implements LogstashPayloadProcessor{
   /**
    * Helper method to allow logging to build console.
    */
-  @SuppressFBWarnings(
-    value="DM_DEFAULT_ENCODING",
-    justification="TODO: not sure how to fix this")
   private void buildLogPrintln(Object o) throws IOException {
-    consoleOut.write(o.toString().getBytes());
-    consoleOut.write("\n".getBytes());
-    consoleOut.flush();
+    consoleWriter.write(o.toString() + "\n");
+    consoleWriter.flush();
   }
 
   /*

@@ -26,6 +26,9 @@ package jenkins.plugins.logstash;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+import java.nio.charset.Charset;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -95,12 +98,13 @@ public class LogstashBuildWrapper extends BuildWrapper
 
   // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(AbstractBuild<?, ?> build, OutputStream errorStream) {
+    Charset charset = build.getCharset();
     LogstashScriptProcessor processor = null;
     if (secureGroovyScript != null) {
-      processor = new LogstashScriptProcessor(secureGroovyScript, errorStream);
+      processor = new LogstashScriptProcessor(secureGroovyScript, new OutputStreamWriter(errorStream, charset));
     }
 
-    return new LogstashWriter(build, errorStream, null, build.getCharset(), processor);
+    return new LogstashWriter(build, errorStream, null, charset, processor);
   }
 
   /**

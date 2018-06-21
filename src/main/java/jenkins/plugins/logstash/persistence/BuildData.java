@@ -57,8 +57,6 @@ import org.apache.commons.lang.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * POJO for mapping build info to JSON.
  *
@@ -96,9 +94,6 @@ public class BuildData {
       this(null);
     }
 
-    @SuppressFBWarnings(
-      value="URF_UNREAD_FIELD",
-      justification="TODO: not sure how to fix this")
     public TestData(Action action) {
       AbstractTestResultAction<?> testResultAction = null;
       if (action instanceof AbstractTestResultAction) {

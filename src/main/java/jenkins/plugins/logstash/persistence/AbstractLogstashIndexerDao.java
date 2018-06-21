@@ -25,13 +25,10 @@
 package jenkins.plugins.logstash.persistence;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import jenkins.plugins.logstash.LogstashConfiguration;
 import net.sf.json.JSONObject;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Abstract data access object for Logstash indexers.

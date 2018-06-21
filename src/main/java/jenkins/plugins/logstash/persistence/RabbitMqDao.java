@@ -33,8 +33,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * RabbitMQ Data Access Object.
  *
@@ -124,9 +122,6 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
    * @see jenkins.plugins.logstash.persistence.LogstashIndexerDao#push(java.lang.String)
    */
   @Override
-  @SuppressFBWarnings(
-    value="DM_DEFAULT_ENCODING",
-    justification="TODO: not sure how to fix this")
   public void push(String data) throws IOException {
     Connection connection = null;
     Channel channel = null;
