@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash;
 
 import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.object.HasToString.hasToString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
@@ -134,6 +135,6 @@ public class LogstashOutputStreamTest {
     inOrder.verify(mockBuffer).close();
 
     // Verify results
-    assertEquals("Results don't match", "", buffer.toString());
+    assertThat(buffer, hasToString(""));
   }
 }

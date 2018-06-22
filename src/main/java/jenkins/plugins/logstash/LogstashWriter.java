@@ -31,6 +31,7 @@ import hudson.model.Run;
 import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -199,7 +200,7 @@ public class LogstashWriter {
 
         logErrorMessage(msg);
       }
-      if (processedPayload != null) { writeRaw(processedPayload); }
+      if (payloadNeedsPersistence(processedPayload)) writeRaw(processedPayload);
     } else {
       writeRaw(payload);
     }
@@ -257,6 +258,16 @@ public class LogstashWriter {
     }
   }
 
+  /**
+   * Check whether payload is something we are expected to persist
+   */
+  private Boolean payloadNeedsPersistence(JSONObject payload) {
+    if (payload != null) {
+      Object message = payload.opt("message");
+      return message != null && (message instanceof JSONArray) && !((JSONArray) message).isEmpty();
+    }
+    return false;
+  }
 
   /**
    * Signal payload processor that there will be no more lines
@@ -273,7 +284,7 @@ public class LogstashWriter {
 
         logErrorMessage(msg);
       }
-      if (payload != null) writeRaw(payload);
+      if (payloadNeedsPersistence(payload)) writeRaw(payload);
     }
   }
 }

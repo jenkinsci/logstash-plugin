@@ -306,9 +306,9 @@ public class LogstashWriterTest {
     String goodMsg = "test message";
     String ignoredMsg = "ignored input";
     String scriptString =
-      "if (payload) {\n" +
+      "if (payload['message']) {\n" +
       "  if (payload['message'][0] =~ /" + ignoredMsg + "/) {\n" +
-      "    payload = null\n" +
+      "    payload.clear()\n" +
       "  } else {\n" +
       "    console.println('l');\n" +
       "  }\n" +

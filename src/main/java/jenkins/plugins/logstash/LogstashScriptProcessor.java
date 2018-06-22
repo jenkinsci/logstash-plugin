@@ -74,9 +74,9 @@ public class LogstashScriptProcessor implements LogstashPayloadProcessor{
     binding = new Binding();
     binding.setVariable("console", new BuildConsoleWrapper());
 
-    // not sure what the diff is compared to getClass().getClassLoader();
-    final Jenkins jenkins = Jenkins.getInstance();
-    classLoader = jenkins.getPluginManager().uberClassLoader;
+    // if users need access to types defined by any plugin we may decide to
+    // switch to Jenkins.getInstance().getPluginManager().uberClassLoader
+    classLoader = LogstashScriptProcessor.class.getClassLoader();
   }
 
   /**
@@ -102,7 +102,7 @@ public class LogstashScriptProcessor implements LogstashPayloadProcessor{
   @Override
   public JSONObject finish() throws Exception {
     buildLogPrintln("Tearing down Script Log Processor..");
-    return process(null);
+    return process(new JSONObject());
   }
 
   /**
