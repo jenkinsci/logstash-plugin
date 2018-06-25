@@ -31,8 +31,8 @@ before_install:
 language: java
 dist: trusty
 jdk:
+  - oraclejdk9
   - oraclejdk8
-  - openjdk7
   - openjdk8
 branches:
   except:
