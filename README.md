@@ -27,6 +27,7 @@ Currently supported methods of input/output:
 * Redis {format => 'json_event'}
 * RabbitMQ {mechanism => PLAIN}
 * Syslog {format => cee/json ([RFC-5424](https://tools.ietf.org/html/rfc5424),[RFC-3164](https://tools.ietf.org/html/rfc3164)), protocol => UDP}
+* Logz.io
 
 Pipeline
 ========
