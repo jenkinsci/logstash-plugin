@@ -1,3 +1,18 @@
+2.1.0
+-----
+* [JENKINS-51793] explicit enable (#68)
+* [JENKINS-49114] evaluate result and TestResultAction late (#52)
+* url has to point to wiki (#65, #69)
+* add vhost support for rabbitmq (#64)
+* [JENKINS-42536] fix ansi console note (#62)
+* improve help (#61)
+* code cleanup (#60)
+* charset for rabbitMQ (#58, #63)
+* add dao to work with logstash tcp (#59)
+* Use mime type from config field in Elasticsearch indexer while posting HTTP request (#41)
+* millisecond timestamps (#57)
+
+
 2.0.0
 -----
 * [JENKINS-49960] use a Jobproperty instead of a BuildWrapper (#55) :warning:

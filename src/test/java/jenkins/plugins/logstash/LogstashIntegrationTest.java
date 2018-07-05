@@ -269,4 +269,18 @@ public class LogstashIntegrationTest
       JSONObject firstLine = dataLines.get(0);
       assertThat(firstLine.getJSONArray("message").get(0).toString(),not(startsWith("[8mha")));
     }
+
+    @Test
+    public void disabledWillNotWrite() throws Exception
+    {
+      when(logstashConfiguration.isEnabled()).thenReturn(false);
+      project.addProperty(new LogstashJobProperty());
+      Cause cause = new Cause.UserIdCause();
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0, cause);
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.SUCCESS));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      assertThat(dataLines.size(), equalTo(0));
+    }
 }

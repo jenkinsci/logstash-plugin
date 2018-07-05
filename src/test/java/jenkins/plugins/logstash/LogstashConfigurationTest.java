@@ -25,6 +25,15 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/notExisting.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), equalTo(null));
+    assertThat(configuration.isEnabled(), equalTo(false));
+  }
+
+  @Test
+  public void disabled()
+  {
+    LogstashConfigurationTestBase.configFile = new File("src/test/resources/disabled.xml");
+    LogstashConfiguration configuration = new LogstashConfigurationForTest();
+    assertThat(configuration.isEnabled(), equalTo(false));
   }
 
   @Test
@@ -33,6 +42,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/elasticSearch.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(ElasticSearchDao.class));
+    assertThat(configuration.isEnabled(), equalTo(true));
   }
 
   @Test
@@ -41,6 +51,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RabbitMqDao.class));
+    assertThat(configuration.isEnabled(), equalTo(true));
   }
 
   @Test
@@ -49,6 +60,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/redis.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RedisDao.class));
+    assertThat(configuration.isEnabled(), equalTo(true));
   }
 
   @Test
@@ -57,6 +69,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/syslog.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(SyslogDao.class));
+    assertThat(configuration.isEnabled(), equalTo(true));
   }
 
   @Test

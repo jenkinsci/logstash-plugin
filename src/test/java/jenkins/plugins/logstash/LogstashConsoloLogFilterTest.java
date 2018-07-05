@@ -67,6 +67,7 @@ public class LogstashConsoloLogFilterTest {
     PowerMockito.mockStatic(LogstashConfiguration.class);
     when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
     when(logstashConfiguration.isEnableGlobally()).thenReturn(false);
+    when(logstashConfiguration.isEnabled()).thenReturn(true);
 
     when(mockWriter.isConnectionBroken()).thenReturn(false);
     when(mockBuild.getParent()).thenReturn(mockProject);
