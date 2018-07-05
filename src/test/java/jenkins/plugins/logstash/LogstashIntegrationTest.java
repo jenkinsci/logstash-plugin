@@ -57,6 +57,7 @@ public class LogstashIntegrationTest
         LogstashConfiguration config = LogstashConfiguration.getInstance();
         MemoryIndexer indexer = new MemoryIndexer(memoryDao);
         config.setActiveIndexer(indexer);
+        config.setEnabled(false);
 
         slave = jenkins.createSlave();
         slave.setLabelString("myLabel");
@@ -273,7 +274,7 @@ public class LogstashIntegrationTest
     @Test
     public void disabledWillNotWrite() throws Exception
     {
-      when(logstashConfiguration.isEnabled()).thenReturn(false);
+      LogstashConfiguration.getInstance().setEnabled(false);
       project.addProperty(new LogstashJobProperty());
       Cause cause = new Cause.UserIdCause();
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0, cause);
