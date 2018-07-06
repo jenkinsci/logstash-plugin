@@ -111,15 +111,11 @@ public class ElasticSearchSSLCertsTest {
 
         String baseUrl = getBaseUrl(server);
 
-        try {
-            KeyStore keyStore = getStore(CLIENT_KEYSTORE, KEYPASS_AND_STOREPASS_VALUE);
-            String alias = keyStore.aliases().nextElement();
-            X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+        ElasticSearchDao dao = new ElasticSearchDao(new URI("https://" + baseUrl), "", "");
+        KeyStore keyStore = getStore(CLIENT_KEYSTORE, KEYPASS_AND_STOREPASS_VALUE);
+        dao.setCustomKeyStore(keyStore);
 
-            SSLContext sslContext = ElasticSearch.createSSLContext(alias, certificate);
-            HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().setSslcontext(sslContext);
-            
-            ElasticSearchDao dao = new ElasticSearchDao(httpClientBuilder, new URI("https://" + baseUrl), "", "");
+        try {
             dao.push("");
         } finally {
             server.stop();
@@ -133,18 +129,14 @@ public class ElasticSearchSSLCertsTest {
 
         String baseUrl = getBaseUrl(server);
 
+        ElasticSearchDao dao = new ElasticSearchDao(new URI("https://" + baseUrl), "", "");
+        KeyStore keyStore = getStore(CLIENT_KEYSTORE, KEYPASS_AND_STOREPASS_VALUE);
+        dao.setCustomKeyStore(keyStore);
+
         try {
             thrown.expect(IsInstanceOf.instanceOf(SSLException.class));
             thrown.expectMessage("Unrecognized SSL message, plaintext connection?");
 
-            KeyStore keyStore = getStore(CLIENT_KEYSTORE, KEYPASS_AND_STOREPASS_VALUE);
-            String alias = keyStore.aliases().nextElement();
-            X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
-
-            SSLContext sslContext = ElasticSearch.createSSLContext(alias, certificate);
-            HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().setSslcontext(sslContext);
-            
-            ElasticSearchDao dao = new ElasticSearchDao(httpClientBuilder, new URI("https://" + baseUrl), "", "");
             dao.push("");
         } finally {
             server.stop();

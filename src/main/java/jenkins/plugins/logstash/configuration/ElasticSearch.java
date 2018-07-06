@@ -19,21 +19,12 @@ import com.cloudbees.plugins.credentials.common.StandardCertificateCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.KeyStore;
 import java.util.Collections;
 import java.util.List;
 
@@ -189,105 +180,26 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   @Override
   public ElasticSearchDao createIndexerInstance()
   {
-    ElasticSearchDao esDao = null;
-    HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+    ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password));
 
-    // Install custom certificate (if present) on a best-effort basis
-    if (!StringUtils.isBlank(customServerCertificateId)) {
-      StandardCertificateCredentials certificateCredentials = getCredentials(customServerCertificateId);
-      if (certificateCredentials instanceof StandardCertificateCredentials) {
-        try {
-          // Fetch our custom certificate
-          KeyStore keyStore = certificateCredentials.getKeyStore();
-          String alias = keyStore.aliases().nextElement();
-          X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
-
-          SSLContext sslContext = ElasticSearch.createSSLContext(alias, certificate);
-          if (sslContext != null)
-            httpClientBuilder = httpClientBuilder.setSslcontext(sslContext);
-        } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException
-            | UnrecoverableKeyException | CertificateException | IOException ex) {
-          //TODO: Report exception in logger
-        }
-      }
-    }
-
-    esDao = new ElasticSearchDao(httpClientBuilder, getUri(), username, Secret.toString(password));
-
+    esDao.setCustomKeyStore(getCustomKeyStore());
     esDao.setMimeType(getMimeType());
     return esDao;
   }
 
-  public static SSLContext createSSLContext(String alias, X509Certificate certificate)
-      throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException, IOException,
-      UnrecoverableKeyException, CertificateException
-  {
-    // Step 1: Get all defaults
-    TrustManagerFactory tmf = TrustManagerFactory
-        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    // Using null here initialises the TMF with the default trust store.
-    tmf.init((KeyStore) null);
+  private KeyStore getCustomKeyStore() {
+    KeyStore customKeyStore = null;
 
-    // Get hold of the default trust manager
-    X509TrustManager defaultTM = null;
-    for (TrustManager tm : tmf.getTrustManagers()) {
-      if (tm instanceof X509TrustManager) {
-        defaultTM = (X509TrustManager) tm;
-        break;
+    // Fetch custom alias+certificate as a keystore (if present)
+    if (!StringUtils.isBlank(customServerCertificateId)) {
+      StandardCertificateCredentials certificateCredentials = getCredentials(customServerCertificateId);
+      if (certificateCredentials != null) {
+        // Fetch keystore containing custom certificate
+        customKeyStore = certificateCredentials.getKeyStore();
       }
     }
 
-    // Step 2: Add custom cert to keystore
-    KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-    ks.load(null, null);
-    ks.setEntry(alias, new KeyStore.TrustedCertificateEntry(certificate), null);
-
-    // Create TMF with our custom cert's KS
-    tmf = TrustManagerFactory
-        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    tmf.init(ks);
-
-    // Get hold of the custom trust manager
-    X509TrustManager customTM = null;
-    for (TrustManager tm : tmf.getTrustManagers()) {
-      if (tm instanceof X509TrustManager) {
-        customTM = (X509TrustManager) tm;
-        break;
-      }
-    }
-
-    // Step 3: Wrap it in our own class.
-    final X509TrustManager finalDefaultTM = defaultTM;
-    final X509TrustManager finalCustomTM = customTM;
-    X509TrustManager combinedTM = new X509TrustManager() {
-      @Override
-      public X509Certificate[] getAcceptedIssuers() {
-        return finalDefaultTM.getAcceptedIssuers();
-      }
-
-      @Override
-      public void checkServerTrusted(X509Certificate[] chain,
-                       String authType) throws CertificateException {
-        try {
-          finalCustomTM.checkServerTrusted(chain, authType);
-        } catch (CertificateException e) {
-          // This will throw another CertificateException if this fails too.
-          finalDefaultTM.checkServerTrusted(chain, authType);
-        }
-      }
-
-      @Override
-      public void checkClientTrusted(X509Certificate[] chain,
-                       String authType) throws CertificateException {
-        finalDefaultTM.checkClientTrusted(chain, authType);
-      }
-    };
-
-    // Step 4: Finally, create SSLContext based off of this combined TM
-    SSLContext sslContext = SSLContext.getInstance("TLS");
-    sslContext.init(null, new TrustManager[]{combinedTM}, null);
-
-    return sslContext;
+    return customKeyStore;
   }
 
   private StandardCertificateCredentials getCredentials(String credentials)
@@ -321,12 +233,14 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       return new StandardListBoxModel().withEmptySelection()
           .withMatching( //
               CredentialsMatchers.anyOf(
-                  CredentialsMatchers.instanceOf(StandardCertificateCredentials.class)),
+                  CredentialsMatchers.instanceOf(StandardCertificateCredentials.class)
+              ),
               CredentialsProvider.lookupCredentials(StandardCredentials.class,
                   Jenkins.getInstance(),
                   ACL.SYSTEM,
                   Collections.EMPTY_LIST
-              ));
+              )
+          );
     }
 
     public FormValidation doCheckUrl(@QueryParameter("value") String value)
