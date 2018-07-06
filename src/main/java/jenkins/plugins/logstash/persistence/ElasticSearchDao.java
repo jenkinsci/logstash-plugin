@@ -70,14 +70,11 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   private String password;
   private String mimeType;
   
-
-  //primary constructor used by indexer factory
   public ElasticSearchDao(URI uri, String username, String password) {
     this(null, uri, username, password);
   }
 
-  // Factored for unit testing
-  ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password) {
+  public ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password) {
 
     if (uri == null)
     {

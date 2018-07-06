@@ -8,6 +8,7 @@
     <jenkins-test-harness.version>2.23</jenkins-test-harness.version>
     <java.level>8</java.level>
     <jenkins.version>2.60.3</jenkins.version>
+    <jenkins-credentials.version>2.1.11</jenkins-credentials.version>
   </properties>
   
   <parent>
@@ -133,23 +134,29 @@
     	<version>1.39</version>
     	<scope>test</scope>
     </dependency>
+
     <dependency>
-    	<groupId>org.powermock</groupId>
-    	<artifactId>powermock-api-mockito2</artifactId>
-    	<version>2.0.0-beta.5</version>
-    	<scope>test</scope>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+      <version>${jenkins-credentials.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.powermock</groupId>
-    	<artifactId>powermock-module-junit4</artifactId>
-    	<version>2.0.0-beta.5</version>
-    	<scope>test</scope>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito2</artifactId>
+        <version>2.0.0-beta.5</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.jenkins-ci.plugins</groupId>
-    	<artifactId>mask-passwords</artifactId>
-    	<version>2.10.1</version>
-    	<scope>test</scope>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>2.0.0-beta.5</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>mask-passwords</artifactId>
+        <version>2.10.1</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
        <groupId>org.jenkins-ci.plugins</groupId>
@@ -158,10 +165,10 @@
        <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.hamcrest</groupId>
-    	<artifactId>java-hamcrest</artifactId>
-    	<version>2.0.0.0</version>
-    	<scope>test</scope>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>java-hamcrest</artifactId>
+        <version>2.0.0.0</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
     	<groupId>org.jenkins-ci.plugins</groupId>
@@ -205,7 +212,7 @@
     <defaultGoal>clean verify</defaultGoal>
     <plugins>
 
-	<plugin>
+    <plugin>
         <groupId>org.jenkins-ci.tools</groupId>
         <artifactId>maven-hpi-plugin</artifactId>
         <extensions>true</extensions>
