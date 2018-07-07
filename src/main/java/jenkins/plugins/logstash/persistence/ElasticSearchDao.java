@@ -44,6 +44,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -72,6 +74,8 @@ import javax.net.ssl.X509TrustManager;
  * @since 1.0.4
  */
 public class ElasticSearchDao extends AbstractLogstashIndexerDao {
+
+  private static final Logger LOGGER = Logger.getLogger(ElasticSearchDao.class.getName());
 
   private final HttpClientBuilder clientBuilder;
   private final URI uri;
@@ -168,11 +172,29 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   public void setCustomKeyStore(KeyStore customKeyStore) {
     this.customKeyStore = customKeyStore;
+
+    // This function sets the state of HttpClientBuilder,
+    // hence can safely be called multiple times if keystore is changed
+    setClientBuilderSSLContext();
   }
   
   String getAuth()
   {
     return auth;
+  }
+
+  private void setClientBuilderSSLContext() {
+    if (this.customKeyStore == null)
+        return;
+    try {
+      String alias = customKeyStore.aliases().nextElement();
+      X509Certificate certificate = (X509Certificate) customKeyStore.getCertificate(alias);
+      if (certificate != null)
+        this.clientBuilder.setSslcontext(ElasticSearchDao.createSSLContext(alias, certificate));
+    } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException
+            | KeyManagementException | IOException e) {
+      LOGGER.log(Level.WARNING, e.getMessage(), e);
+    }
   }
 
   HttpPost getHttpPost(String data) {
@@ -195,20 +217,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     CloseableHttpResponse response = null;
     HttpPost post = getHttpPost(data);
 
-    if (customKeyStore != null) {
-      try {
-        String alias;
-        alias = customKeyStore.aliases().nextElement();
-        X509Certificate certificate = (X509Certificate) customKeyStore.getCertificate(alias);
-        if (certificate != null)
-          clientBuilder.setSslcontext(ElasticSearchDao.createSSLContext(alias, certificate));
-      } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | KeyManagementException e) {
-        e.printStackTrace();
-      }
-    }
-
     try {
-
       httpClient = clientBuilder.build();
       response = httpClient.execute(post);
 
