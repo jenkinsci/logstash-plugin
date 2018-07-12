@@ -70,9 +70,9 @@ public class ElasticSearchSSLCertsTest {
         server.start();
 
         String baseUrl = getBaseUrl(server);
+        ElasticSearchDao dao = new ElasticSearchDao(null, new URI("http://" + baseUrl), "", "");
 
         try {
-            ElasticSearchDao dao = new ElasticSearchDao(null, new URI("http://" + baseUrl), "", "");
             dao.push("");
         } finally {
             server.stop();
@@ -86,6 +86,7 @@ public class ElasticSearchSSLCertsTest {
         server.start();
 
         String baseUrl = getBaseUrl(server);
+        ElasticSearchDao dao = new ElasticSearchDao(null, new URI("https://" + baseUrl), "", "");
 
         /*
             The server's cert does not exist in the default trust store. When connecting to a server
@@ -96,7 +97,6 @@ public class ElasticSearchSSLCertsTest {
             thrown.expect(IsInstanceOf.instanceOf(SSLHandshakeException.class));
             thrown.expectMessage("unable to find valid certification path to requested target");
 
-            ElasticSearchDao dao = new ElasticSearchDao(null, new URI("https://" + baseUrl), "", "");
             dao.push("");
         } finally {
             server.stop();
