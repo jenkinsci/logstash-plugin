@@ -242,6 +242,14 @@ public class LogstashConfiguration extends GlobalConfiguration
     // logstashIndexer is holder for the dao instance.
     // To avoid that we get a new dao instance in case there was no change in configuration
     // we compare it to the currently active configuration.
+    Boolean e = json.getBoolean("enabled");
+    if (!e)
+    {
+      enabled = false;
+      save();
+      return true;
+    }
+
     staplerRequest.bindJSON(this, json);
 
     try {
