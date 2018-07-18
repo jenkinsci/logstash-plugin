@@ -65,7 +65,7 @@ public class ElasticSearchSSLCertsTest {
     private static final String CLIENT_TRUSTSTORE = "elasticsearch-sslcerts/truststore.ks";
 
     @Test
-    public void httpPost_HttpServer_Returns200OK() throws Exception {
+    public void NoSSLPost_NoSSLServer_Returns200OK() throws Exception {
         final HttpServer server = createLocalTestServer(NO_SSL_CONTEXT);
         server.start();
 
@@ -80,7 +80,7 @@ public class ElasticSearchSSLCertsTest {
     }
 
     @Test
-    public void httpsPost_HttpsServer_NoTrustStore_ThrowsSSLException() throws Exception {
+    public void SSLPost_NoSSLServer_NoTrustStore_ThrowsSSLException() throws Exception {
         SSLContext sslContext = createServerSSLContext(CLIENT_KEYSTORE, KEYPASS_AND_STOREPASS_VALUE);
         final HttpServer server = createLocalTestServer(sslContext);
         server.start();
@@ -104,7 +104,7 @@ public class ElasticSearchSSLCertsTest {
     }
 
     @Test
-    public void httpsPost_HttpsServer_UpdatedTrustStore_Returns200OK() throws Exception {
+    public void SSLPost_SSLServer_UpdatedTrustStore_Returns200OK() throws Exception {
         SSLContext serverSSLContext = createServerSSLContext(CLIENT_KEYSTORE, KEYPASS_AND_STOREPASS_VALUE);
         final HttpServer server = createLocalTestServer(serverSSLContext);
         server.start();
@@ -123,7 +123,7 @@ public class ElasticSearchSSLCertsTest {
     }
 
     @Test
-    public void httpsPost_HttpServer_ThrowsSSLException() throws Exception {
+    public void SSLPost_NoSSLServer_ThrowsSSLException() throws Exception {
         final HttpServer server = createLocalTestServer(NO_SSL_CONTEXT);
         server.start();
 
