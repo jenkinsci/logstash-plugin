@@ -33,7 +33,7 @@ public class PipelineTest
       memoryDao = new MemoryDao();
       LogstashConfiguration config = LogstashConfiguration.getInstance();
       MemoryIndexer indexer = new MemoryIndexer(memoryDao);
-      config.setActiveIndexer(indexer);
+      config.setLogstashIndexer(indexer);
       config.setEnabled(true);
   }
 

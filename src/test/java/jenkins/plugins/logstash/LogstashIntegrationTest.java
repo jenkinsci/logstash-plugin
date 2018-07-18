@@ -56,7 +56,7 @@ public class LogstashIntegrationTest
         memoryDao = new MemoryDao();
         LogstashConfiguration config = LogstashConfiguration.getInstance();
         MemoryIndexer indexer = new MemoryIndexer(memoryDao);
-        config.setActiveIndexer(indexer);
+        config.setLogstashIndexer(indexer);
         config.setEnabled(true);
 
         slave = jenkins.createSlave();

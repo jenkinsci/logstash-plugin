@@ -45,6 +45,9 @@ public class LogstashConfiguration extends GlobalConfiguration
   private boolean milliSecondTimestamps = true;
   private transient LogstashIndexer<?> activeIndexer;
 
+  // a flag indicating if we're currently in the configure method.
+  private transient boolean configuring = false;
+
   public LogstashConfiguration()
   {
     load();
@@ -117,6 +120,10 @@ public class LogstashConfiguration extends GlobalConfiguration
   public void setLogstashIndexer(LogstashIndexer<?> logstashIndexer)
   {
     this.logstashIndexer = logstashIndexer;
+    if (!configuring && !Objects.equals(logstashIndexer, activeIndexer))
+    {
+      activeIndexer = logstashIndexer;
+    }
   }
 
   /**
@@ -133,13 +140,6 @@ public class LogstashConfiguration extends GlobalConfiguration
     return null;
   }
 
-
-  // for testing only
-  @Restricted(NoExternalUse.class)
-  void setActiveIndexer(LogstashIndexer<?> activeIndexer)
-  {
-    this.activeIndexer = activeIndexer;
-  }
 
   public List<?> getIndexerTypes()
   {
@@ -238,31 +238,39 @@ public class LogstashConfiguration extends GlobalConfiguration
   public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException
   {
 
+    configuring = true;
     // when we bind the stapler request we get a new instance of logstashIndexer.
     // logstashIndexer is holder for the dao instance.
     // To avoid that we get a new dao instance in case there was no change in configuration
     // we compare it to the currently active configuration.
-    staplerRequest.bindJSON(this, json);
-
-    try {
-      // validate
-      logstashIndexer.validate();
-    } catch (Exception ex) {
-      // You are here which means user is trying to save invalid indexer configuration.
-      // Exception will be thrown here so that it gets displayed on UI.
-      // But before that revert back to original configuration (in-memory)
-      // so that when user refreshes the configuration page, last saved settings will be displayed again.
-      logstashIndexer = activeIndexer;
-      throw new IllegalArgumentException(ex);
-    }
-
-    if (!Objects.equals(logstashIndexer, activeIndexer))
+    try
     {
-      activeIndexer = logstashIndexer;
-    }
+      staplerRequest.bindJSON(this, json);
 
-    save();
-    return true;
+      try {
+        // validate
+        logstashIndexer.validate();
+      } catch (Exception ex) {
+        // You are here which means user is trying to save invalid indexer configuration.
+        // Exception will be thrown here so that it gets displayed on UI.
+        // But before that revert back to original configuration (in-memory)
+        // so that when user refreshes the configuration page, last saved settings will be displayed again.
+        logstashIndexer = activeIndexer;
+        throw new IllegalArgumentException(ex);
+      }
+
+      if (!Objects.equals(logstashIndexer, activeIndexer))
+      {
+        activeIndexer = logstashIndexer;
+      }
+
+      save();
+      return true;
+    }
+    finally
+    {
+      configuring = false;
+    }
   }
 
   public static LogstashConfiguration getInstance()
