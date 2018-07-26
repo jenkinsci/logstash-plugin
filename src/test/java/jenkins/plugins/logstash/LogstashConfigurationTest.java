@@ -5,12 +5,15 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.apache.commons.lang.time.FastDateFormat;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 
+import jenkins.plugins.logstash.configuration.RabbitMq;
 import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 import jenkins.plugins.logstash.persistence.RabbitMqDao;
 import jenkins.plugins.logstash.persistence.RedisDao;
@@ -52,6 +55,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RabbitMqDao.class));
     assertThat(configuration.isEnabled(), equalTo(true));
+    assertThat(configuration.getLogstashIndexer(),IsInstanceOf.instanceOf(RabbitMq.class));
   }
 
   @Test

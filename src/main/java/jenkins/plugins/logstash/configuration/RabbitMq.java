@@ -3,6 +3,8 @@ package jenkins.plugins.logstash.configuration;
 import java.nio.charset.Charset;
 
 import org.apache.commons.lang.StringUtils;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -51,6 +53,21 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   public String getCharset()
   {
     return charset;
+  }
+
+  // package visibility for testing only
+  @Restricted(NoExternalUse.class)
+  Charset getEffectiveCharset()
+  {
+    try
+    {
+      return Charset.forName(charset);
+
+    }
+    catch (IllegalArgumentException e)
+    {
+      return Charset.defaultCharset();
+    }
   }
 
   public String getVirtualHost()
@@ -153,7 +170,7 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   @Override
   public RabbitMqDao createIndexerInstance()
   {
-    return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password), Charset.forName(charset), getVirtualHost());
+    return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password), getEffectiveCharset(), getVirtualHost());
   }
 
   @Extension

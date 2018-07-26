@@ -1,14 +1,24 @@
 package jenkins.plugins.logstash.configuration;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
+import java.nio.charset.Charset;
+
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-public class RabbitMqTest
+import jenkins.plugins.logstash.LogstashConfiguration;
+import jenkins.plugins.logstash.LogstashConfigurationTestBase;
+import jenkins.plugins.logstash.LogstashConfigurationTestBase.LogstashConfigurationForTest;
+import jenkins.plugins.logstash.persistence.RabbitMqDao;
+
+public class RabbitMqTest extends LogstashConfigurationTestBase
 {
 
   @Rule
@@ -84,4 +94,16 @@ public class RabbitMqTest
     indexer.setVirtualHost("newVhost");
     assertThat(indexer.equals(indexer2), is(false));
   }
+
+  @Test
+  public void rabbitMqBrokenCharset_returns_default_charset()
+  {
+    LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq_brokenCharset.xml");
+    LogstashConfiguration configuration = new LogstashConfigurationForTest();
+    assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RabbitMqDao.class));
+    assertThat(configuration.isEnabled(), equalTo(true));
+    assertThat(configuration.getLogstashIndexer(),IsInstanceOf.instanceOf(RabbitMq.class));
+    assertThat(((RabbitMq)configuration.getLogstashIndexer()).getEffectiveCharset(),equalTo(Charset.defaultCharset()));
+  }
+
 }
