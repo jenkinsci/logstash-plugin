@@ -128,6 +128,7 @@ public class LogstashWriterTest {
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
     when(mockTestResultAction.getFailCount()).thenReturn(0);
+    when(mockTestResultAction.getPassedTests()).thenReturn(Collections.emptyList());
     when(mockTestResultAction.getFailedTests()).thenReturn(Collections.emptyList());
 
     when(mockProject.getName()).thenReturn("LogstashWriterTest");
@@ -182,6 +183,7 @@ public class LogstashWriterTest {
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
     verify(mockTestResultAction, times(1)).getFailedTests();
+    verify(mockTestResultAction, times(1)).getPassedTests();
 
     verify(mockProject, times(2)).getName();
     verify(mockProject, times(2)).getFullName();

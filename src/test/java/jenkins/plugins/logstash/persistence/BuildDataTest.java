@@ -59,7 +59,8 @@ public class BuildDataTest {
       + "\"rootProjectName\":\"RootBuildDataTest\",\"rootFullProjectName\":\"parent/RootBuildDataTest\","
       + "\"rootProjectDisplayName\":\"Root BuildData Test\",\"rootBuildNum\":456,\"buildVariables\":{},"
       + "\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0, \"passCount\":0,"
-      + "\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}}";
+      + "\"passedTests\":[], \"passedTestsWithDetail\":[],"
+      + "\"failedTests\":[], \"failedTestsWithDetail\":[]}}";
 
   @Mock AbstractBuild mockBuild;
   @Mock AbstractBuild mockRootBuild;
@@ -99,6 +100,7 @@ public class BuildDataTest {
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
     when(mockTestResultAction.getFailCount()).thenReturn(0);
+    when(mockTestResultAction.getPassedTests()).thenReturn(Collections.emptyList());
     when(mockTestResultAction.getFailedTests()).thenReturn(Collections.emptyList());
 
     when(mockProject.getName()).thenReturn("BuildDataTest");
@@ -166,6 +168,7 @@ public class BuildDataTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
+    verify(mockTestResultAction, times(1)).getPassedTests();
     verify(mockTestResultAction, times(1)).getFailedTests();
   }
 
@@ -247,6 +250,7 @@ public class BuildDataTest {
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
     when(mockTestResultAction.getFailCount()).thenReturn(1);
     when(mockTestResultAction.getFailedTests()).thenReturn(Arrays.asList(mockTestResult));
+    when(mockTestResultAction.getPassedTests()).thenReturn(Arrays.asList(mockTestResult));
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
@@ -256,9 +260,40 @@ public class BuildDataTest {
     Assert.assertEquals("Incorrect test results", 123, testResults.getTotalCount());
     Assert.assertEquals("Incorrect test results", 0, testResults.getSkipCount());
     Assert.assertEquals("Incorrect test results", 1, testResults.getFailCount());
-    Assert.assertEquals("Incorrect test details count", 1, testResults.getFailedTestsWithErrorDetail().size());
-    Assert.assertEquals("Incorrect failed test error details", "ErrorDetails Test", testResults.getFailedTestsWithErrorDetail().get(0).getErrorDetails());
-    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", testResults.getFailedTestsWithErrorDetail().get(0).getFullName());
+    Assert.assertEquals("Incorrect test details count", 1, testResults.getFailedTestsWithDetail().size());
+    Assert.assertEquals("Incorrect failed test error details", "ErrorDetails Test", testResults.getFailedTestsWithDetail().get(0).getErrorDetails());
+    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", testResults.getFailedTestsWithDetail().get(0).getFullName());
+
+
+    verifyMocks();
+    verifyTestResultActions();
+  }
+
+  @Test
+  public void constructorSuccessTestPasses() throws Exception {
+    TestResult mockTestResult = Mockito.mock(hudson.tasks.test.TestResult.class);
+    when(mockTestResult.getFullName()).thenReturn("Mock Full Test");
+    when(mockTestResult.getErrorDetails()).thenReturn("");
+
+    when(mockTestResultAction.getTotalCount()).thenReturn(123);
+    when(mockTestResultAction.getSkipCount()).thenReturn(0);
+    when(mockTestResultAction.getFailCount()).thenReturn(0);
+    when(mockTestResultAction.getFailedTests()).thenReturn(Arrays.asList(mockTestResult));
+    when(mockTestResultAction.getPassedTests()).thenReturn(Arrays.asList(mockTestResult));
+
+    // Unit under test
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+    TestData testResults = buildData.getTestResults();
+
+    Assert.assertEquals("Incorrect test results", 123, testResults.getTotalCount());
+    Assert.assertEquals("Incorrect test results", 0, testResults.getSkipCount());
+    Assert.assertEquals("Incorrect test results", 0, testResults.getFailCount());
+    Assert.assertEquals("Incorrect test results", 123, testResults.getPassCount());
+    Assert.assertEquals("Incorrect test details count", 1, testResults.getFailedTestsWithDetail().size());
+    Assert.assertEquals("Incorrect failed test error details", "", testResults.getPassedTestsWithDetail().get(0).getErrorDetails());
+    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", testResults.getPassedTestsWithDetail().get(0).getFullName());
+
 
     verifyMocks();
     verifyTestResultActions();

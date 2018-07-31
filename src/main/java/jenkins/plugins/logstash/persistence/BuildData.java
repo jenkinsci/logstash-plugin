@@ -67,15 +67,20 @@ public class BuildData {
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
     private int totalCount, skipCount, failCount, passCount;
-    private List<FailedTest> failedTestsWithErrorDetail;
+    private List<ExecutedTest> failedTestsWithDetail;
     private List<String> failedTests;
 
-    public static class FailedTest {
+    private List<ExecutedTest> passedTestsWithDetail;
+    private List<String> passedTests;
+
+    public static class ExecutedTest {
       private final String fullName, errorDetails;
-      public FailedTest(String fullName, String errorDetails) {
+      private final float duration;
+      public ExecutedTest(String fullName, String errorDetails, float duration) {
         super();
         this.fullName = fullName;
         this.errorDetails = errorDetails;
+        this.duration = duration;
       }
 
       public String getFullName()
@@ -102,7 +107,8 @@ public class BuildData {
       if (testResultAction == null) {
         totalCount = skipCount = failCount = 0;
         failedTests = Collections.emptyList();
-        failedTestsWithErrorDetail = Collections.emptyList();
+        failedTestsWithDetail = Collections.emptyList();
+        passedTestsWithDetail = Collections.emptyList();
         return;
       }
 
@@ -112,10 +118,17 @@ public class BuildData {
       passCount = totalCount - skipCount - failCount;
 
       failedTests = new ArrayList<String>();
-      failedTestsWithErrorDetail = new ArrayList<FailedTest>();
+      failedTestsWithDetail = new ArrayList<ExecutedTest>();
       for (TestResult result : testResultAction.getFailedTests()) {
           failedTests.add(result.getFullName());
-          failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(),result.getErrorDetails()));
+          failedTestsWithDetail.add(new ExecutedTest(result.getFullName(),result.getErrorDetails(), result.getDuration()));
+      }
+
+      passedTests = new ArrayList<String>();
+      passedTestsWithDetail = new ArrayList<ExecutedTest>();
+      for (TestResult result : testResultAction.getPassedTests()) {
+          passedTests.add(result.getFullName());
+          passedTestsWithDetail.add(new ExecutedTest(result.getFullName(),result.getErrorDetails(), result.getDuration()));
       }
     }
 
@@ -139,9 +152,19 @@ public class BuildData {
         return passCount;
     }
 
-    public List<FailedTest> getFailedTestsWithErrorDetail()
+    public List<ExecutedTest> getFailedTestsWithDetail()
     {
-        return failedTestsWithErrorDetail;
+        return failedTestsWithDetail;
+    }
+
+    public List<ExecutedTest> getPassedTestsWithDetail()
+    {
+        return passedTestsWithDetail;
+    }
+
+    public List<String> getPassedTests()
+    {
+        return passedTests;
     }
 
     public List<String> getFailedTests()
