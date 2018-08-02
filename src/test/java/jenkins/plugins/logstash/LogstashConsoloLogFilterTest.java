@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import jenkins.plugins.logstash.persistence.BuildData;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +44,7 @@ public class LogstashConsoloLogFilterTest {
     }
 
     @Override
-    LogstashWriter getLogStashWriter(Run<?, ?> build, OutputStream errorStream) {
+    LogstashWriter getLogStashWriter(Run<?, ?> build, OutputStream errorStream, SecureGroovyScript script) {
       // Simulate bad Writer
       if(writer.isConnectionBroken()) {
         try {

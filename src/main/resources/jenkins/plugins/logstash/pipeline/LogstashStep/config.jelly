@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core"/>
+<f:advanced>
+	<f:entry field="script" help="/plugin/logstash/help/help-script.html"/>
+	<f:property field="secureGroovyScript"/>
+</f:advanced>
