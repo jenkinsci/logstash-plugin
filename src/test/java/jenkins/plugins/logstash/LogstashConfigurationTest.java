@@ -93,9 +93,12 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     assertThat(formatter.format(new Date(118,02,10,22,22)), matchesPattern("2018-03-10T22:22:00.000[+-]\\d{4}"));
   }
 
+  /**
+   * Test whether we can open the Jenkins configuration page and save it without
+   * changing anything i.e. plugin is disabled. (JENKINS-51793)
+   */
   @Test
-  public void jenkinsConfigure() throws Exception
-  {
+  public void jenkinsInitialConfigurationCanBeSaved()
     HtmlPage p = j.createWebClient().goTo("configure");
     HtmlForm f = p.getFormByName("config");
     j.submit(f);
