@@ -6,6 +6,8 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.apache.commons.lang.time.FastDateFormat;
@@ -19,6 +21,7 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import jenkins.plugins.logstash.configuration.RabbitMq;
 import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 import jenkins.plugins.logstash.persistence.RabbitMqDao;
 import jenkins.plugins.logstash.persistence.RedisDao;
@@ -63,6 +66,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RabbitMqDao.class));
     assertThat(configuration.isEnabled(), equalTo(true));
+    assertThat(configuration.getLogstashIndexer(),IsInstanceOf.instanceOf(RabbitMq.class));
   }
 
   @Test
