@@ -1,5 +1,6 @@
 package jenkins.plugins.logstash.configuration;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,6 +8,7 @@ import java.net.URL;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import java.security.cert.CertificateException;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -24,9 +26,14 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import hudson.Extension;
 import hudson.util.FormValidation;
@@ -40,6 +47,8 @@ import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 
 public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
 {
+  private static final Logger LOGGER = Logger.getLogger(ElasticSearch.class.getName());
+
   private String username;
   private Secret password;
   private URI uri;
@@ -182,8 +191,13 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   {
     ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password));
 
-    esDao.setCustomKeyStore(getCustomKeyStore());
     esDao.setMimeType(getMimeType());
+    try {
+        esDao.setCustomKeyStore(getCustomKeyStore());
+    } catch (KeyStoreException | CertificateException |
+             NoSuchAlgorithmException | KeyManagementException | IOException e) {
+          LOGGER.log(Level.WARNING, e.getMessage(), e);
+    }
     return esDao;
   }
 

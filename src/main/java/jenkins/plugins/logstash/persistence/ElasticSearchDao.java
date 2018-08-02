@@ -44,8 +44,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -68,8 +66,6 @@ import jenkins.plugins.logstash.configuration.ElasticSearch;
  * @since 1.0.4
  */
 public class ElasticSearchDao extends AbstractLogstashIndexerDao {
-
-  private static final Logger LOGGER = Logger.getLogger(ElasticSearchDao.class.getName());
 
   private final HttpClientBuilder clientBuilder;
   private final URI uri;
@@ -169,15 +165,10 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     return auth;
   }
 
-  public void setCustomKeyStore(KeyStore customKeyStore) {
+  public void setCustomKeyStore(KeyStore customKeyStore) throws
+          CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
+    SSLHelper.setClientBuilderSSLContext(this.clientBuilder, customKeyStore);
     this.customKeyStore = customKeyStore;
-
-    try {
-      SSLHelper.setClientBuilderSSLContext(this.clientBuilder, this.customKeyStore);
-    } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException
-            | KeyManagementException | IOException e) {
-      LOGGER.log(Level.WARNING, e.getMessage(), e);
-    }
   }
   
   HttpPost getHttpPost(String data) {
