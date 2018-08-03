@@ -102,7 +102,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
    * changing anything i.e. plugin is disabled. (JENKINS-51793)
    */
   @Test
-  public void jenkinsInitialConfigurationCanBeSaved()
+  public void jenkinsInitialConfigurationCanBeSaved() {
     HtmlPage p = j.createWebClient().goTo("configure");
     HtmlForm f = p.getFormByName("config");
     j.submit(f);
