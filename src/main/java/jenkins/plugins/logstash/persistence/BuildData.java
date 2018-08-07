@@ -119,16 +119,17 @@ public class BuildData {
 
       failedTests = new ArrayList<String>();
       failedTestsWithErrorDetail = new ArrayList<ExecutedTest>();
-      for (TestResult result : testResultAction.getFailedTests()) {
-          failedTests.add(result.getFullName());
-          failedTestsWithErrorDetail.add(new ExecutedTest(result.getFullName(),result.getErrorDetails(), result.getDuration()));
-      }
+      testListFill((List<TestResult>) testResultAction.getFailedTests(), failedTests, failedTestsWithErrorDetail);
 
       passedTests = new ArrayList<String>();
       passedTestsWithDetail = new ArrayList<ExecutedTest>();
-      for (TestResult result : testResultAction.getPassedTests()) {
-          passedTests.add(result.getFullName());
-          passedTestsWithDetail.add(new ExecutedTest(result.getFullName(),result.getErrorDetails(), result.getDuration()));
+      testListFill((List<TestResult>) testResultAction.getPassedTests(), passedTests, passedTestsWithDetail);
+    }
+
+    private void testListFill(List<TestResult> testResults, List<String> testNames, List<ExecutedTest> testDetails) {
+      for (TestResult result : testResults) {
+        testNames.add(result.getFullName());
+        testDetails.add(new ExecutedTest(result.getFullName(),result.getErrorDetails(), result.getDuration()));
       }
     }
 
