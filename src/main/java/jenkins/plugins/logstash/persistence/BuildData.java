@@ -70,7 +70,7 @@ public class BuildData {
     private List<ExecutedTest> failedTestsWithErrorDetail;
     private List<String> failedTests;
 
-    private List<ExecutedTest> passedTestsWithDetail;
+    private List<ExecutedTest> passedTestsWithErrorDetail;
     private List<String> passedTests;
 
     public static class ExecutedTest {
@@ -108,7 +108,7 @@ public class BuildData {
         totalCount = skipCount = failCount = 0;
         failedTests = Collections.emptyList();
         failedTestsWithErrorDetail = Collections.emptyList();
-        passedTestsWithDetail = Collections.emptyList();
+        passedTestsWithErrorDetail = Collections.emptyList();
         return;
       }
 
@@ -122,8 +122,8 @@ public class BuildData {
       testListFill((List<TestResult>) testResultAction.getFailedTests(), failedTests, failedTestsWithErrorDetail);
 
       passedTests = new ArrayList<String>();
-      passedTestsWithDetail = new ArrayList<ExecutedTest>();
-      testListFill((List<TestResult>) testResultAction.getPassedTests(), passedTests, passedTestsWithDetail);
+      passedTestsWithErrorDetail = new ArrayList<ExecutedTest>();
+      testListFill((List<TestResult>) testResultAction.getPassedTests(), passedTests, passedTestsWithErrorDetail);
     }
 
     private void testListFill(List<TestResult> testResults, List<String> testNames, List<ExecutedTest> testDetails) {
@@ -160,7 +160,7 @@ public class BuildData {
 
     public List<ExecutedTest> getPassedTestsWithDetail()
     {
-        return passedTestsWithDetail;
+        return passedTestsWithErrorDetail;
     }
 
     public List<String> getPassedTests()
