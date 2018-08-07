@@ -67,7 +67,7 @@ public class BuildData {
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
     private int totalCount, skipCount, failCount, passCount;
-    private List<ExecutedTest> failedTestsWithDetail;
+    private List<ExecutedTest> failedTestsWithErrorDetail;
     private List<String> failedTests;
 
     private List<ExecutedTest> passedTestsWithDetail;
@@ -107,7 +107,7 @@ public class BuildData {
       if (testResultAction == null) {
         totalCount = skipCount = failCount = 0;
         failedTests = Collections.emptyList();
-        failedTestsWithDetail = Collections.emptyList();
+        failedTestsWithErrorDetail = Collections.emptyList();
         passedTestsWithDetail = Collections.emptyList();
         return;
       }
@@ -118,10 +118,10 @@ public class BuildData {
       passCount = totalCount - skipCount - failCount;
 
       failedTests = new ArrayList<String>();
-      failedTestsWithDetail = new ArrayList<ExecutedTest>();
+      failedTestsWithErrorDetail = new ArrayList<ExecutedTest>();
       for (TestResult result : testResultAction.getFailedTests()) {
           failedTests.add(result.getFullName());
-          failedTestsWithDetail.add(new ExecutedTest(result.getFullName(),result.getErrorDetails(), result.getDuration()));
+          failedTestsWithErrorDetail.add(new ExecutedTest(result.getFullName(),result.getErrorDetails(), result.getDuration()));
       }
 
       passedTests = new ArrayList<String>();
@@ -154,7 +154,7 @@ public class BuildData {
 
     public List<ExecutedTest> getFailedTestsWithDetail()
     {
-        return failedTestsWithDetail;
+        return failedTestsWithErrorDetail;
     }
 
     public List<ExecutedTest> getPassedTestsWithDetail()
