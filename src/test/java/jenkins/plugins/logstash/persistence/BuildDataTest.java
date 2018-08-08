@@ -59,7 +59,7 @@ public class BuildDataTest {
       + "\"rootProjectName\":\"RootBuildDataTest\",\"rootFullProjectName\":\"parent/RootBuildDataTest\","
       + "\"rootProjectDisplayName\":\"Root BuildData Test\",\"rootBuildNum\":456,\"buildVariables\":{},"
       + "\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0, \"passCount\":0,"
-      + "\"passedTests\":[], \"passedTestsWithDetail\":[],"
+      + "\"passedTests\":[], \"passedTestsWithErrorDetail\":[],"
       + "\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}}";
 
   @Mock AbstractBuild mockBuild;
