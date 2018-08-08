@@ -54,7 +54,7 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
     {
       if (isLogstashEnabled(build))
       {
-        LogstashWriter logstash = getLogStashWriter(build, logger, null);
+        LogstashWriter logstash = getLogStashWriter(build, logger, secureGroovyScript);
         return new LogstashOutputStream(logger, logstash);
       }
       else
@@ -93,8 +93,10 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
     if (build.getParent() instanceof AbstractProject)
     {
       AbstractProject<?, ?> project = (AbstractProject<?, ?>)build.getParent();
-      if (project.getProperty(LogstashJobProperty.class) != null)
+      LogstashJobProperty jobProperty = project.getProperty(LogstashJobProperty.class);
+      if (jobProperty != null)
       {
+        this.secureGroovyScript = jobProperty.getSecureGroovyScript();
         return true;
       }
     }
