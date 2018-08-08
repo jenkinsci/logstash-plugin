@@ -108,6 +108,7 @@ public class BuildData {
         totalCount = skipCount = failCount = 0;
         failedTests = Collections.emptyList();
         failedTestsWithErrorDetail = Collections.emptyList();
+        passedTests = Collections.emptyList();
         passedTestsWithErrorDetail = Collections.emptyList();
         return;
       }
