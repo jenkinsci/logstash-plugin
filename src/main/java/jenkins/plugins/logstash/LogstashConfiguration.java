@@ -83,12 +83,12 @@ public class LogstashConfiguration extends GlobalConfiguration
     this.enableGlobally = enableGlobally;
   }
 
-  public void setrecordingPassingTests(boolean recordingPassingTests)
+  public void setRecordingPassingTests(boolean recordingPassingTests)
   {
     this.recordingPassingTests = recordingPassingTests;
   }
 
-  public boolean isrecordingPassingTests()
+  public boolean isRecordingPassingTests()
   {
     return recordingPassingTests;
   }
