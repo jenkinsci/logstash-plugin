@@ -8,6 +8,9 @@
 	    <f:entry title="Enable Globally" field="enableGlobally" description="This will not enable it for pipeline jobs.">
 	      <f:checkbox/>
 	    </f:entry>
+			<f:entry title="Enable Globally" field="recordingPassingTests" description="This will record all passing tests in addition to failing tests.">
+	      <f:checkbox/>
+	    </f:entry>
 	    <f:entry title="Use millisecond time stamps" field="milliSecondTimestamps">
 	    	<f:checkbox default="true"/>
 	    </f:entry>

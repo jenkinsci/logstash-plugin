@@ -42,6 +42,7 @@ public class LogstashConfiguration extends GlobalConfiguration
   private Boolean enabled;
   private boolean dataMigrated = false;
   private boolean enableGlobally = false;
+  private boolean recordingPassingTests = false;
   private boolean milliSecondTimestamps = true;
   private transient LogstashIndexer<?> activeIndexer;
 
@@ -80,6 +81,16 @@ public class LogstashConfiguration extends GlobalConfiguration
   public void setEnableGlobally(boolean enableGlobally)
   {
     this.enableGlobally = enableGlobally;
+  }
+
+  public void setrecordingPassingTests(boolean recordingPassingTests)
+  {
+    this.recordingPassingTests = recordingPassingTests;
+  }
+
+  public boolean isrecordingPassingTests()
+  {
+    return recordingPassingTests;
   }
 
   public boolean isMilliSecondTimestamps()

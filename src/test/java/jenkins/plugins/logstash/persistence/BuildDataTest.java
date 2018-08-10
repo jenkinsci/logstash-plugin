@@ -168,7 +168,6 @@ public class BuildDataTest {
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
     verify(mockTestResultAction).getFailCount();
-    verify(mockTestResultAction, times(1)).getPassedTests();
     verify(mockTestResultAction, times(1)).getFailedTests();
   }
 
@@ -279,7 +278,6 @@ public class BuildDataTest {
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
     when(mockTestResultAction.getFailCount()).thenReturn(0);
     when(mockTestResultAction.getFailedTests()).thenReturn(Arrays.asList(mockTestResult));
-    when(mockTestResultAction.getPassedTests()).thenReturn(Arrays.asList(mockTestResult));
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
@@ -291,9 +289,6 @@ public class BuildDataTest {
     Assert.assertEquals("Incorrect test results", 0, testResults.getFailCount());
     Assert.assertEquals("Incorrect test results", 123, testResults.getPassCount());
     Assert.assertEquals("Incorrect test details count", 1, testResults.getFailedTestsWithDetail().size());
-    Assert.assertEquals("Incorrect failed test error details", "", testResults.getPassedTestsWithDetail().get(0).getErrorDetails());
-    Assert.assertEquals("Incorrect failed test fullName", "Mock Full Test", testResults.getPassedTestsWithDetail().get(0).getFullName());
-
 
     verifyMocks();
     verifyTestResultActions();

@@ -122,9 +122,15 @@ public class BuildData {
       failedTestsWithErrorDetail = new ArrayList<ExecutedTest>();
       testListFill((List<TestResult>) testResultAction.getFailedTests(), failedTests, failedTestsWithErrorDetail);
 
-      passedTests = new ArrayList<String>();
-      passedTestsWithErrorDetail = new ArrayList<ExecutedTest>();
-      testListFill((List<TestResult>) testResultAction.getPassedTests(), passedTests, passedTestsWithErrorDetail);
+      LogstashConfiguration configuration = LogstashConfiguration.getInstance();
+      if (configuration.isrecordingPassingTests()) {
+          passedTests = new ArrayList<String>();
+          passedTestsWithErrorDetail = new ArrayList<ExecutedTest>();
+          testListFill((List<TestResult>) testResultAction.getPassedTests(), passedTests, passedTestsWithErrorDetail);
+      } else {
+        passedTests = Collections.emptyList();
+        passedTestsWithErrorDetail = Collections.emptyList();
+      }
     }
 
     private void testListFill(List<TestResult> testResults, List<String> testNames, List<ExecutedTest> testDetails) {
