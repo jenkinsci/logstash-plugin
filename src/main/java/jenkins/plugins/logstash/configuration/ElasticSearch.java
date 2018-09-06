@@ -1,5 +1,6 @@
 package jenkins.plugins.logstash.configuration;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,24 +8,52 @@ import java.net.URL;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import java.security.cert.CertificateException;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardCertificateCredentials;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import hudson.Extension;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
+import hudson.model.Item;
+import hudson.security.ACL;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.Messages;
 import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 
 public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
 {
+  private static final Logger LOGGER = Logger.getLogger(ElasticSearch.class.getName());
+
   private String username;
   private Secret password;
   private URI uri;
   private String mimeType;
+  private String customServerCertificateId;
 
   @DataBoundConstructor
   public ElasticSearch()
@@ -76,16 +105,27 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   {
     this.password = Secret.fromString(password);
   }
-  
+
   @DataBoundSetter
   public void setMimeType(String mimeType) {
     this.mimeType = mimeType;
   }
-  
+
   public String getMimeType() {
     return mimeType;
   }
-  
+
+  @DataBoundSetter
+  public void setCustomServerCertificateId(String customServerCertificateId)
+  {
+    this.customServerCertificateId = customServerCertificateId;
+  }
+
+  public String getCustomServerCertificateId()
+  {
+    return customServerCertificateId;
+  }
+
   @Override
   public boolean equals(Object obj)
   {
@@ -122,6 +162,16 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     {
       return false;
     }
+
+    if (this.customServerCertificateId == null)
+    {
+      if (other.customServerCertificateId != null)
+        return false;
+    }
+    else if (!this.customServerCertificateId.equals(other.customServerCertificateId))
+    {
+      return false;
+    }
     return true;
   }
 
@@ -140,8 +190,39 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   public ElasticSearchDao createIndexerInstance()
   {
     ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password));
+
     esDao.setMimeType(getMimeType());
+    try {
+        esDao.setCustomKeyStore(getCustomKeyStore());
+    } catch (KeyStoreException | CertificateException |
+             NoSuchAlgorithmException | KeyManagementException | IOException e) {
+          LOGGER.log(Level.WARNING, e.getMessage(), e);
+    }
     return esDao;
+  }
+
+  private KeyStore getCustomKeyStore() {
+    KeyStore customKeyStore = null;
+
+    // Fetch custom alias+certificate as a keystore (if present)
+    if (!StringUtils.isBlank(customServerCertificateId)) {
+      StandardCertificateCredentials certificateCredentials = getCredentials(customServerCertificateId);
+      if (certificateCredentials != null) {
+        // Fetch keystore containing custom certificate
+        customKeyStore = certificateCredentials.getKeyStore();
+      }
+    }
+
+    return customKeyStore;
+  }
+
+  private StandardCertificateCredentials getCredentials(String credentials)
+  {
+    return (StandardCertificateCredentials) CredentialsMatchers.firstOrNull(
+        CredentialsProvider.lookupCredentials(StandardCredentials.class,
+            Jenkins.getInstance(), ACL.SYSTEM, Collections.<DomainRequirement>emptyList()),
+        CredentialsMatchers.withId(credentials)
+    );
   }
 
   @Extension
@@ -157,6 +238,23 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     public int getDefaultPort()
     {
       return 0;
+    }
+
+    public ListBoxModel doFillCustomServerCertificateIdItems(
+        @AncestorInPath Item item,
+        @QueryParameter String customServerCertificateId)
+    {
+      return new StandardListBoxModel().withEmptySelection()
+          .withMatching( //
+              CredentialsMatchers.anyOf(
+                  CredentialsMatchers.instanceOf(StandardCertificateCredentials.class)
+              ),
+              CredentialsProvider.lookupCredentials(StandardCredentials.class,
+                  Jenkins.getInstance(),
+                  ACL.SYSTEM,
+                  Collections.EMPTY_LIST
+              )
+          );
     }
 
     public FormValidation doCheckUrl(@QueryParameter("value") String value)

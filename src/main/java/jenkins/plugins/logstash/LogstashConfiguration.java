@@ -238,7 +238,19 @@ public class LogstashConfiguration extends GlobalConfiguration
   public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException
   {
 
+    // When not enabling the plugin we just save the enabled state
+    // without binding the JSON and then return. This avoids problems with missing configuration
+    // like URLs which can't be parsed when empty, which would lead to errors in the UI.
+    Boolean e = json.getBoolean("enabled");
+    if (!e)
+    {
+      enabled = false;
+      save();
+      return true;
+    }
+    
     configuring = true;
+
     // when we bind the stapler request we get a new instance of logstashIndexer.
     // logstashIndexer is holder for the dao instance.
     // To avoid that we get a new dao instance in case there was no change in configuration
