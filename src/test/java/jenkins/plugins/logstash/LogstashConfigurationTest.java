@@ -6,6 +6,9 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -21,6 +24,8 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import jenkins.plugins.logstash.configuration.ElasticSearch;
+import jenkins.plugins.logstash.configuration.LogstashIndexer;
 import jenkins.plugins.logstash.configuration.RabbitMq;
 import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 import jenkins.plugins.logstash.persistence.RabbitMqDao;
@@ -107,5 +112,16 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     HtmlPage p = j.createWebClient().goTo("configure");
     HtmlForm f = p.getFormByName("config");
     j.submit(f);
+  }
+
+  @Test
+  public void programmaticConfigurationChangesActiveIndexer() throws Exception
+  {
+    LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq.xml");
+    LogstashConfiguration configuration = new LogstashConfigurationForTest();
+    ElasticSearch es = new ElasticSearch();
+    es.setUri(new URL("http://localhost/key"));
+    configuration.setLogstashIndexer(es);
+    assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(ElasticSearchDao.class));
   }
 }
