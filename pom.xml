@@ -1,21 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  
-  <properties>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <skipIntegrationTests>true</skipIntegrationTests>
-    <jenkins-test-harness.version>2.23</jenkins-test-harness.version>
-    <java.level>8</java.level>
-    <jenkins.version>2.60.3</jenkins.version>
-    <jenkins-credentials.version>2.1.11</jenkins-credentials.version>
-  </properties>
-  
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
     <version>3.15</version>
   </parent>
+  
+  <properties>
+    <java.level>8</java.level>
+    <jenkins.version>2.60.3</jenkins.version>
+  </properties>
 
   <repositories>
     <repository>
@@ -38,19 +33,6 @@
     <tag>HEAD</tag>
   </scm>
 
-  <distributionManagement>
-    <repository>
-      <id>maven.jenkins-ci.org</id>
-      <name>jenkinsci-releases</name>
-      <url>https://repo.jenkins-ci.org/releases</url>
-    </repository>
-    <snapshotRepository>
-      <id>maven.jenkins-ci.org</id>
-      <name>jenkinsci-snapshots</name>
-      <url>https://repo.jenkins-ci.org/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
-
   <artifactId>logstash</artifactId>
   <packaging>hpi</packaging>
   <version>2.3.1-SNAPSHOT</version>
@@ -60,9 +42,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.4</version>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>apache-httpcomponents-client-4-api</artifactId>
+      <version>4.5.3-2.1</version>
     </dependency>
 
     <dependency>
@@ -137,7 +119,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials</artifactId>
-      <version>${jenkins-credentials.version}</version>
+      <version>2.1.11</version>
     </dependency>
     <dependency>
     	<groupId>org.powermock</groupId>
@@ -235,15 +217,6 @@
         </dependencies>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-
       <!-- http://jira.codehaus.org/browse/MRELEASE-812 -->
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
@@ -259,17 +232,6 @@
             <version>1.9.1</version>
           </dependency>
         </dependencies>
-      </plugin>
-
-      <!-- https://issues.jenkins-ci.org/browse/JENKINS-21977 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>InjectedTest.java</exclude>
-          </excludes>
-        </configuration>
       </plugin>
  
       <plugin>

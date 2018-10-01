@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <div>
   Adds the possibility to push builds logs and build data to a Logstash indexer such as Redis, RabbitMQ, Elastic Search or to Syslog.
 </div>

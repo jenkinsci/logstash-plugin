@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import net.sf.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.awaitility.Awaitility.*;
@@ -36,6 +37,7 @@ public class SyslogDaoTestIT{
 
   // Send a real Syslog message to Logstash.
   @Test
+  @Ignore
   public void syslogSendRFC3164UDP() throws Exception {
 
 	PrintWriter writer = null;

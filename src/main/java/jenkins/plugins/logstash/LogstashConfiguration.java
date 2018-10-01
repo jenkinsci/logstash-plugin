@@ -148,9 +148,10 @@ public class LogstashConfiguration extends GlobalConfiguration
 
   @SuppressWarnings("deprecation")
   @Initializer(after = InitMilestone.JOB_LOADED)
-  public void migrateData()
+  public static void migrateData()
   {
-    if (!dataMigrated)
+    LogstashConfiguration c = LogstashConfiguration.getInstance();
+    if (!c.dataMigrated)
     {
       Descriptor descriptor = LogstashInstallation.getLogstashDescriptor();
       if (descriptor.getType() != null)
@@ -165,8 +166,8 @@ public class LogstashConfiguration extends GlobalConfiguration
             redis.setPort(descriptor.getPort());
             redis.setKey(descriptor.getKey());
             redis.setPassword(descriptor.getPassword());
-            logstashIndexer = redis;
-            enabled = true;
+            c.logstashIndexer = redis;
+            c.enabled = true;
             break;
           case ELASTICSEARCH:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search");
@@ -180,8 +181,8 @@ public class LogstashConfiguration extends GlobalConfiguration
               es.setUri(uri);
               es.setUsername(descriptor.getUsername());
               es.setPassword(descriptor.getPassword());
-              logstashIndexer = es;
-              enabled = true;
+              c.logstashIndexer = es;
+              c.enabled = true;
             }
             catch (URISyntaxException e)
             {
@@ -197,8 +198,8 @@ public class LogstashConfiguration extends GlobalConfiguration
             rabbitMq.setQueue(descriptor.getKey());
             rabbitMq.setUsername(descriptor.getUsername());
             rabbitMq.setPassword(descriptor.getPassword());
-            logstashIndexer = rabbitMq;
-            enabled = true;
+            c.logstashIndexer = rabbitMq;
+            c.enabled = true;
             break;
           case SYSLOG:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for  SYSLOG");
@@ -218,19 +219,20 @@ public class LogstashConfiguration extends GlobalConfiguration
                 syslog.setMessageFormat(MessageFormat.RFC_3164);
                 break;
             }
-            logstashIndexer = syslog;
-            enabled = true;
+            c.logstashIndexer = syslog;
+            c.enabled = true;
             break;
           default:
             LOGGER.log(Level.INFO, "unknown logstash Indexer type: " + type);
-            enabled = false;
+            c.enabled = false;
             break;
         }
-        milliSecondTimestamps = false;
-        activeIndexer = logstashIndexer;
+        c.activeIndexer = c.logstashIndexer;
+        c.milliSecondTimestamps = false;
+        c.activeIndexer = logstashIndexer;
       }
-      dataMigrated = true;
-      save();
+      c.dataMigrated = true;
+      c.save();
     }
   }
 
