@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash;
 
 import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.object.HasToString.hasToString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
@@ -15,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.InOrder;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SuppressWarnings("resource")
@@ -121,5 +123,18 @@ public class LogstashOutputStreamTest {
     // Verify results
     assertEquals("Results don't match", msg, buffer.toString());
     verify(mockWriter).isConnectionBroken();
+  }
+
+  @Test
+  public void writerClosedBeforeDelegate() throws Exception {
+    ByteArrayOutputStream mockBuffer = Mockito.spy(buffer);
+    new LogstashOutputStream(mockBuffer, mockWriter).close();
+
+    InOrder inOrder = Mockito.inOrder(mockBuffer, mockWriter);
+    inOrder.verify(mockWriter).close();
+    inOrder.verify(mockBuffer).close();
+
+    // Verify results
+    assertThat(buffer, hasToString(""));
   }
 }
