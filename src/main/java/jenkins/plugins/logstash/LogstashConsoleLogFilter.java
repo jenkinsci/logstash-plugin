@@ -19,7 +19,7 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
   private static Logger LOGGER = Logger.getLogger(LogstashConsoleLogFilter.class.getName());
 
   private transient Run<?, ?> run;
-  public LogstashConsoleLogFilter() {};
+  public LogstashConsoleLogFilter() {}
 
   public LogstashConsoleLogFilter(Run<?, ?> run)
   {
