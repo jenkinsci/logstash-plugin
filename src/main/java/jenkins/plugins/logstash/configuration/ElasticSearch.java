@@ -248,7 +248,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
               CredentialsProvider.lookupCredentials(StandardCredentials.class,
                   Jenkins.getInstance(),
                   ACL.SYSTEM,
-                  Collections.EMPTY_LIST
+                  Collections.emptyList()
               )
           );
     }
