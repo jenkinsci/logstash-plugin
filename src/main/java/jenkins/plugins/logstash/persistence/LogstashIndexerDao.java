@@ -55,7 +55,7 @@ public interface LogstashIndexerDao {
 	UDP
   }
 
-  public String getDescription();
+  String getDescription();
 
   /**
    * Sends the log data to the Logstash indexer.
@@ -65,7 +65,7 @@ public interface LogstashIndexerDao {
    * @throws java.io.IOException
    *          The data is not written to the server
    */
-  public void push(String data) throws IOException;
+  void push(String data) throws IOException;
 
   /**
    * Builds a JSON payload compatible with the Logstash schema.
@@ -78,5 +78,5 @@ public interface LogstashIndexerDao {
    *          The log data to transmit, not null
    * @return The formatted JSON object, never null
    */
-  public JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines);
+  JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines);
 }
