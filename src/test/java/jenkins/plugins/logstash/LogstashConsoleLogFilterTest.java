@@ -28,16 +28,16 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"javax.crypto.*"})
 @PrepareForTest(LogstashConfiguration.class)
-public class LogstashConsoloLogFilterTest {
+public class LogstashConsoleLogFilterTest {
 
   @Mock
   private LogstashConfiguration logstashConfiguration;
 
   // Extension of the unit under test that avoids making calls to statics or constructors
-  static class MockLogstashConsoloeLogFilter extends LogstashConsoleLogFilter {
+  static class MockLogstashConsoleLogFilter extends LogstashConsoleLogFilter {
     LogstashWriter writer;
 
-    MockLogstashConsoloeLogFilter(LogstashWriter writer) {
+    MockLogstashConsoleLogFilter(LogstashWriter writer) {
       super();
       this.writer = writer;
     }
@@ -85,7 +85,7 @@ public class LogstashConsoloLogFilterTest {
 
   @Test
   public void decorateLoggerSuccess() throws Exception {
-    MockLogstashConsoloeLogFilter consoleLogFilter = new MockLogstashConsoloeLogFilter(mockWriter);
+    MockLogstashConsoleLogFilter consoleLogFilter = new MockLogstashConsoleLogFilter(mockWriter);
 
     // Unit under test
     OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
@@ -102,7 +102,7 @@ public class LogstashConsoloLogFilterTest {
   public void decorateLoggerSuccessLogstashNotEnabled() throws Exception {
     when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(null);
 
-    MockLogstashConsoloeLogFilter consoleLogFilter = new MockLogstashConsoloeLogFilter(mockWriter);
+    MockLogstashConsoleLogFilter consoleLogFilter = new MockLogstashConsoleLogFilter(mockWriter);
 
     // Unit under test
     OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
@@ -117,7 +117,7 @@ public class LogstashConsoloLogFilterTest {
   public void decorateLoggerSuccessBadWriter() throws Exception {
     when(mockWriter.isConnectionBroken()).thenReturn(true);
 
-    MockLogstashConsoloeLogFilter consoleLogFilter = new MockLogstashConsoloeLogFilter(mockWriter);
+    MockLogstashConsoleLogFilter consoleLogFilter = new MockLogstashConsoleLogFilter(mockWriter);
 
     // Unit under test
     OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
@@ -134,7 +134,7 @@ public class LogstashConsoloLogFilterTest {
   public void decorateLoggerSuccessEnabledGlobally() throws IOException, InterruptedException
   {
     when(logstashConfiguration.isEnableGlobally()).thenReturn(true);
-    MockLogstashConsoloeLogFilter buildWrapper = new MockLogstashConsoloeLogFilter(mockWriter);
+    MockLogstashConsoleLogFilter buildWrapper = new MockLogstashConsoleLogFilter(mockWriter);
 
     // Unit under test
     OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);

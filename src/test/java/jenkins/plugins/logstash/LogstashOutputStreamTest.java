@@ -82,7 +82,7 @@ public class LogstashOutputStreamTest {
     // Verify results
     assertEquals("Results don't match", msg, buffer.toString());
 
-    // Break the dao connnection after this write
+    // Break the dao connection after this write
     buffer.reset();
 
     // Unit under test

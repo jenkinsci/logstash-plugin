@@ -169,7 +169,7 @@ public class BuildDataTest {
     verify(mockTestResultAction, times(1)).getFailedTests();
   }
 
-  private void verifiyNodeActions(int labelCount) {
+  private void verifyNodeActions(int labelCount) {
       verify(mockComputer).getNode();
       verify(mockNode, times(2)).getDisplayName();
       verify(mockNode, times(labelCount)).getLabelString();
@@ -212,7 +212,7 @@ public class BuildDataTest {
 
     verifyMocks();
     verifyTestResultActions();
-    verifiyNodeActions(1);
+    verifyNodeActions(1);
   }
 
   @Test
@@ -234,7 +234,7 @@ public class BuildDataTest {
 
     verifyMocks();
     verifyTestResultActions();
-    verifiyNodeActions(2);
+    verifyNodeActions(2);
   }
 
   @Test
@@ -318,7 +318,7 @@ public class BuildDataTest {
 
     verifyMocks();
     verifyTestResultActions();
-    verifiyNodeActions(1);
+    verifyNodeActions(1);
   }
 
   @Test // JENKINS-41324
@@ -356,7 +356,7 @@ public class BuildDataTest {
 
     verifyMocks();
     verifyTestResultActions();
-    verifiyNodeActions(1);
+    verifyNodeActions(1);
   }
 
   @Test

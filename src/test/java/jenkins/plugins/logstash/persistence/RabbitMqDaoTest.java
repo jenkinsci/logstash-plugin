@@ -214,7 +214,7 @@ public class RabbitMqDaoTest {
   }
 
   @Test
-  public void pushSuccesBuildQueue() throws Exception {
+  public void pushSuccessBuildQueue() throws Exception {
     String json = "{ 'foo': 'bar' }";
 
     when(mockChannel.queueDeclarePassive("logstash")).thenThrow(new IOException("Queue does not exist"));

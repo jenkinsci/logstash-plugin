@@ -293,7 +293,7 @@ public class LogstashWriterTest {
     // Verify results
     assertEquals("Results don't match", "", errorBuffer.toString());
 
-    // Break the dao connnection
+    // Break the dao connection
     errorBuffer.reset();
 
     // Unit under test
