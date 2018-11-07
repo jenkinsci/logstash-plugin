@@ -38,7 +38,7 @@ import net.sf.json.JSONObject;
  */
 public interface LogstashIndexerDao {
   @Deprecated
-  static enum IndexerType {
+  enum IndexerType {
     REDIS,
     RABBIT_MQ,
     ELASTICSEARCH,
@@ -46,12 +46,12 @@ public interface LogstashIndexerDao {
   }
 
   @Deprecated
-  static enum SyslogFormat {
+  enum SyslogFormat {
 	RFC5424,
 	RFC3164
   }
 
-  static enum SyslogProtocol {
+  enum SyslogProtocol {
 	UDP
   }
 
