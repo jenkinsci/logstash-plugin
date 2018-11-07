@@ -22,14 +22,8 @@
 
 package jenkins.plugins.logstash.persistence;
 
-import java.nio.charset.Charset;
-import java.util.Calendar;
-import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-
-import jenkins.plugins.logstash.LogstashConfiguration;
-import net.sf.json.JSONObject;
 
 /**
  * Abstract data access object for Logstash indexers.
@@ -48,27 +42,11 @@ public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexe
     }
   }
 
-  @Override
-  public JSONObject buildPayload(BuildData buildData, String jenkinsUrl, List<String> logLines) {
-    JSONObject payload = new JSONObject();
-    payload.put("data", buildData.toJson());
-    payload.put("message", logLines);
-    payload.put("source", "jenkins");
-    payload.put("source_host", jenkinsUrl);
-    payload.put("@buildTimestamp", buildData.getTimestamp());
-    payload.put("@timestamp", LogstashConfiguration.getInstance().getDateFormatter().format(Calendar.getInstance().getTime()));
-    payload.put("@version", 1);
-
-    return payload;
-  }
-
-  public String getHost()
-  {
+  public String getHost() {
     return host;
   }
 
-  public int getPort()
-  {
+  public int getPort() {
     return port;
   }
 
