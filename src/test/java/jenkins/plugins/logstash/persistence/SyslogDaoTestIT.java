@@ -37,20 +37,10 @@ public class SyslogDaoTestIT{
   // Send a real Syslog message to Logstash.
   @Test
   public void syslogSendRFC3164UDP() throws Exception {
-
-	PrintWriter writer = null;
-
     // Clean up the the logstash log file
-    try {
-      writer = new PrintWriter(logfile);
-    }
-    catch (FileNotFoundException e) {
+    try (PrintWriter writer = new PrintWriter(logfile)) {
+    } catch (FileNotFoundException e) {
       fail("Unable to clean up the logstash log file: " + e.getMessage());
-    }
-    finally {
-      if (writer != null) {
-        writer.close();
-      }
     }
 
     // Send the syslog message

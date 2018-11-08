@@ -183,23 +183,11 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   @Override
   public void push(String data) throws IOException {
-    CloseableHttpClient httpClient = null;
-    CloseableHttpResponse response = null;
     HttpPost post = getHttpPost(data);
 
-    try {
-      httpClient = clientBuilder.build();
-      response = httpClient.execute(post);
-
+    try (CloseableHttpClient httpClient = clientBuilder.build(); CloseableHttpResponse response = httpClient.execute(post)) {
       if (!successCodes.contains(response.getStatusLine().getStatusCode())) {
         throw new IOException(this.getErrorMessage(response));
-      }
-    } finally {
-      if (response != null) {
-        response.close();
-      }
-      if (httpClient != null) {
-        httpClient.close();
       }
     }
   }

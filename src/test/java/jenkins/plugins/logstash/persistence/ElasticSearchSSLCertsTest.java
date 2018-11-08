@@ -167,11 +167,8 @@ public class ElasticSearchSSLCertsTest {
         KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
             final KeyStore store = KeyStore.getInstance(JAVA_KEYSTORE);
             URL url = getClass().getClassLoader().getResource(storeFileName);
-            InputStream inputStream = url.openStream();
-            try {
+            try (InputStream inputStream = url.openStream()) {
                 store.load(inputStream, password);
-            } finally {
-                inputStream.close();
             }
 
             return store;
