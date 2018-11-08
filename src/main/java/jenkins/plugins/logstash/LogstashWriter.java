@@ -78,8 +78,9 @@ public class LogstashWriter {
   }
 
   /**
-   * gets the charset that Jenkins is using during this build.
-   * @return
+   * Gets the charset that Jenkins is using during this build.
+   *
+   * @return the charset
    */
   public Charset getCharset()
   {

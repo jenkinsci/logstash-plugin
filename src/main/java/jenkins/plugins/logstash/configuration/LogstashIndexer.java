@@ -51,7 +51,7 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    * Purpose of this method is to validate the inputs (if required) and if found
    * erroneous throw an exception so that it will be bubbled up to the UI.
    *
-   * @throws Exception
+   * @throws Exception on erroneous input
    */
   public void validate() throws Exception {
   }
