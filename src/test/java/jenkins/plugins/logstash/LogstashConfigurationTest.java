@@ -91,7 +91,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.isMilliSecondTimestamps(),equalTo(true));
     FastDateFormat formatter = configuration.getDateFormatter();
-    assertThat(formatter.format(new Date(118,02,10,22,22)), matchesPattern("2018-03-10T22:22:00.000[+-]\\d{4}"));
+    assertThat(formatter.format(new Date(118,2,10,22,22)), matchesPattern("2018-03-10T22:22:00.000[+-]\\d{4}"));
   }
 
   /**
