@@ -37,8 +37,8 @@
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/logstash-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/logstash-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/logstash-plugin</url>
     <tag>HEAD</tag>
+    <url>https://github.com/jenkinsci/logstash-plugin</url>
   </scm>
   <distributionManagement>
     <repository>
