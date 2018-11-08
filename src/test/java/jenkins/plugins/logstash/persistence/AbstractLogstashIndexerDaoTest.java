@@ -46,7 +46,7 @@ public class AbstractLogstashIndexerDaoTest {
     AbstractLogstashIndexerDao dao = getInstance();
 
     // Unit under test
-    JSONObject result = dao.buildPayload(mockBuildData, "http://localhost:8080/jenkins", new ArrayList<String>());
+    JSONObject result = dao.buildPayload(mockBuildData, "http://localhost:8080/jenkins", new ArrayList<>());
     result.remove("@timestamp");
 
     // Verify results
