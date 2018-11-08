@@ -128,21 +128,18 @@ public class ElasticSearchSSLCertsTest {
         }
     }
 
-    protected HttpServer createLocalTestServer(SSLContext sslContext)
-            throws UnknownHostException {
-            final HttpServer server = ServerBootstrap.bootstrap()
-                .setLocalAddress(Inet4Address.getByName("localhost"))
-                .setSslContext(sslContext)
-                .registerHandler("*", new HttpRequestHandler(){
-                        @Override
-                        public void handle(final HttpRequest request, final HttpResponse response, final HttpContext context)
-                            throws HttpException, IOException {
-                            response.setStatusCode(HttpStatus.SC_OK);
-                        }
-                    })
-                .create();
-
-            return server;
+    protected HttpServer createLocalTestServer(SSLContext sslContext) throws UnknownHostException {
+        return ServerBootstrap.bootstrap()
+            .setLocalAddress(Inet4Address.getByName("localhost"))
+            .setSslContext(sslContext)
+            .registerHandler("*", new HttpRequestHandler(){
+                    @Override
+                    public void handle(final HttpRequest request, final HttpResponse response, final HttpContext context)
+                        throws HttpException, IOException {
+                        response.setStatusCode(HttpStatus.SC_OK);
+                    }
+                })
+            .create();
     }
 
     protected String getBaseUrl(HttpServer server) {

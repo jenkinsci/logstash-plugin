@@ -17,8 +17,7 @@ public class LogstashDaoTest {
   LogstashDao dao;
 
   LogstashDao createDao(String host, int port) {
-    LogstashDao factory = new LogstashDao(host, port);
-    return factory;
+    return new LogstashDao(host, port);
   }
 
   @Test
