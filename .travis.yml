@@ -7,6 +7,7 @@ env:
     - LOGSTASH_PIPELINE_DIR="src/test/resources/logstash/pipeline"
     - LOGSTASH_LOGS_DIR="target/logs"
     - LOGSTASH_LOGFILE="syslog-test.log"
+    - JENKINS_SERVER_COOKIE="true"
 
 sudo: required
 
