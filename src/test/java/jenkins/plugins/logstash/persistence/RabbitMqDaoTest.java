@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang.StringUtils;

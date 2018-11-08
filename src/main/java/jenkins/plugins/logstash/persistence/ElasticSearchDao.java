@@ -35,7 +35,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.client.utils.URIBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,9 +42,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -56,7 +53,6 @@ import java.security.cert.CertificateException;
 import com.google.common.collect.Range;
 
 import jenkins.plugins.logstash.utils.SSLHelper;
-import jenkins.plugins.logstash.configuration.ElasticSearch;
 
 
 /**

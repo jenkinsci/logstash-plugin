@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 
 import javax.annotation.CheckForNull;
 
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.syslog.MessageFormat;
