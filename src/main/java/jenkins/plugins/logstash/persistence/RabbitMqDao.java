@@ -45,11 +45,11 @@ import com.rabbitmq.client.ConnectionFactory;
 public class RabbitMqDao extends HostBasedLogstashIndexerDao {
   private final ConnectionFactory pool;
 
-  private String queue;
-  private String username;
-  private String password;
-  private Charset charset;
-  private String virtualHost;
+  private final String queue;
+  private final String username;
+  private final String password;
+  private final Charset charset;
+  private final String virtualHost;
 
 
   //primary constructor used by indexer factory

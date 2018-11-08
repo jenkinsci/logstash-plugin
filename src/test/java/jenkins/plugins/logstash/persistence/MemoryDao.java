@@ -9,7 +9,7 @@ import net.sf.json.JSONObject;
 
 public class MemoryDao extends AbstractLogstashIndexerDao
 {
-    List<JSONObject> output = new ArrayList<>();
+    final List<JSONObject> output = new ArrayList<>();
 
     public MemoryDao()
     {

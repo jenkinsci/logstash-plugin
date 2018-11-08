@@ -4,7 +4,7 @@ import jenkins.plugins.logstash.persistence.MemoryDao;
 
 public class MemoryIndexer extends LogstashIndexer<MemoryDao>
 {
-  MemoryDao dao;
+  final MemoryDao dao;
 
   public MemoryIndexer(MemoryDao dao)
   {

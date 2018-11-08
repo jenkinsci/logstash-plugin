@@ -19,7 +19,7 @@ import jenkins.model.Jenkins;
 public class LogstashItemListener extends ItemListener
 {
 
-  private static Logger LOGGER = Logger.getLogger(LogstashItemListener.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(LogstashItemListener.class.getName());
 
   @Override
   public void onCreated(Item item)

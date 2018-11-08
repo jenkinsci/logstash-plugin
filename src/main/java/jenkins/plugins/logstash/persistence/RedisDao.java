@@ -43,8 +43,8 @@ import redis.clients.jedis.exceptions.JedisException;
 public class RedisDao extends HostBasedLogstashIndexerDao {
   private final JedisPool pool;
 
-  private String password;
-  private String key;
+  private final String password;
+  private final String key;
 
   //primary constructor used by indexer factory
   public RedisDao(String host, int port, String key, String password) {

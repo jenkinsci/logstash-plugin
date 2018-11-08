@@ -66,9 +66,9 @@ public class BuildData {
   // ISO 8601 date format
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
-    private int totalCount, skipCount, failCount, passCount;
-    private List<FailedTest> failedTestsWithErrorDetail;
-    private List<String> failedTests;
+    private final int totalCount, skipCount, failCount, passCount;
+    private final List<FailedTest> failedTestsWithErrorDetail;
+    private final List<String> failedTests;
 
     public static class FailedTest {
       private final String fullName, errorDetails;
@@ -100,7 +100,7 @@ public class BuildData {
       }
 
       if (testResultAction == null) {
-        totalCount = skipCount = failCount = 0;
+        totalCount = skipCount = failCount = passCount = 0;
         failedTests = Collections.emptyList();
         failedTestsWithErrorDetail = Collections.emptyList();
         return;

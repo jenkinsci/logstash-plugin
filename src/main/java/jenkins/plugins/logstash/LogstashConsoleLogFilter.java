@@ -16,7 +16,7 @@ import hudson.model.Run;
 public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serializable
 {
 
-  private static Logger LOGGER = Logger.getLogger(LogstashConsoleLogFilter.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(LogstashConsoleLogFilter.class.getName());
 
   private transient Run<?, ?> run;
   public LogstashConsoleLogFilter() {}
