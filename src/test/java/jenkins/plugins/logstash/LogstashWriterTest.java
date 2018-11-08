@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -133,7 +133,7 @@ public class LogstashWriterTest {
     when(mockProject.getName()).thenReturn("LogstashWriterTest");
     when(mockProject.getFullName()).thenReturn("parent/LogstashWriterTest");
 
-    when(mockDao.buildPayload(any(BuildData.class), anyString(), anyListOf(String.class)))
+    when(mockDao.buildPayload(any(BuildData.class), anyString(), anyList()))
       .thenReturn(JSONObject.fromObject("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}"));
 
     Mockito.doNothing().when(mockDao).push(anyString());
@@ -249,7 +249,7 @@ public class LogstashWriterTest {
     // No error output
     assertEquals("Results don't match", "", errorBuffer.toString());
 
-    verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
+    verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyList());
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockBuild).getCharset();
     verify(mockBuildData).updateResult();
@@ -269,7 +269,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getLog(3);
     verify(mockBuild).getCharset();
 
-    verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
+    verify(mockDao).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyList());
     verify(mockDao).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockBuildData).updateResult();
   }
@@ -312,7 +312,7 @@ public class LogstashWriterTest {
     assertEquals("Results don't match", "", errorBuffer.toString());
 
     //Verify calls were made to the dao logging twice, not three times.
-    verify(mockDao, times(2)).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyListOf(String.class));
+    verify(mockDao, times(2)).buildPayload(eq(mockBuildData), eq("http://my-jenkins-url"), anyList());
     verify(mockDao, times(2)).push("{\"data\":{},\"message\":[\"test\"],\"source\":\"jenkins\",\"source_host\":\"http://my-jenkins-url\",\"@version\":1}");
     verify(mockDao, times(2)).getDescription();
     verify(mockBuild).getCharset();
