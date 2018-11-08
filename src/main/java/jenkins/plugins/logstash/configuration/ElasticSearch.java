@@ -17,7 +17,6 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCertificateCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -216,7 +215,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   {
     return (StandardCertificateCredentials) CredentialsMatchers.firstOrNull(
         CredentialsProvider.lookupCredentials(StandardCredentials.class,
-            Jenkins.getInstance(), ACL.SYSTEM, Collections.<DomainRequirement>emptyList()),
+            Jenkins.getInstance(), ACL.SYSTEM, Collections.emptyList()),
         CredentialsMatchers.withId(credentials)
     );
   }

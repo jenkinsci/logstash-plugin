@@ -301,7 +301,7 @@ public class BuildDataTest {
         output.put(sensitiveVarKey, "privateKey");
         return null;
       }
-    }).when(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
+    }).when(mockEnvironment).buildEnvVars(Matchers.any());
     when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars(buildVarKey, buildVarVal));
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(new HashSet<>(Arrays.asList(sensitiveVarKey)));
 
@@ -314,7 +314,7 @@ public class BuildDataTest {
     Assert.assertEquals("Missing environment variable '" + buildVarKey + "'", buildVarVal, buildData.getBuildVariables().get(buildVarKey));
     Assert.assertNull("Found sensitive environment variable '" + sensitiveVarKey + "'", buildData.getBuildVariables().get(sensitiveVarKey));
 
-    verify(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
+    verify(mockEnvironment).buildEnvVars(Matchers.any());
 
     verifyMocks();
     verifyTestResultActions();
@@ -342,7 +342,7 @@ public class BuildDataTest {
         output.put(varKey, envVarVal);
         return null;
       }
-    }).when(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
+    }).when(mockEnvironment).buildEnvVars(Matchers.any());
     when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars(varKey, buildVarVal));
 
     // Unit under test
@@ -352,7 +352,7 @@ public class BuildDataTest {
     Assert.assertEquals("Wrong number of environment variables", 1, buildData.getBuildVariables().size());
     Assert.assertEquals("Missing environment variable '" + varKey + "'", buildVarVal, buildData.getBuildVariables().get(varKey));
 
-    verify(mockEnvironment).buildEnvVars(Matchers.<Map<String, String>>any());
+    verify(mockEnvironment).buildEnvVars(Matchers.any());
 
     verifyMocks();
     verifyTestResultActions();
