@@ -46,6 +46,7 @@ import java.util.logging.Logger;
 import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.jenkinsci.Symbol;
 
@@ -61,11 +62,24 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   private final int maxLines;
   private final boolean failBuild;
+  private boolean runNotifierAtEnd;
 
   @DataBoundConstructor
   public LogstashNotifier(int maxLines, boolean failBuild) {
     this.maxLines = maxLines;
     this.failBuild = failBuild;
+
+  }
+
+  public boolean isRunNotifierAtEnd()
+  {
+    return runNotifierAtEnd;
+  }
+
+  @DataBoundSetter
+  public void setRunNotifierAtEnd(boolean runNotifierAtEnd)
+  {
+    this.runNotifierAtEnd = runNotifierAtEnd;
   }
 
   public int getMaxLines()
@@ -99,12 +113,43 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
       return true;
     }
 
+    // globally enabled and active. No need to send the data another time.
+    LogstashMarkerAction markerAction = getLogstashMarkerAction(run);
+    if (markerAction != null && markerAction.isLineModeEnabled())
+    {
+      listener.getLogger().println("LogstashNotifier ignored. The data is already sent line by line.");
+      return true;
+    }
+
+    if (runNotifierAtEnd)
+    {
+      markerAction.setRunNotifierAtEnd(true);
+      markerAction.setMaxLines(maxLines);
+      return true;
+    }
+
     PrintStream errorPrintStream = listener.getLogger();
     LogstashWriter logstash = getLogStashWriter(run, errorPrintStream, listener);
     logstash.writeBuildLog(maxLines);
     return !(failBuild && logstash.isConnectionBroken());
   }
 
+  /**
+   * Returns the LogstashMarkerAction of this build.
+   * @param run The {@link Run} to get the action from.
+   * @return LogstashMarkerAction, never {@code null}
+   */
+  private synchronized LogstashMarkerAction getLogstashMarkerAction(Run<?, ?> run)
+  {
+    LogstashMarkerAction markerAction = run.getAction(LogstashMarkerAction.class);
+    if (markerAction == null)
+    {
+      markerAction = new LogstashMarkerAction();
+      run.addAction(markerAction);
+    }
+
+    return markerAction;
+  }
   // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(Run<?, ?> run, OutputStream errorStream, TaskListener listener) {
     return new LogstashWriter(run, errorStream, listener, run.getCharset());

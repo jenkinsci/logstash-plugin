@@ -1,0 +1,16 @@
+<div>
+Allows to enable the upload globally for all jobs. If jobs explicitly configure uploading this will overwrite the settings defined here.<br/>
+E.g. you enable the notifier mode globally, a project defines the line mode, the logs will be uploaded in line mode only.
+<ul>
+ <li>OFF:<br/>
+  Do not send log for each build.</li>
+  <li>Line Mode:<br/>
+  Enable sending an event for each log line. This will not enable it for pipeline jobs.
+  </li>
+  <li>
+  Notifier Mode:<br/>
+  Enable sending the log at the end of the build in a single event.<br/>
+  This will never fail the build even when uploading fails.
+  </li>
+</ul>
+</div>

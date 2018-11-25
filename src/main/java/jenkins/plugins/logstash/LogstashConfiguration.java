@@ -39,9 +39,11 @@ public class LogstashConfiguration extends GlobalConfiguration
   private LogstashIndexer<?> logstashIndexer;
   private Boolean enabled;
   private boolean dataMigrated = false;
-  private boolean enableGlobally = false;
+  private transient boolean enableGlobally = false;
   private boolean milliSecondTimestamps = true;
   private transient LogstashIndexer<?> activeIndexer;
+  private GloballyEnabledMode globalMode;
+  private int maxLines = 1000;
 
   // a flag indicating if we're currently in the configure method.
   private transient boolean configuring = false;
@@ -63,6 +65,26 @@ public class LogstashConfiguration extends GlobalConfiguration
     activeIndexer = logstashIndexer;
   }
 
+  public int getMaxLines()
+  {
+    return maxLines;
+  }
+
+  public void setMaxLines(int maxLines)
+  {
+    this.maxLines = maxLines;
+  }
+
+  public GloballyEnabledMode getGlobalMode()
+  {
+    return globalMode;
+  }
+
+  public void setGlobalMode(GloballyEnabledMode globalMode)
+  {
+    this.globalMode = globalMode;
+  }
+
   public boolean isEnabled()
   {
     return enabled == null ? false: enabled;
@@ -73,14 +95,23 @@ public class LogstashConfiguration extends GlobalConfiguration
     this.enabled = enabled;
   }
 
+  @Deprecated
   public boolean isEnableGlobally()
   {
-    return enableGlobally;
+    return Objects.equals(globalMode, GloballyEnabledMode.LINEMODE);
   }
 
+  @Deprecated
   public void setEnableGlobally(boolean enableGlobally)
   {
-    this.enableGlobally = enableGlobally;
+    if (enableGlobally)
+    {
+      globalMode = GloballyEnabledMode.LINEMODE;
+    }
+    else
+    {
+      globalMode = GloballyEnabledMode.OFF;
+    }
   }
 
   public boolean isMilliSecondTimestamps()
@@ -230,6 +261,17 @@ public class LogstashConfiguration extends GlobalConfiguration
       dataMigrated = true;
       save();
     }
+    if (globalMode == null)
+    {
+      if (enableGlobally == true)
+      {
+        globalMode = GloballyEnabledMode.LINEMODE;
+      }
+      else
+      {
+        globalMode = GloballyEnabledMode.OFF;
+      }
+    }
   }
 
   @Override
@@ -246,7 +288,7 @@ public class LogstashConfiguration extends GlobalConfiguration
       save();
       return true;
     }
-    
+
     configuring = true;
 
     // when we bind the stapler request we get a new instance of logstashIndexer.

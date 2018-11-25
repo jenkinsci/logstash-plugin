@@ -6,12 +6,16 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import static org.mockito.Mockito.verify;
 
 import hudson.model.AbstractBuild;
+import hudson.model.Descriptor;
 import hudson.model.Project;
 import hudson.model.Run;
+import hudson.tasks.Publisher;
+import hudson.util.DescribableList;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 
 import jenkins.plugins.logstash.persistence.BuildData;
 
@@ -61,19 +65,26 @@ public class LogstashConsoleLogFilterTest {
   @Mock Project<?, ?> mockProject;
   @Mock BuildData mockBuildData;
   @Mock LogstashWriter mockWriter;
+  @Mock LogstashJobProperty mockProperty;
+  private DescribableList<Publisher, Descriptor<Publisher>> publishers;
+  private MockLogstashConsoleLogFilter consoleLogFilter;
 
   @Before
   public void before() throws Exception {
+    publishers = new DescribableList<>(mockProject);
+    buffer = new ByteArrayOutputStream();
+    consoleLogFilter = new MockLogstashConsoleLogFilter(mockWriter);
+
     PowerMockito.mockStatic(LogstashConfiguration.class);
     when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
-    when(logstashConfiguration.isEnableGlobally()).thenReturn(false);
+    when(logstashConfiguration.getGlobalMode()).thenReturn(GloballyEnabledMode.OFF);
     when(logstashConfiguration.isEnabled()).thenReturn(true);
 
     when(mockWriter.isConnectionBroken()).thenReturn(false);
     when(mockBuild.getParent()).thenReturn(mockProject);
-    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(new LogstashJobProperty());
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(null);
+    when(mockProject.getPublishersList()).thenReturn(publishers);
 
-    buffer = new ByteArrayOutputStream();
   }
 
   @After
@@ -83,41 +94,27 @@ public class LogstashConsoleLogFilterTest {
     buffer.close();
   }
 
-  @Test
-  public void decorateLoggerSuccess() throws Exception {
-    MockLogstashConsoleLogFilter consoleLogFilter = new MockLogstashConsoleLogFilter(mockWriter);
-
-    // Unit under test
-    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
-
-    // Verify results
-    assertNotNull("Result was null", result);
-    assertTrue("Result is not the right type", result instanceof LogstashOutputStream);
-    assertSame("Result has wrong writer", mockWriter, ((LogstashOutputStream) result).getLogstashWriter());
-    assertEquals("Results don't match", "", buffer.toString());
-    verify(mockWriter).isConnectionBroken();
-  }
-
-  @Test
-  public void decorateLoggerSuccessLogstashNotEnabled() throws Exception {
-    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(null);
-
-    MockLogstashConsoleLogFilter consoleLogFilter = new MockLogstashConsoleLogFilter(mockWriter);
-
-    // Unit under test
-    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
-
+  private void assertIsOriginalOutputStream(OutputStream result)
+  {
     // Verify results
     assertNotNull("Result was null", result);
     assertTrue("Result is not the right type", result == buffer);
     assertEquals("Results don't match", "", buffer.toString());
   }
 
-  @Test
-  public void decorateLoggerSuccessBadWriter() throws Exception {
-    when(mockWriter.isConnectionBroken()).thenReturn(true);
+  private void assertIsLogstashOutputStream(OutputStream result)
+  {
+    // Verify results
+    assertNotNull("Result was null", result);
+    assertTrue("Result is not the right type", result instanceof LogstashOutputStream);
+    assertSame("Result has wrong writer", mockWriter, ((LogstashOutputStream) result).getLogstashWriter());
+    assertEquals("Results don't match", "", buffer.toString());
+  }
 
-    MockLogstashConsoleLogFilter consoleLogFilter = new MockLogstashConsoleLogFilter(mockWriter);
+  @Test
+  public void successBadWriter() throws Exception {
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(mockProperty);
+    when(mockWriter.isConnectionBroken()).thenReturn(true);
 
     // Unit under test
     OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
@@ -131,19 +128,92 @@ public class LogstashConsoleLogFilterTest {
   }
 
   @Test
-  public void decorateLoggerSuccessEnabledGlobally() throws IOException, InterruptedException
-  {
-    when(logstashConfiguration.isEnableGlobally()).thenReturn(true);
-    MockLogstashConsoleLogFilter buildWrapper = new MockLogstashConsoleLogFilter(mockWriter);
+  public void successJobPropertyEnabled() throws Exception {
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(mockProperty);
 
     // Unit under test
-    OutputStream result = buildWrapper.decorateLogger(mockBuild, buffer);
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
 
-    // Verify results
-    assertNotNull("Result was null", result);
-    assertTrue("Result is not the right type", result instanceof LogstashOutputStream);
-    assertSame("Result has wrong writer", mockWriter, ((LogstashOutputStream) result).getLogstashWriter());
-    assertEquals("Results don't match", "", buffer.toString());
+    assertIsLogstashOutputStream(result);
     verify(mockWriter).isConnectionBroken();
+  }
+
+  @Test
+  public void successJobPropertySetDisable() throws Exception {
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(mockProperty);
+    when(mockProperty.isDisableGlobal()).thenReturn(true);
+
+    // Unit under test
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
+
+    assertIsOriginalOutputStream(result);
+  }
+
+  @Test
+  public void successGlobalOffJobPropertyNull() throws Exception {
+    // Unit under test
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
+
+    assertIsOriginalOutputStream(result);
+  }
+
+  @Test
+  public void successGlobalLineMode() throws IOException, InterruptedException
+  {
+    when(logstashConfiguration.getGlobalMode()).thenReturn(GloballyEnabledMode.LINEMODE);
+
+    // Unit under test
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
+
+    assertIsLogstashOutputStream(result);
+    verify(mockWriter).isConnectionBroken();
+  }
+
+  @Test
+  public void successGlobalLineModeWithNotifier() throws Exception {
+    when(logstashConfiguration.getGlobalMode()).thenReturn(GloballyEnabledMode.LINEMODE);
+    publishers.add(new LogstashNotifier(10, false));
+
+    // Unit under test
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
+
+    assertIsOriginalOutputStream(result);
+  }
+
+  @Test
+  public void successGlobalLineModeWithJobPropertyDisabled() throws Exception {
+    when(mockProperty.isDisableGlobal()).thenReturn(true);
+    when(logstashConfiguration.getGlobalMode()).thenReturn(GloballyEnabledMode.LINEMODE);
+    publishers.add(new LogstashNotifier(10, false));
+
+    // Unit under test
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
+
+    assertIsOriginalOutputStream(result);
+  }
+
+  @Test
+  public void successGlobalNotifierModeWithJobProperty() throws IOException, InterruptedException
+  {
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(mockProperty);
+    when(logstashConfiguration.getGlobalMode()).thenReturn(GloballyEnabledMode.NOTIFIERMODE);
+
+    // Unit under test
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
+
+    assertIsLogstashOutputStream(result);
+    verify(mockWriter).isConnectionBroken();
+  }
+
+  @Test
+  public void successGlobalNotifierMode() throws Exception {
+    when(mockProject.getProperty(LogstashJobProperty.class)).thenReturn(null);
+    when(logstashConfiguration.getGlobalMode()).thenReturn(GloballyEnabledMode.NOTIFIERMODE);
+    publishers.add(new LogstashNotifier(10, false));
+
+    // Unit under test
+    OutputStream result = consoleLogFilter.decorateLogger(mockBuild, buffer);
+
+    assertIsOriginalOutputStream(result);
   }
 }

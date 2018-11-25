@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
@@ -70,6 +71,24 @@ public class PipelineTest
     assertThat(data.getString("result"),equalTo("SUCCESS"));
   }
 
+  @Test
+  public void logstashSendNotifierAtEnd() throws Exception
+  {
+    WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
+    p.setDefinition(new CpsFlowDefinition("node {" +
+          "echo 'Message'\n" +
+          "currentBuild.result = 'SUCCESS'\n" +
+          "step([$class: 'LogstashNotifier',  failBuild: true, maxLines: 5, runNotifierAtEnd: true])" +
+    "}", true));
+    j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
+  List<JSONObject> dataLines = memoryDao.getOutput();
+  assertThat(dataLines.size(), is(1));
+  JSONObject firstLine = dataLines.get(0);
+  int messageSize = firstLine.getJSONArray("message").size();
+  assertThat(messageSize,equalTo(5));
+  assertThat(firstLine.getJSONArray("message").get(messageSize-1).toString(),equalTo("Finished: SUCCESS"));
+
+}
   @Test
   public void logstashSend() throws Exception
   {

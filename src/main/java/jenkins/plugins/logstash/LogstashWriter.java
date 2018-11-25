@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -122,6 +123,9 @@ public class LogstashWriter {
       try {
         if (maxLines < 0) {
           logLines = build.getLog(Integer.MAX_VALUE);
+        } else if (maxLines == 0)
+        {
+          logLines = Collections.emptyList();
         } else {
           logLines = build.getLog(maxLines);
         }

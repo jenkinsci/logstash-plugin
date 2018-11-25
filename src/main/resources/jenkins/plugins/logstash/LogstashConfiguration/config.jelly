@@ -3,13 +3,26 @@
   <f:section title="${%Logstash}">
     <f:optionalBlock name="enabled" title="Enable sending logs to an Indexer" inline="true" field="enabled">
 	    <f:entry>
-	    	<f:dropdownDescriptorSelector title="${%Indexer Type}" field="logstashIndexer" descriptors="${descriptor.indexerTypes}"/>
+	      <f:dropdownDescriptorSelector title="${%Indexer Type}" field="logstashIndexer" descriptors="${descriptor.indexerTypes}"/>
 	    </f:entry>
-	    <f:entry title="Enable Globally" field="enableGlobally" description="This will not enable it for pipeline jobs.">
-	      <f:checkbox/>
-	    </f:entry>
+	    <f:block>
+	    <f:entry title="Enable Globally">
+	      <table>
+		    <f:radioBlock name="globalMode" value="OFF" title="Off" checked="${descriptor.globalMode.name() == 'OFF'}" inline="true"/>
+		    <f:radioBlock name="globalMode" value="NOTIFIERMODE" title="Notifier Mode" checked="${descriptor.globalMode.name() == 'NOTIFIERMODE'}" inline="true">
+		      <f:nested>
+			    <f:entry field="maxLines" title="Number of lines" help="/plugin/logstash/help/help-maxLines.html">
+			      <f:number field="maxLines" clazz="required number" default="1000"/>
+			    </f:entry>
+			  </f:nested>
+		    </f:radioBlock>
+		    <f:radioBlock name="globalMode" value="LINEMODE" title="Line mode" checked="${descriptor.globalMode.name() == 'LINEMODE'}" inline="true"/>
+		  </table>
+		<f:helpLink url="/plugin/logstash/help/help-enableGlobally.html"/>
+		</f:entry>
+		</f:block>
 	    <f:entry title="Use millisecond time stamps" field="milliSecondTimestamps">
-	    	<f:checkbox default="true"/>
+	      <f:checkbox default="true"/>
 	    </f:entry>
     </f:optionalBlock>
   </f:section>

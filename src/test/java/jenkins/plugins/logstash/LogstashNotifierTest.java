@@ -9,6 +9,7 @@ import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Action;
 import hudson.model.TaskListener;
 import hudson.model.Run;
 import hudson.model.Result;
@@ -62,6 +63,7 @@ public class LogstashNotifierTest {
   }
 
   static class MockRun<P extends AbstractProject<P,R>, R extends AbstractBuild<P,R>> extends Run<P,R> {
+
     Result result;
 
     MockRun(P job) throws IOException {
@@ -136,6 +138,8 @@ public class LogstashNotifierTest {
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(3);
     verify(mockWriter).isConnectionBroken();
+    verify(mockBuild).getAction(LogstashMarkerAction.class);
+    verify(mockBuild).addAction(any(LogstashMarkerAction.class));
 
     assertEquals("Errors were written", "", errorBuffer.toString());
 
@@ -172,6 +176,8 @@ public class LogstashNotifierTest {
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(3);
     verify(mockWriter).isConnectionBroken();
+    verify(mockBuild).getAction(LogstashMarkerAction.class);
+    verify(mockBuild).addAction(any(LogstashMarkerAction.class));
 
     assertEquals("Error was not written", "Mocked Constructor failure", errorBuffer.toString());
   }
@@ -213,6 +219,8 @@ public class LogstashNotifierTest {
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(3);
     verify(mockWriter, times(2)).isConnectionBroken();
+    verify(mockBuild).getAction(LogstashMarkerAction.class);
+    verify(mockBuild).addAction(any(LogstashMarkerAction.class));
     assertEquals("Error was not written", "Mocked Constructor failure", errorBuffer.toString());
   }
 
@@ -264,6 +272,8 @@ public class LogstashNotifierTest {
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(3);
     verify(mockWriter, times(3)).isConnectionBroken();
+    verify(mockBuild).getAction(LogstashMarkerAction.class);
+    verify(mockBuild).addAction(any(LogstashMarkerAction.class));
 
     assertThat("Wrong error message", errorBuffer.toString(), containsString(errorMsg));
   }
@@ -286,6 +296,8 @@ public class LogstashNotifierTest {
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(-1);
     verify(mockWriter, times(2)).isConnectionBroken();
+    verify(mockBuild).getAction(LogstashMarkerAction.class);
+    verify(mockBuild).addAction(any(LogstashMarkerAction.class));
 
     assertEquals("Errors were written", "", errorBuffer.toString());
   }
@@ -308,6 +320,8 @@ public class LogstashNotifierTest {
     verify(mockListener).getLogger();
     verify(mockWriter).writeBuildLog(0);
     verify(mockWriter, times(2)).isConnectionBroken();
+    verify(mockBuild).getAction(LogstashMarkerAction.class);
+    verify(mockBuild).addAction(any(LogstashMarkerAction.class));
 
     assertEquals("Errors were written", "", errorBuffer.toString());
   }

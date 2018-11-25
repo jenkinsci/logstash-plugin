@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.jvnet.hudson.test.FailureBuilder;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper;
@@ -30,6 +31,7 @@ import hudson.model.Result;
 import hudson.model.Slave;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.ansicolor.AnsiColorBuildWrapper;
+import hudson.tasks.BuildStep;
 import net.sf.json.JSONArray;
 import jenkins.plugins.logstash.configuration.MemoryIndexer;
 import jenkins.plugins.logstash.persistence.MemoryDao;
@@ -58,6 +60,7 @@ public class LogstashIntegrationTest
         MemoryIndexer indexer = new MemoryIndexer(memoryDao);
         config.setLogstashIndexer(indexer);
         config.setEnabled(true);
+        config.setMaxLines(1000);
 
         slave = jenkins.createSlave();
         slave.setLabelString("myLabel");
@@ -203,21 +206,34 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void enableGlobally() throws Exception
+    public void enableGlobalLineMode() throws Exception
     {
-      LogstashConfiguration.getInstance().setEnableGlobally(true);
+      LogstashConfiguration.getInstance().setGlobalMode(GloballyEnabledMode.LINEMODE);
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
+      project.getBuildersList().add(new FailureBuilder());
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.FAILURE));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      assertThat(dataLines.size(), is(6));
+      JSONObject lastLine = dataLines.get(dataLines.size()-1);
+      assertThat(lastLine.getJSONArray("message").get(0).toString(),equalTo("Finished: FAILURE"));
+    }
+
+    @Test
+    public void enableGlobalNotifierMode() throws Exception
+    {
+      LogstashConfiguration.getInstance().setGlobalMode(GloballyEnabledMode.NOTIFIERMODE);
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      assertThat(dataLines.size(), is(4));
+      assertThat(dataLines.size(), is(1));
       JSONObject firstLine = dataLines.get(0);
-      JSONObject lastLine = dataLines.get(dataLines.size()-1);
-      JSONObject data = firstLine.getJSONObject("data");
-      assertThat(data.getString("buildHost"),equalTo("Jenkins"));
-      assertThat(data.getString("buildLabel"),equalTo("master"));
-      assertThat(lastLine.getJSONArray("message").get(0).toString(),equalTo("Finished: SUCCESS"));
+      int messageSize = firstLine.getJSONArray("message").size();
+      System.out.println("Message SIze: " + messageSize);
+      assertThat(firstLine.getJSONArray("message").get(messageSize-1).toString(),equalTo("Finished: SUCCESS"));
     }
 
     @Test
@@ -284,4 +300,75 @@ public class LogstashIntegrationTest
       List<JSONObject> dataLines = memoryDao.getOutput();
       assertThat(dataLines.size(), equalTo(0));
     }
+
+    @Test
+    public void enableGlobalLineModeNotifierWillSend() throws Exception
+    {
+      LogstashConfiguration.getInstance().setGlobalMode(GloballyEnabledMode.LINEMODE);
+      project.getPublishersList().add(new LogstashNotifier(10, false));
+
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.SUCCESS));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      assertThat(dataLines.size(), is(1));
+      JSONObject firstLine = dataLines.get(0);
+      JSONObject data = firstLine.getJSONObject("data");
+      assertThat(firstLine.getJSONArray("message").size(),not(equalTo(1)));
+      assertThat(data.getString("buildHost"),equalTo("Jenkins"));
+      assertThat(data.getString("buildLabel"),equalTo("master"));
+      assertThat(data.getString("result"),equalTo("SUCCESS"));
+    }
+
+    private void assertNotifierNotCalled(List<JSONObject> dataLines)
+    {
+      boolean foundNotifierMessage = false;
+      for (JSONObject line: dataLines)
+      {
+        assertThat(line.getJSONArray("message").size(), equalTo(1));
+        if (line.getJSONArray("message").get(0).toString().equals("LogstashNotifier ignored. The data is already sent line by line."))
+        {
+          foundNotifierMessage = true;
+          break;
+        }
+      }
+      assertThat(foundNotifierMessage, equalTo(true));
+    }
+
+    @Test
+    public void enabledJobPropertyNotifierWillNotSend() throws Exception
+    {
+      project.addProperty(new LogstashJobProperty());
+      project.getPublishersList().add(new LogstashNotifier(10, false));
+
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.SUCCESS));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      assertThat(dataLines.size(), is(5));
+      JSONObject lastLine = dataLines.get(dataLines.size()-1);
+      assertThat(lastLine.getJSONArray("message").get(0).toString(),equalTo("Finished: SUCCESS"));
+      assertNotifierNotCalled(dataLines);
+    }
+
+    @Test
+    public void notifierAtEnd() throws Exception
+    {
+      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
+      LogstashNotifier notifier = new LogstashNotifier(2, false);
+      notifier.setRunNotifierAtEnd(true);
+      project.getPublishersList().add(notifier);
+
+      FreeStyleBuild build = f.get();
+      assertThat(build.getResult(), equalTo(Result.SUCCESS));
+      List<JSONObject> dataLines = memoryDao.getOutput();
+      assertThat(dataLines.size(), is(1));
+      JSONObject firstLine = dataLines.get(0);
+      int messageSize = firstLine.getJSONArray("message").size();
+      assertThat(messageSize,equalTo(2));
+      assertThat(firstLine.getJSONArray("message").get(messageSize-1).toString(),equalTo("Finished: SUCCESS"));
+    }
+
 }
