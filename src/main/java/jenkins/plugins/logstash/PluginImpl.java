@@ -54,4 +54,3 @@ public class PluginImpl extends Plugin {
     return LogstashIndexer.all();
   }
 }
-
