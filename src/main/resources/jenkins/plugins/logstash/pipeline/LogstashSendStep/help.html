@@ -2,7 +2,7 @@
   <p>Send the tail of the log to Logstash.<br/><br/>
    <b>Hint:</b>
    In order to get the result in the data sent to Logstash it must be set before the logstashSend step.<br/>
-   Due to the way log output was collected in older version of the pipeline plugin, the logstashSend step might not 
+   Due to the way log output was collected in older version of the pipeline plugin, the logstashSend step might not
    transfer the lines logged directly before the step is called. Adding a sleep of 1 second might help here.
   </p>
 </div>

@@ -44,7 +44,7 @@ Logstash plugin can be used as a publisher in pipeline jobs to send the whole lo
 
 It can be used as a wrapper step to send each log line separately.
 
-Note: when you combine with timestamps step, you should make the timestamps the outer most block. Otherwise you get the timestamps as part of the log lines, basically duplicating the timestamp information. 
+Note: when you combine with timestamps step, you should make the timestamps the outer most block. Otherwise you get the timestamps as part of the log lines, basically duplicating the timestamp information.
 
 ```Groovy
 timestamps {
@@ -73,7 +73,7 @@ Contributing
 Adding support for new indexers
 -------------------------------
 
-* Implement the extension point `jenkins.plugins.logstash.configuration.LogstashIndexer` that will take your configuration. 
+* Implement the extension point `jenkins.plugins.logstash.configuration.LogstashIndexer` that will take your configuration.
 * Implement `equals()` and `hashCode()`so the plugin can compare new configuration with existing configuration.
 * Create a `configure-advanced.jelly` for the UI part of your configuration.
 * Create a `help.jelly` with more details about indexer.

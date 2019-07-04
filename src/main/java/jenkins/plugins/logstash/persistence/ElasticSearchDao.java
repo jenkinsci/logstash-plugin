@@ -143,11 +143,11 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   {
     return uri.getPath();
   }
-  
+
   public String getMimeType() {
     return this.mimeType;
   }
-  
+
   public void setMimeType(String mimeType) {
     this.mimeType = mimeType;
   }
@@ -166,7 +166,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     SSLHelper.setClientBuilderSSLContext(this.clientBuilder, customKeyStore);
     this.customKeyStore = customKeyStore;
   }
-  
+
   HttpPost getHttpPost(String data) {
     HttpPost postRequest = new HttpPost(uri);
     String mimeType = this.getMimeType();
