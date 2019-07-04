@@ -46,12 +46,12 @@ public interface LogstashIndexerDao {
 
   @Deprecated
   enum SyslogFormat {
-	RFC5424,
-	RFC3164
+    RFC5424,
+    RFC3164
   }
 
   enum SyslogProtocol {
-	UDP
+    UDP
   }
 
   String getDescription();

@@ -2,15 +2,15 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:section title="${%Logstash}">
     <f:optionalBlock name="enabled" title="Enable sending logs to an Indexer" inline="true" field="enabled">
-	    <f:entry>
-	    	<f:dropdownDescriptorSelector title="${%Indexer Type}" field="logstashIndexer" descriptors="${descriptor.indexerTypes}"/>
-	    </f:entry>
-	    <f:entry title="Enable Globally" field="enableGlobally" description="This will not enable it for pipeline jobs.">
-	      <f:checkbox/>
-	    </f:entry>
-	    <f:entry title="Use millisecond time stamps" field="milliSecondTimestamps">
-	    	<f:checkbox default="true"/>
-	    </f:entry>
+      <f:entry>
+        <f:dropdownDescriptorSelector title="${%Indexer Type}" field="logstashIndexer" descriptors="${descriptor.indexerTypes}"/>
+      </f:entry>
+      <f:entry title="Enable Globally" field="enableGlobally" description="This will not enable it for pipeline jobs.">
+        <f:checkbox/>
+      </f:entry>
+      <f:entry title="Use millisecond time stamps" field="milliSecondTimestamps">
+        <f:checkbox default="true"/>
+      </f:entry>
     </f:optionalBlock>
   </f:section>
 </j:jelly>

@@ -13,6 +13,6 @@
   <builders/>
   <publishers/>
   <buildWrappers>
-	<jenkins.plugins.logstash.LogstashBuildWrapper plugin="logstash@2.0.0-SNAPSHOT"/>
+    <jenkins.plugins.logstash.LogstashBuildWrapper plugin="logstash@2.0.0-SNAPSHOT"/>
   </buildWrappers>
 </project>
