@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+  <p>The Logz.io account token.</p>
+</div>

@@ -24,7 +24,7 @@
 
 package jenkins.plugins.logstash.persistence;
 
-import static com.google.common.collect.Ranges.closedOpen;
+import static com.google.common.collect.Range.closedOpen;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;

@@ -48,60 +48,60 @@ import hudson.tasks.BuildWrapperDescriptor;
 public class LogstashBuildWrapper extends BuildWrapper
 {
 
-  /**
-   * Create a new {@link LogstashBuildWrapper}.
-   */
-  @DataBoundConstructor
-  public LogstashBuildWrapper()
-  {}
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
-      throws IOException, InterruptedException
-  {
-    return new Environment()
-    {
-    };
-  }
-
-  @Override
-  public DescriptorImpl getDescriptor()
-  {
-    return (DescriptorImpl)super.getDescriptor();
-  }
-
-  /**
-   * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
-   */
-  @Extension
-  public static class DescriptorImpl extends BuildWrapperDescriptor
-  {
-
-    public DescriptorImpl()
-    {
-      super(LogstashBuildWrapper.class);
-      load();
-    }
+    /**
+     * Create a new {@link LogstashBuildWrapper}.
+     */
+    @DataBoundConstructor
+    public LogstashBuildWrapper()
+    {}
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getDisplayName()
+    public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
+            throws IOException, InterruptedException
     {
-      return Messages.DisplayName();
+        return new Environment()
+        {
+        };
+    }
+
+    @Override
+    public DescriptorImpl getDescriptor()
+    {
+        return (DescriptorImpl)super.getDescriptor();
     }
 
     /**
-     * {@inheritDoc}
+     * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
      */
-    @Override
-    public boolean isApplicable(AbstractProject<?, ?> item)
+    @Extension
+    public static class DescriptorImpl extends BuildWrapperDescriptor
     {
-      return false;
+
+        public DescriptorImpl()
+        {
+            super(LogstashBuildWrapper.class);
+            load();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getDisplayName()
+        {
+            return Messages.DisplayName();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isApplicable(AbstractProject<?, ?> item)
+        {
+            return false;
+        }
     }
-  }
 }

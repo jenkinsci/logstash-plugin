@@ -79,6 +79,7 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
    */
   @Override
   public void close() throws IOException {
+    logstash.close();
     delegate.close();
     super.close();
   }

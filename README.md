@@ -4,7 +4,7 @@ Jenkins Logstash Plugin
 Travis: [![Build Status](https://travis-ci.org/jenkinsci/logstash-plugin.svg?branch=master)](https://travis-ci.org/jenkinsci/logstash-plugin)
 Jenkins: [![Build Status](https://ci.jenkins.io/job/Plugins/job/logstash-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/logstash-plugin/job/master/)
 
-This plugin adds support for sending a job's console log to Logstash indexers such as [Elastic Search](https://www.elastic.co/products/elasticsearch), [Logstash](https://www.elastic.co/de/products/logstash), [RabbitMQ](https://www.rabbitmq.com), [Redis](https://redis.io/) or to Syslog.
+This plugin adds support for sending a job's console log to Logstash indexers such as [Logzio](https://logz.io/), [Elastic Search](https://www.elastic.co/products/elasticsearch), [Logstash](https://www.elastic.co/de/products/logstash), [RabbitMQ](https://www.rabbitmq.com), [Redis](https://redis.io/) or to Syslog.
 
 * see [Jenkins wiki](https://wiki.jenkins-ci.org/display/JENKINS/Logstash+Plugin) for detailed feature descriptions
 * use [JIRA](https://issues.jenkins-ci.org) to report issues / feature requests
@@ -15,6 +15,7 @@ Install
 * Generate the `hpi` file with the command: `mvn package`
 
 * Put the `hpi` file in the directory `$JENKINS_HOME/plugins`
+
 * Restart jenkins
 
 Configure
@@ -27,6 +28,7 @@ Currently supported methods of input/output:
 * Redis {format => 'json_event'}
 * RabbitMQ {mechanism => PLAIN}
 * Syslog {format => cee/json ([RFC-5424](https://tools.ietf.org/html/rfc5424),[RFC-3164](https://tools.ietf.org/html/rfc3164)), protocol => UDP}
+* Logz.io
 
 Pipeline
 ========

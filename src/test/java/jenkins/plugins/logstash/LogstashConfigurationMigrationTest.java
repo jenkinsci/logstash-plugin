@@ -150,5 +150,4 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
     assertThat(es.getPassword(), equalTo("pwd"));
     assertThat(es.getUsername(), equalTo("user"));
   }
-
 }

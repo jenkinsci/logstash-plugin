@@ -35,6 +35,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -62,11 +63,23 @@ public class LogstashWriter {
   private boolean connectionBroken;
   private final Charset charset;
 
+  @CheckForNull
+  private final LogstashPayloadProcessor payloadProcessor;
+
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener) {
+    this(run, error, listener, null);
+  }
+
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
+    this(run, error, listener, charset, null);
+  }
+
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, LogstashPayloadProcessor payloadProcessor) {
     this.errorStream = error != null ? error : System.err;
     this.build = run;
     this.listener = listener;
     this.charset = charset;
+    this.payloadProcessor = payloadProcessor;
     this.dao = this.getDaoOrNull();
     if (this.dao == null) {
       this.jenkinsUrl = "";
@@ -179,6 +192,21 @@ public class LogstashWriter {
   }
 
   /**
+   * Write JSONObject payload to the Logstash indexer.
+   * @since 1.0.5
+   */
+  private void writeRaw(JSONObject payload) {
+    try {
+      dao.push(payload.toString());
+    } catch (IOException e) {
+      String msg = "[logstash-plugin]: Failed to send log data: " + dao.getDescription() + ".\n" +
+              "[logstash-plugin]: No Further logs will be sent to " + dao.getDescription() + ".\n" +
+              ExceptionUtils.getStackTrace(e);
+      logErrorMessage(msg);
+    }
+  }
+
+  /**
    * Construct a valid indexerDao or return null.
    * Writes errors to errorStream if dao constructor fails.
    *
@@ -212,6 +240,25 @@ public class LogstashWriter {
     } catch (IOException ex) {
       // This should never happen, but if it does we just have to let it go.
       ex.printStackTrace();
+    }
+  }
+
+  /**
+   * Signal payload processor that there will be no more lines
+   */
+  public void close() {
+    if (payloadProcessor != null) {
+      JSONObject payload = null;
+      try {
+        // calling finish() is mandatory to avoid memory leaks
+        payload = payloadProcessor.finish();
+      } catch (Exception e) {
+        String msg =  ExceptionUtils.getMessage(e) + "\n" +
+                "[logstash-plugin]: Error with payload processor on finish.\n";
+
+        logErrorMessage(msg);
+      }
+      if (payload != null) writeRaw(payload);
     }
   }
 
