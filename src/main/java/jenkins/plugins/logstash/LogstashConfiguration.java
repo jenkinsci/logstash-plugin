@@ -30,8 +30,8 @@ import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
 import net.sf.json.JSONObject;
 
 @Extension
-public class LogstashConfiguration extends GlobalConfiguration
-{
+public class LogstashConfiguration extends GlobalConfiguration {
+
   private static final Logger LOGGER = Logger.getLogger(LogstashConfiguration.class.getName());
   private static final FastDateFormat MILLIS_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
   private static final FastDateFormat LEGACY_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -46,61 +46,46 @@ public class LogstashConfiguration extends GlobalConfiguration
   // a flag indicating if we're currently in the configure method.
   private transient boolean configuring = false;
 
-  public LogstashConfiguration()
-  {
+  public LogstashConfiguration() {
     load();
-    if (enabled == null)
-    {
-      if (logstashIndexer == null)
-      {
+    if (enabled == null) {
+      if (logstashIndexer == null) {
         enabled = false;
-      }
-      else
-      {
+      } else {
         enabled = true;
       }
     }
     activeIndexer = logstashIndexer;
   }
 
-  public boolean isEnabled()
-  {
+  public boolean isEnabled() {
     return enabled == null ? false: enabled;
   }
 
-  public void setEnabled(boolean enabled)
-  {
+  public void setEnabled(boolean enabled) {
     this.enabled = enabled;
   }
 
-  public boolean isEnableGlobally()
-  {
+  public boolean isEnableGlobally() {
     return enableGlobally;
   }
 
-  public void setEnableGlobally(boolean enableGlobally)
-  {
+  public void setEnableGlobally(boolean enableGlobally) {
     this.enableGlobally = enableGlobally;
   }
 
-  public boolean isMilliSecondTimestamps()
-  {
+  public boolean isMilliSecondTimestamps() {
     return milliSecondTimestamps;
   }
 
-  public void setMilliSecondTimestamps(boolean milliSecondTimestamps)
-  {
+  public void setMilliSecondTimestamps(boolean milliSecondTimestamps) {
     this.milliSecondTimestamps = milliSecondTimestamps;
   }
 
-  public FastDateFormat getDateFormatter()
-  {
-    if (milliSecondTimestamps)
-    {
+  public FastDateFormat getDateFormatter() {
+    if (milliSecondTimestamps) {
       return MILLIS_FORMATTER;
-    }
-    else
-    {
+    } else {
       return LEGACY_FORMATTER;
     }
   }
@@ -110,16 +95,13 @@ public class LogstashConfiguration extends GlobalConfiguration
    *
    * @return configuration instance
    */
-  public LogstashIndexer<?> getLogstashIndexer()
-  {
+  public LogstashIndexer<?> getLogstashIndexer() {
     return logstashIndexer;
   }
 
-  public void setLogstashIndexer(LogstashIndexer<?> logstashIndexer)
-  {
+  public void setLogstashIndexer(LogstashIndexer<?> logstashIndexer) {
     this.logstashIndexer = logstashIndexer;
-    if (!configuring && !Objects.equals(logstashIndexer, activeIndexer))
-    {
+    if (!configuring && !Objects.equals(logstashIndexer, activeIndexer)) {
       activeIndexer = logstashIndexer;
     }
   }
@@ -129,33 +111,25 @@ public class LogstashConfiguration extends GlobalConfiguration
    * @return dao instance
    */
   @CheckForNull
-  public LogstashIndexerDao getIndexerInstance()
-  {
-    if (activeIndexer != null)
-    {
+  public LogstashIndexerDao getIndexerInstance() {
+    if (activeIndexer != null) {
       return activeIndexer.getInstance();
     }
     return null;
   }
 
-
-  public List<?> getIndexerTypes()
-  {
+  public List<?> getIndexerTypes() {
     return LogstashIndexer.all();
   }
 
   @SuppressWarnings("deprecation")
   @Initializer(after = InitMilestone.JOB_LOADED)
-  public void migrateData()
-  {
-    if (!dataMigrated)
-    {
+  public void migrateData() {
+    if (!dataMigrated) {
       Descriptor descriptor = LogstashInstallation.getLogstashDescriptor();
-      if (descriptor.getType() != null)
-      {
+      if (descriptor.getType() != null) {
         IndexerType type = descriptor.getType();
-        switch (type)
-        {
+        switch (type) {
           case REDIS:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for Redis");
             Redis redis = new Redis();
@@ -169,8 +143,7 @@ public class LogstashConfiguration extends GlobalConfiguration
           case ELASTICSEARCH:
             LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search");
             URI uri;
-            try
-            {
+            try {
               uri = (new URIBuilder(descriptor.getHost()))
                   .setPort(descriptor.getPort())
                   .setPath("/" + descriptor.getKey()).build();
@@ -180,9 +153,7 @@ public class LogstashConfiguration extends GlobalConfiguration
               es.setPassword(descriptor.getPassword());
               logstashIndexer = es;
               enabled = true;
-            }
-            catch (URISyntaxException e)
-            {
+            } catch (URISyntaxException e) {
               enabled = false;
               LOGGER.log(Level.INFO, "Migrating logstash configuration for Elastic Search failed: " + e.toString());
             }
@@ -204,8 +175,7 @@ public class LogstashConfiguration extends GlobalConfiguration
             syslog.setHost(descriptor.getHost());
             syslog.setPort(descriptor.getPort());
             syslog.setSyslogProtocol(descriptor.getSyslogProtocol());
-            switch (descriptor.getSyslogFormat())
-            {
+            switch (descriptor.getSyslogFormat()) {
               case RFC3164:
                 syslog.setMessageFormat(MessageFormat.RFC_3164);
                 break;
@@ -233,15 +203,12 @@ public class LogstashConfiguration extends GlobalConfiguration
   }
 
   @Override
-  public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException
-  {
-
+  public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException {
     // When not enabling the plugin we just save the enabled state
     // without binding the JSON and then return. This avoids problems with missing configuration
     // like URLs which can't be parsed when empty, which would lead to errors in the UI.
     Boolean e = json.getBoolean("enabled");
-    if (!e)
-    {
+    if (!e) {
       enabled = false;
       save();
       return true;
@@ -253,8 +220,7 @@ public class LogstashConfiguration extends GlobalConfiguration
     // logstashIndexer is holder for the dao instance.
     // To avoid that we get a new dao instance in case there was no change in configuration
     // we compare it to the currently active configuration.
-    try
-    {
+    try {
       staplerRequest.bindJSON(this, json);
 
       try {
@@ -269,23 +235,18 @@ public class LogstashConfiguration extends GlobalConfiguration
         throw new IllegalArgumentException(ex);
       }
 
-      if (!Objects.equals(logstashIndexer, activeIndexer))
-      {
+      if (!Objects.equals(logstashIndexer, activeIndexer)) {
         activeIndexer = logstashIndexer;
       }
 
       save();
       return true;
-    }
-    finally
-    {
+    } finally {
       configuring = false;
     }
   }
 
-  public static LogstashConfiguration getInstance()
-  {
+  public static LogstashConfiguration getInstance() {
     return GlobalConfiguration.all().get(LogstashConfiguration.class);
   }
-
 }

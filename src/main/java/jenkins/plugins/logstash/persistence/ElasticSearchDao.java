@@ -54,7 +54,6 @@ import com.google.common.collect.Range;
 
 import jenkins.plugins.logstash.utils.SSLHelper;
 
-
 /**
  * Elastic Search Data Access Object.
  *
@@ -80,9 +79,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   // Factored for unit testing
   ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password) {
-
-    if (uri == null)
-    {
+    if (uri == null) {
       throw new IllegalArgumentException("uri field must not be empty");
     }
 
@@ -90,13 +87,9 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     this.username = username;
     this.password = password;
 
-
-    try
-    {
+    try {
       uri.toURL();
-    }
-    catch (MalformedURLException e)
-    {
+    } catch (MalformedURLException e) {
       throw new IllegalArgumentException(e);
     }
 
@@ -109,38 +102,31 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     clientBuilder = factory == null ? HttpClientBuilder.create() : factory;
   }
 
-
-  public URI getUri()
-  {
+  public URI getUri() {
     return uri;
   }
-  public String getHost()
-  {
+
+  public String getHost() {
     return uri.getHost();
   }
 
-  public String getScheme()
-  {
+  public String getScheme() {
     return uri.getScheme();
   }
 
-  public int getPort()
-  {
+  public int getPort() {
     return uri.getPort();
   }
 
-  public String getUsername()
-  {
+  public String getUsername() {
     return username;
   }
 
-  public String getPassword()
-  {
+  public String getPassword() {
       return password;
   }
 
-  public String getKey()
-  {
+  public String getKey() {
     return uri.getPath();
   }
 
@@ -156,8 +142,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     return this.customKeyStore;
   }
 
-  String getAuth()
-  {
+  String getAuth() {
     return auth;
   }
 
@@ -211,9 +196,7 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
       }
       stream.flush();
       return byteStream.toString(StandardCharsets.UTF_8.name());
-    }
-    catch (UnsupportedEncodingException e)
-    {
+    } catch (UnsupportedEncodingException e) {
       return ExceptionUtils.getStackTrace(e);
     } finally {
       if (stream != null) {
@@ -222,10 +205,8 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     }
   }
 
-
   @Override
-  public String getDescription()
-  {
+  public String getDescription() {
     return uri.toString();
   }
 }

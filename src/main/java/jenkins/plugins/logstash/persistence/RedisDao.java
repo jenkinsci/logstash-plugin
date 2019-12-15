@@ -41,6 +41,7 @@ import redis.clients.jedis.exceptions.JedisException;
  * @since 1.0.0
  */
 public class RedisDao extends HostBasedLogstashIndexerDao {
+
   private final JedisPool pool;
 
   private final String password;
@@ -71,13 +72,11 @@ public class RedisDao extends HostBasedLogstashIndexerDao {
     pool = factory == null ? new JedisPool(new JedisPoolConfig(), host, port) : factory;
   }
 
-  public String getPassword()
-  {
+  public String getPassword() {
     return password;
   }
 
-  public String getKey()
-  {
+  public String getKey() {
     return key;
   }
 

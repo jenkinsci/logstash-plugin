@@ -32,25 +32,21 @@ public class LogstashStep extends Step {
   public LogstashStep() {}
 
   @Override
-  public StepExecution start(StepContext context) throws Exception
-  {
+  public StepExecution start(StepContext context) throws Exception {
     return new Execution(context);
   }
 
   /** Execution for {@link LogstashStep}. */
   public static class Execution extends AbstractStepExecutionImpl  {
 
-    public Execution(StepContext context)
-    {
+    public Execution(StepContext context) {
       super(context);
     }
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void onResume()
-    {
-    }
+    public void onResume() {}
 
     /** {@inheritDoc} */
     @Override
@@ -102,12 +98,10 @@ public class LogstashStep extends Step {
     }
 
     @Override
-    public Set<? extends Class<?>> getRequiredContext()
-    {
+    public Set<? extends Class<?>> getRequiredContext() {
       Set<Class<?>> contexts = new HashSet<>();
       contexts.add(Run.class);
       return contexts;
     }
   }
-
 }

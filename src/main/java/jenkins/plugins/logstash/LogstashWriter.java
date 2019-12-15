@@ -68,6 +68,7 @@ public class LogstashWriter {
     this.listener = listener;
     this.charset = charset;
     this.dao = this.getDaoOrNull();
+
     if (this.dao == null) {
       this.jenkinsUrl = "";
       this.buildData = null;
@@ -82,14 +83,12 @@ public class LogstashWriter {
    *
    * @return the charset
    */
-  public Charset getCharset()
-  {
+  public Charset getCharset() {
     return charset;
   }
 
   // for testing only
-  LogstashIndexerDao getDao()
-  {
+  LogstashIndexerDao getDao() {
     return dao;
   }
 
@@ -214,5 +213,4 @@ public class LogstashWriter {
       ex.printStackTrace();
     }
   }
-
 }

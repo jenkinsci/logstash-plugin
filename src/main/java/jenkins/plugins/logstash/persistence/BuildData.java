@@ -65,6 +65,7 @@ import com.google.gson.GsonBuilder;
 public class BuildData {
   // ISO 8601 date format
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
+
   public static class TestData {
     private final int totalCount, skipCount, failCount, passCount;
     private final List<FailedTest> failedTestsWithErrorDetail;
@@ -72,19 +73,18 @@ public class BuildData {
 
     public static class FailedTest {
       private final String fullName, errorDetails;
+
       public FailedTest(String fullName, String errorDetails) {
         super();
         this.fullName = fullName;
         this.errorDetails = errorDetails;
       }
 
-      public String getFullName()
-      {
+      public String getFullName() {
         return fullName;
       }
 
-      public String getErrorDetails()
-      {
+      public String getErrorDetails() {
         return errorDetails;
       }
     }
@@ -119,33 +119,27 @@ public class BuildData {
       }
     }
 
-    public int getTotalCount()
-    {
+    public int getTotalCount() {
         return totalCount;
     }
 
-    public int getSkipCount()
-    {
+    public int getSkipCount() {
         return skipCount;
     }
 
-    public int getFailCount()
-    {
+    public int getFailCount() {
         return failCount;
     }
 
-    public int getPassCount()
-    {
+    public int getPassCount() {
         return passCount;
     }
 
-    public List<FailedTest> getFailedTestsWithErrorDetail()
-    {
+    public List<FailedTest> getFailedTestsWithErrorDetail() {
         return failedTestsWithErrorDetail;
     }
 
-    public List<String> getFailedTests()
-    {
+    public List<String> getFailedTests() {
         return failedTests;
     }
   }
@@ -230,7 +224,6 @@ public class BuildData {
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {
-
     this.build = build;
     Executor executor = build.getExecutor();
     if (executor == null) {
@@ -260,10 +253,8 @@ public class BuildData {
     updateResult();
   }
 
-  public void updateResult()
-  {
-    if (result == null && build.getResult() != null)
-    {
+  public void updateResult() {
+    if (result == null && build.getResult() != null) {
       Result result = build.getResult();
       this.result = result == null ? null : result.toString();
     }

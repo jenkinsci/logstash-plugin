@@ -68,13 +68,11 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
     this.failBuild = failBuild;
   }
 
-  public int getMaxLines()
-  {
+  public int getMaxLines() {
     return maxLines;
   }
 
-  public boolean isFailBuild()
-  {
+  public boolean isFailBuild() {
     return failBuild;
   }
 
@@ -93,8 +91,7 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   private boolean perform(Run<?, ?> run, TaskListener listener) {
     LogstashConfiguration configuration = LogstashConfiguration.getInstance();
-    if (!configuration.isEnabled())
-    {
+    if (!configuration.isEnabled()) {
       LOGGER.log(Level.FINE, "Logstash is disabled. Logs will not be forwarded.");
       return true;
     }
@@ -146,6 +143,5 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
       return FormValidation.ok();
     }
-
   }
 }

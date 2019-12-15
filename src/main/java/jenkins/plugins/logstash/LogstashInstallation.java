@@ -45,6 +45,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @since 1.0.0
  */
 public class LogstashInstallation extends ToolInstallation {
+
   private static final long serialVersionUID = -5730780734005293851L;
 
   @DataBoundConstructor
@@ -72,59 +73,41 @@ public class LogstashInstallation extends ToolInstallation {
       load();
     }
 
-
     @Override
     public String getDisplayName() {
       return Messages.DisplayName();
     }
 
-
-    public IndexerType getType()
-    {
+    public IndexerType getType() {
       return type;
     }
 
-
-    public SyslogFormat getSyslogFormat()
-    {
+    public SyslogFormat getSyslogFormat() {
       return syslogFormat;
     }
 
-
-    public SyslogProtocol getSyslogProtocol()
-    {
+    public SyslogProtocol getSyslogProtocol() {
       return syslogProtocol;
     }
 
-
-    public String getHost()
-    {
+    public String getHost() {
       return host;
     }
 
-
-    public Integer getPort()
-    {
+    public Integer getPort() {
       return port;
     }
 
-
-    public String getUsername()
-    {
+    public String getUsername() {
       return username;
     }
 
-
-    public String getPassword()
-    {
+    public String getPassword() {
       return password;
     }
 
-
-    public String getKey()
-    {
+    public String getKey() {
       return key;
     }
-
   }
 }

@@ -16,54 +16,41 @@ import hudson.util.DescribableList;
 import jenkins.model.Jenkins;
 
 @Extension
-public class LogstashItemListener extends ItemListener
-{
+public class LogstashItemListener extends ItemListener {
 
   private static final Logger LOGGER = Logger.getLogger(LogstashItemListener.class.getName());
 
   @Override
-  public void onCreated(Item item)
-  {
-    if (item instanceof BuildableItemWithBuildWrappers)
-    {
+  public void onCreated(Item item) {
+    if (item instanceof BuildableItemWithBuildWrappers) {
       convertBuildWrapperToJobProperty((BuildableItemWithBuildWrappers)item);
     }
   }
 
   @Override
-  public void onLoaded()
-  {
-    for (BuildableItemWithBuildWrappers item : Jenkins.getInstance().getAllItems(BuildableItemWithBuildWrappers.class))
-    {
+  public void onLoaded() {
+    for (BuildableItemWithBuildWrappers item : Jenkins.getInstance().getAllItems(BuildableItemWithBuildWrappers.class)) {
       convertBuildWrapperToJobProperty(item);
     }
   }
 
-  static void convertBuildWrapperToJobProperty(BuildableItemWithBuildWrappers item)
-  {
+  static void convertBuildWrapperToJobProperty(BuildableItemWithBuildWrappers item) {
     DescribableList<BuildWrapper, Descriptor<BuildWrapper>> wrappers = item.getBuildWrappersList();
     @SuppressWarnings("deprecation")
     LogstashBuildWrapper logstashBuildWrapper = wrappers.get(LogstashBuildWrapper.class);
-    if (logstashBuildWrapper != null && item instanceof AbstractProject<?, ?>)
-    {
+    if (logstashBuildWrapper != null && item instanceof AbstractProject<?, ?>) {
       AbstractProject<?, ?> project = (AbstractProject<?, ?>)item;
       BulkChange bc = new BulkChange(project);
-      try
-      {
+      try {
         project.addProperty(new LogstashJobProperty());
         wrappers.remove(logstashBuildWrapper);
         bc.commit();
-      }
-      catch (IOException e)
-      {
+      } catch (IOException e) {
         LOGGER.log(Level.SEVERE,
             "Failed to convert LogstashBuildWrapper to LogstashJobProperty for project " + project.getFullName(), e);
-      }
-      finally
-      {
+      } finally {
         bc.abort();
       }
     }
   }
-
 }

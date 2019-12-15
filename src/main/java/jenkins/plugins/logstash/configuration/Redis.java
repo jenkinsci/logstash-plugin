@@ -12,62 +12,53 @@ import hudson.util.Secret;
 import jenkins.plugins.logstash.Messages;
 import jenkins.plugins.logstash.persistence.RedisDao;
 
-public class Redis extends HostBasedLogstashIndexer<RedisDao>
-{
+public class Redis extends HostBasedLogstashIndexer<RedisDao> {
 
   protected String key;
   protected Secret password;
 
   @DataBoundConstructor
-  public Redis()
-  {
-  }
+  public Redis() {}
 
-  public String getKey()
-  {
+  public String getKey() {
     return key;
   }
 
   @DataBoundSetter
-  public void setKey(String key)
-  {
+  public void setKey(String key) {
     this.key = key;
   }
 
-  public String getPassword()
-  {
+  public String getPassword() {
     return Secret.toString(password);
   }
 
   @DataBoundSetter
-  public void setPassword(String password)
-  {
+  public void setPassword(String password) {
     this.password = Secret.fromString(password);
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
+  public boolean equals(Object obj) {
     if (this == obj)
       return true;
     if (!super.equals(obj))
       return false;
     if (getClass() != obj.getClass())
       return false;
+
     Redis other = (Redis) obj;
-    if (!Secret.toString(password).equals(other.getPassword()))
-    {
+
+    if (!Secret.toString(password).equals(other.getPassword())) {
       return false;
     }
-    if (key == null)
-    {
+    if (key == null) {
       if (other.key != null)
         return false;
-    }
-    else if (!key.equals(other.key))
-    {
+    } else if (!key.equals(other.key)) {
       return false;
     }
+
     return true;
   }
 

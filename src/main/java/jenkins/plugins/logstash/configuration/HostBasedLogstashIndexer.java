@@ -4,8 +4,8 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 import jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao;
 
-public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexerDao> extends LogstashIndexer<T>
-{
+public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexerDao> extends LogstashIndexer<T> {
+
   private String host;
   private int port;
 
@@ -14,8 +14,7 @@ public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexer
    *
    * @return Host of the indexer
    */
-  public String getHost()
-  {
+  public String getHost() {
     return host;
   }
 
@@ -26,8 +25,7 @@ public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexer
    *          host to connect to.
    */
   @DataBoundSetter
-  public void setHost(String host)
-  {
+  public void setHost(String host) {
     this.host = host;
   }
 
@@ -36,8 +34,7 @@ public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexer
    *
    * @return Port of the indexer
    */
-  public int getPort()
-  {
+  public int getPort() {
     return port;
   }
 
@@ -48,8 +45,7 @@ public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexer
    *          The port of the indexer
    */
   @DataBoundSetter
-  public void setPort(int port)
-  {
+  public void setPort(int port) {
     this.port = port;
   }
 
@@ -70,7 +66,9 @@ public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexer
       return false;
     if (getClass() != obj.getClass())
       return false;
+
     HostBasedLogstashIndexer<?> other = (HostBasedLogstashIndexer<?>) obj;
+
     if (host == null) {
       if (other.host != null)
         return false;
@@ -78,6 +76,7 @@ public abstract class HostBasedLogstashIndexer<T extends AbstractLogstashIndexer
       return false;
     if (port != other.port)
       return false;
+
     return true;
   }
 }

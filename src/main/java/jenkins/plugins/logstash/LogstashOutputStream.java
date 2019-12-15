@@ -38,6 +38,7 @@ import java.io.OutputStream;
  * @author Rusty Gerard
  */
 public class LogstashOutputStream extends LineTransformationOutputStream {
+
   private final OutputStream delegate;
   private final LogstashWriter logstash;
 
@@ -48,8 +49,7 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
   }
 
   // for testing purposes
-  LogstashWriter getLogstashWriter()
-  {
+  LogstashWriter getLogstashWriter() {
     return logstash;
   }
 

@@ -43,6 +43,7 @@ import com.rabbitmq.client.ConnectionFactory;
  * @since 1.0.0
  */
 public class RabbitMqDao extends HostBasedLogstashIndexerDao {
+
   private final ConnectionFactory pool;
 
   private final String queue;
@@ -81,8 +82,7 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     pool = factory == null ? new ConnectionFactory() : factory;
     pool.setHost(host);
     pool.setPort(port);
-    if (virtualHost != null)
-    {
+    if (virtualHost != null) {
       pool.setVirtualHost(virtualHost);
     }
 
@@ -92,23 +92,19 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     }
   }
 
-  public String getQueue()
-  {
+  public String getQueue() {
     return queue;
   }
 
-  public String getUsername()
-  {
+  public String getUsername() {
     return username;
   }
 
-  public String getPassword()
-  {
+  public String getPassword() {
       return password;
   }
 
-  public String getVirtualHost()
-  {
+  public String getVirtualHost() {
     return virtualHost;
   }
 

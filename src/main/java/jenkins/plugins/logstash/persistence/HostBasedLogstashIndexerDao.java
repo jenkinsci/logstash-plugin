@@ -22,7 +22,6 @@
 
 package jenkins.plugins.logstash.persistence;
 
-
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -31,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
  * @since 2.0.0
  */
 public abstract class HostBasedLogstashIndexerDao extends AbstractLogstashIndexerDao {
+
   private final String host;
   private final int port;
 
