@@ -64,14 +64,14 @@
     <changelist>-SNAPSHOT</changelist>
     <skipIntegrationTests>true</skipIntegrationTests>
     <java.level>8</java.level>
-    <jenkins.version>2.164.3</jenkins.version>
+    <jenkins.version>2.150.3</jenkins.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.164.x</artifactId>
+        <artifactId>bom-2.150.x</artifactId>
         <version>5</version>
         <type>pom</type>
         <scope>import</scope>
