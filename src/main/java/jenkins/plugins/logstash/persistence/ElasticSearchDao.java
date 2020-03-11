@@ -39,6 +39,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -54,6 +55,8 @@ import com.google.common.collect.Range;
 
 import jenkins.plugins.logstash.utils.SSLHelper;
 
+import javax.annotation.CheckForNull;
+
 
 /**
  * Elastic Search Data Access Object.
@@ -61,9 +64,10 @@ import jenkins.plugins.logstash.utils.SSLHelper;
  * @author Liam Newman
  * @since 1.0.4
  */
-public class ElasticSearchDao extends AbstractLogstashIndexerDao {
+public class ElasticSearchDao extends AbstractLogstashIndexerDao implements Serializable {
 
-  private final HttpClientBuilder clientBuilder;
+  @CheckForNull
+  private transient HttpClientBuilder clientBuilder;
   private final URI uri;
   private final String auth;
   private final Range<Integer> successCodes = closedOpen(200,300);
@@ -106,7 +110,14 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
       auth = null;
     }
 
-    clientBuilder = factory == null ? HttpClientBuilder.create() : factory;
+    clientBuilder = factory;
+  }
+
+  HttpClientBuilder clientBuilder() {
+    if (clientBuilder == null) {
+      clientBuilder = HttpClientBuilder.create();
+    }
+    return clientBuilder;
   }
 
 

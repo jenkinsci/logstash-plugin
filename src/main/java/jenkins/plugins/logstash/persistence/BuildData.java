@@ -36,6 +36,7 @@ import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 import jenkins.plugins.logstash.LogstashConfiguration;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -62,7 +63,7 @@ import com.google.gson.GsonBuilder;
  * @author Rusty Gerard
  * @since 1.0.0
  */
-public class BuildData {
+public class BuildData implements Serializable {
   // ISO 8601 date format
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
   public static class TestData {
