@@ -212,21 +212,14 @@ public class BuildData {
   }
 
   // Pipeline project build
-  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener) {
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, hudson.EnvVars envVars) {
     initData(build, currentTime);
 
+    buildVariables = envVars;
     rootProjectName = projectName;
     rootFullProjectName = fullProjectName;
     rootProjectDisplayName = displayName;
     rootBuildNum = buildNum;
-
-    try {
-      // TODO: sensitive variables are not filtered, c.f. https://stackoverflow.com/questions/30916085
-      buildVariables = build.getEnvironment(listener);
-    } catch (IOException | InterruptedException e) {
-      LOGGER.log(WARNING,"Unable to get environment for " + build.getDisplayName(),e);
-      buildVariables = new HashMap<>();
-    }
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {

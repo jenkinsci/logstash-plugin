@@ -58,7 +58,7 @@ public class LogstashWriterTest {
                                              final String url,
                                              final LogstashIndexerDao indexer,
                                              final BuildData data) {
-    return new LogstashWriter(testBuild, error, null, testBuild.getCharset()) {
+    return new LogstashWriter(testBuild, error, null, testBuild.getCharset(), null) {
       @Override
       LogstashIndexerDao getIndexerDao() {
         return indexer;

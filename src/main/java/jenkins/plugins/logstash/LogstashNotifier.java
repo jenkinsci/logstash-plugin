@@ -107,7 +107,7 @@ public class LogstashNotifier extends Notifier implements SimpleBuildStep {
 
   // Method to encapsulate calls for unit-testing
   LogstashWriter getLogStashWriter(Run<?, ?> run, OutputStream errorStream, TaskListener listener) {
-    return new LogstashWriter(run, errorStream, listener, run.getCharset());
+    return new LogstashWriter(run, errorStream, listener, run.getCharset(), null);
   }
 
   @Override

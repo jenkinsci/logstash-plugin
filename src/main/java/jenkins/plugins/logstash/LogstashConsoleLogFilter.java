@@ -16,14 +16,16 @@ import hudson.model.Run;
 public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serializable
 {
 
+  private hudson.EnvVars envVars;
   private static final Logger LOGGER = Logger.getLogger(LogstashConsoleLogFilter.class.getName());
 
   private transient Run<?, ?> run;
   public LogstashConsoleLogFilter() {}
 
-  public LogstashConsoleLogFilter(Run<?, ?> run)
+  public LogstashConsoleLogFilter(Run<?, ?> run, hudson.EnvVars envVars)
   {
     this.run = run;
+    this.envVars = envVars;
   }
   private static final long serialVersionUID = 1L;
 
@@ -62,7 +64,7 @@ public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serial
 
   LogstashWriter getLogStashWriter(Run<?, ?> build, OutputStream errorStream)
   {
-    return new LogstashWriter(build, errorStream, null, build.getCharset());
+    return new LogstashWriter(build, errorStream, null, build.getCharset(), envVars);
   }
 
   private boolean isLogstashEnabled(Run<?, ?> build)

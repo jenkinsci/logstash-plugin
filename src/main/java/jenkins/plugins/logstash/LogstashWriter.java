@@ -61,8 +61,10 @@ public class LogstashWriter {
   private final LogstashIndexerDao dao;
   private boolean connectionBroken;
   private final Charset charset;
+  private final hudson.EnvVars envVars;
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, hudson.EnvVars envVars) {
+    this.envVars = envVars;
     this.errorStream = error != null ? error : System.err;
     this.build = run;
     this.listener = listener;
@@ -154,7 +156,7 @@ public class LogstashWriter {
     if (build instanceof AbstractBuild) {
       return new BuildData((AbstractBuild<?, ?>) build, new Date(), listener);
     } else {
-      return new BuildData(build, new Date(), listener);
+      return new BuildData(build, new Date(), listener, envVars);
     }
   }
 
