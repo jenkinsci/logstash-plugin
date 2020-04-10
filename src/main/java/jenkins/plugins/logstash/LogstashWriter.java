@@ -25,6 +25,7 @@
 package jenkins.plugins.logstash;
 
 
+import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.TaskListener;
 import hudson.model.Run;
@@ -61,9 +62,25 @@ public class LogstashWriter {
   private final LogstashIndexerDao dao;
   private boolean connectionBroken;
   private final Charset charset;
-  private final hudson.EnvVars envVars;
+  private final EnvVars envVars;
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, hudson.EnvVars envVars) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
+    this.envVars = null;
+    this.errorStream = error != null ? error : System.err;
+    this.build = run;
+    this.listener = listener;
+    this.charset = charset;
+    this.dao = this.getDaoOrNull();
+    if (this.dao == null) {
+      this.jenkinsUrl = "";
+      this.buildData = null;
+    } else {
+      this.jenkinsUrl = getJenkinsUrl();
+      this.buildData = getBuildData();
+    }
+  }
+
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, EnvVars envVars) {
     this.envVars = envVars;
     this.errorStream = error != null ? error : System.err;
     this.build = run;

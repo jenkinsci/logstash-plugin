@@ -15,6 +15,7 @@ import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
@@ -59,7 +60,7 @@ public class LogstashStep extends Step {
       context
           .newBodyInvoker()
           .withContext(createConsoleLogFilter(context))
-          .withContext(context.get(hudson.EnvVars.class))
+          .withContext(context.get(EnvVars.class))
           .withCallback(BodyExecutionCallback.wrap(context))
           .start();
       return false;
@@ -69,7 +70,7 @@ public class LogstashStep extends Step {
         throws IOException, InterruptedException {
       ConsoleLogFilter original = context.get(ConsoleLogFilter.class);
       Run<?, ?> build = context.get(Run.class);
-      hudson.EnvVars envVars = context.get(hudson.EnvVars.class);
+      EnvVars envVars = context.get(EnvVars.class);
       ConsoleLogFilter subsequent = new LogstashConsoleLogFilter(build, envVars);
       return BodyInvoker.mergeConsoleLogFilters(original, subsequent);
     }

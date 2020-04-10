@@ -24,6 +24,7 @@
 
 package jenkins.plugins.logstash.persistence;
 
+import hudson.EnvVars;
 import hudson.model.Action;
 import hudson.model.Environment;
 import hudson.model.Executor;
@@ -212,14 +213,24 @@ public class BuildData {
   }
 
   // Pipeline project build
-  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, hudson.EnvVars envVars) {
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, EnvVars envVars) {
     initData(build, currentTime);
 
-    buildVariables = envVars;
     rootProjectName = projectName;
     rootFullProjectName = fullProjectName;
     rootProjectDisplayName = displayName;
     rootBuildNum = buildNum;
+    if (envVars != null) {
+      buildVariables = envVars;
+    } else {
+      try {
+        // TODO: sensitive variables are not filtered, c.f. https://stackoverflow.com/questions/30916085
+        buildVariables = build.getEnvironment(listener);
+      } catch (IOException | InterruptedException e) {
+        LOGGER.log(WARNING,"Unable to get environment for " + build.getDisplayName(),e);
+        buildVariables = new HashMap<>();
+      }
+    }
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {

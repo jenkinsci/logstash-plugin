@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.AbstractBuild;
@@ -16,13 +17,13 @@ import hudson.model.Run;
 public class LogstashConsoleLogFilter extends ConsoleLogFilter implements Serializable
 {
 
-  private hudson.EnvVars envVars;
+  private EnvVars envVars;
   private static final Logger LOGGER = Logger.getLogger(LogstashConsoleLogFilter.class.getName());
 
   private transient Run<?, ?> run;
   public LogstashConsoleLogFilter() {}
 
-  public LogstashConsoleLogFilter(Run<?, ?> run, hudson.EnvVars envVars)
+  public LogstashConsoleLogFilter(Run<?, ?> run, EnvVars envVars)
   {
     this.run = run;
     this.envVars = envVars;
