@@ -65,19 +65,7 @@ public class LogstashWriter {
   private final EnvVars envVars;
 
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
-    this.envVars = null;
-    this.errorStream = error != null ? error : System.err;
-    this.build = run;
-    this.listener = listener;
-    this.charset = charset;
-    this.dao = this.getDaoOrNull();
-    if (this.dao == null) {
-      this.jenkinsUrl = "";
-      this.buildData = null;
-    } else {
-      this.jenkinsUrl = getJenkinsUrl();
-      this.buildData = getBuildData();
-    }
+    this(run, error, listener, charset, null);
   }
 
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, EnvVars envVars) {

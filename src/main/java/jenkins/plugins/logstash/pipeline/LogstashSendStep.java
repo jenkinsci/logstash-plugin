@@ -73,7 +73,7 @@ public class LogstashSendStep extends Step
       Run<?, ?> run = getContext().get(Run.class);
       TaskListener listener = getContext().get(TaskListener.class);
       PrintStream errorStream = listener.getLogger();
-      LogstashWriter logstash = new LogstashWriter(run, errorStream, listener, run.getCharset(), null);
+      LogstashWriter logstash = new LogstashWriter(run, errorStream, listener, run.getCharset());
       logstash.writeBuildLog(maxLines);
       if (failBuild && logstash.isConnectionBroken())
       {
