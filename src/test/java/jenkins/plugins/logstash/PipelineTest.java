@@ -13,6 +13,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import jenkins.plugins.logstash.configuration.MemoryIndexer;
@@ -38,6 +39,7 @@ public class PipelineTest
       config.setEnabled(true);
   }
 
+  @Issue("JENKINS-61735")
   @Test
   public void logstash() throws Exception
   {
