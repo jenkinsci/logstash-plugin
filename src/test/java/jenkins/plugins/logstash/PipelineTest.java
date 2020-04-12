@@ -43,7 +43,7 @@ public class PipelineTest
   {
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
     p.setDefinition(new CpsFlowDefinition(
-            "node {\n" +
+            "node('master') {\n" +
             "  stage('mystage') {\n" +
             "    logstash {\n" +
             "      currentBuild.result = 'SUCCESS'\n" +
