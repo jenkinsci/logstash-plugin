@@ -13,6 +13,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import jenkins.plugins.logstash.configuration.MemoryIndexer;
@@ -38,20 +39,28 @@ public class PipelineTest
       config.setEnabled(true);
   }
 
+  @Issue("JENKINS-61735")
   @Test
   public void logstash() throws Exception
   {
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
-    p.setDefinition(new CpsFlowDefinition("logstash {\n" +
-        "currentBuild.result = 'SUCCESS'\n" +
-        "echo 'Message'\n" +
-    "}", true));
+    p.setDefinition(new CpsFlowDefinition(
+            "node('master') {\n" +
+            "  stage('mystage') {\n" +
+            "    logstash {\n" +
+            "      currentBuild.result = 'SUCCESS'\n" +
+            "      echo 'Message'\n" +
+            "    }\n" +
+            "  }\n" +
+            "}", true));
     j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
     List<JSONObject> dataLines = memoryDao.getOutput();
     assertThat(dataLines.size(), equalTo(1));
     JSONObject firstLine = dataLines.get(0);
     JSONObject data = firstLine.getJSONObject("data");
     assertThat(data.getString("result"),equalTo("SUCCESS"));
+    assertThat(data.getJSONObject("buildVariables").getString("STAGE_NAME"), equalTo("mystage"));
+    assertThat(data.getJSONObject("buildVariables").getString("NODE_NAME"), equalTo("master"));
   }
 
   @Test

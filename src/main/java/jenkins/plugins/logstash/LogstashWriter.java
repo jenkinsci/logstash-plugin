@@ -25,6 +25,7 @@
 package jenkins.plugins.logstash;
 
 
+import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.TaskListener;
 import hudson.model.Run;
@@ -61,8 +62,14 @@ public class LogstashWriter {
   private final LogstashIndexerDao dao;
   private boolean connectionBroken;
   private final Charset charset;
+  private final EnvVars envVars;
 
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
+    this(run, error, listener, charset, null);
+  }
+
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, EnvVars envVars) {
+    this.envVars = envVars;
     this.errorStream = error != null ? error : System.err;
     this.build = run;
     this.listener = listener;
@@ -154,7 +161,7 @@ public class LogstashWriter {
     if (build instanceof AbstractBuild) {
       return new BuildData((AbstractBuild<?, ?>) build, new Date(), listener);
     } else {
-      return new BuildData(build, new Date(), listener);
+      return new BuildData(build, new Date(), listener, envVars);
     }
   }
 
