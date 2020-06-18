@@ -5,7 +5,7 @@
       <f:entry>
         <f:dropdownDescriptorSelector title="${%Indexer Type}" field="logstashIndexer" descriptors="${descriptor.indexerTypes}"/>
       </f:entry>
-      <f:entry title="Enable Globally" field="enableGlobally" description="This will not enable it for pipeline jobs.">
+      <f:entry title="Enable Globally" field="enableGlobally" description="">
         <f:checkbox/>
       </f:entry>
       <f:entry title="Use millisecond time stamps" field="milliSecondTimestamps">
