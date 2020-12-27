@@ -35,7 +35,7 @@ import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogFormat;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ LogstashInstallation.class, Descriptor.class })
-@PowerMockIgnore({"javax.crypto.*"})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 public class LogstashConfigurationMigrationTest extends LogstashConfigurationTestBase
 {
 
@@ -52,7 +52,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   {
     mockStatic(LogstashInstallation.class);
     configFile = new File("notExisting.xml");
-    when(LogstashInstallation.getLogstashDescriptor()).thenReturn(descriptor);
+    when(LogstashInstallation.getLogstashDescriptor()).thenAnswer(invocationOnMock -> descriptor);
     when(descriptor.getHost()).thenReturn("localhost");
     when(descriptor.getPort()).thenReturn(4567);
     when(descriptor.getKey()).thenReturn("logstash");

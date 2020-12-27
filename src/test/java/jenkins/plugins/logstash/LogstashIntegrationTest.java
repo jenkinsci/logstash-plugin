@@ -1,12 +1,13 @@
 package jenkins.plugins.logstash;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class LogstashIntegrationTest
         FreeStyleBuild build = f.get();
         assertThat(build.getResult(), equalTo(Result.SUCCESS));
         List<JSONObject> dataLines = memoryDao.getOutput();
-        assertThat(dataLines.size(), is(4));
+        assertThat(dataLines.size(), greaterThan(3));
         JSONObject firstLine = dataLines.get(0);
         JSONObject lastLine = dataLines.get(dataLines.size()-1);
         JSONObject data = firstLine.getJSONObject("data");
@@ -91,7 +92,7 @@ public class LogstashIntegrationTest
         FreeStyleBuild build = f.get();
         assertThat(build.getResult(), equalTo(Result.SUCCESS));
         List<JSONObject> dataLines = memoryDao.getOutput();
-        assertThat(dataLines.size(), is(4));
+        assertThat(dataLines.size(), greaterThan(3));
         JSONObject firstLine = dataLines.get(0);
         JSONObject lastLine = dataLines.get(dataLines.size()-1);
         JSONObject data = firstLine.getJSONObject("data");
@@ -139,7 +140,7 @@ public class LogstashIntegrationTest
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      assertThat(dataLines.size(), is(4));
+      assertThat(dataLines.size(), greaterThan(3));
       JSONObject firstLine = dataLines.get(0);
       JSONObject lastLine = dataLines.get(dataLines.size()-1);
       JSONObject data = firstLine.getJSONObject("data");
@@ -211,7 +212,7 @@ public class LogstashIntegrationTest
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      assertThat(dataLines.size(), is(4));
+      assertThat(dataLines.size(), greaterThan(3));
       JSONObject firstLine = dataLines.get(0);
       JSONObject lastLine = dataLines.get(dataLines.size()-1);
       JSONObject data = firstLine.getJSONObject("data");

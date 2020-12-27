@@ -117,7 +117,6 @@ public class ElasticSearchSSLCertsTest {
 
         try {
             thrown.expect(IsInstanceOf.instanceOf(SSLException.class));
-            thrown.expectMessage("Unrecognized SSL message, plaintext connection?");
 
             dao.push("");
         } finally {

@@ -35,7 +35,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @SuppressWarnings("rawtypes")
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.crypto.*"})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class LogstashNotifierTest {
 
@@ -100,7 +100,7 @@ public class LogstashNotifierTest {
     errorStream = new PrintStream(errorBuffer, true);
 
     PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.isEnabled()).thenReturn(true);
 
 

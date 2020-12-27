@@ -21,7 +21,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import jenkins.plugins.logstash.LogstashConfiguration;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.crypto.*"})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class AbstractLogstashIndexerDaoTest {
   static final String EMPTY_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
@@ -34,7 +34,7 @@ public class AbstractLogstashIndexerDaoTest {
   @Before
   public void before() throws Exception {
     PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuildData.toJson()).thenReturn(JSONObject.fromObject("{}"));

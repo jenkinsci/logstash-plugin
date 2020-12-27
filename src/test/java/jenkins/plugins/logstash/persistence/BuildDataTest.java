@@ -48,7 +48,7 @@ import net.sf.json.test.JSONAssert;
 
 @SuppressWarnings("rawtypes")
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.crypto.*"})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class BuildDataTest {
 
@@ -78,7 +78,7 @@ public class BuildDataTest {
   public void before() throws Exception {
 
     PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);

@@ -26,7 +26,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.crypto.*"})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class LogstashConsoleLogFilterTest {
 
@@ -65,7 +65,7 @@ public class LogstashConsoleLogFilterTest {
   @Before
   public void before() throws Exception {
     PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenReturn(logstashConfiguration);
+    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.isEnableGlobally()).thenReturn(false);
     when(logstashConfiguration.isEnabled()).thenReturn(true);
 
