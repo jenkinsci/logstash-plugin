@@ -68,8 +68,8 @@ public class LogstashWriter implements Serializable {
   private final String stageName;
   private final String agentName;
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
-    this(run, error, listener, charset, null, null, null);
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, HashMap<String, String> additionalParams) {
+    this(run, error, listener, charset, null, null, additionalParams);
   }
 
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName, HashMap<String, String> additionalParams) {
