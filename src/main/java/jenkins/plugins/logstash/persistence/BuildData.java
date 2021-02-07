@@ -65,11 +65,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Rusty Gerard
  * @since 1.0.0
  */
-@SuppressFBWarnings(value="SE_NO_SERIALVERSIONID")
+@SuppressFBWarnings(value = "SE_NO_SERIALVERSIONID")
 public class BuildData implements Serializable {
 
   // ISO 8601 date format
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
+
   public static class TestData implements Serializable {
     private final int totalCount, skipCount, failCount, passCount;
     private final List<FailedTest> failedTestsWithErrorDetail;
@@ -77,19 +78,18 @@ public class BuildData implements Serializable {
 
     public static class FailedTest implements Serializable {
       private final String fullName, errorDetails;
+
       public FailedTest(String fullName, String errorDetails) {
         super();
         this.fullName = fullName;
         this.errorDetails = errorDetails;
       }
 
-      public String getFullName()
-      {
+      public String getFullName() {
         return fullName;
       }
 
-      public String getErrorDetails()
-      {
+      public String getErrorDetails() {
         return errorDetails;
       }
     }
@@ -119,39 +119,33 @@ public class BuildData implements Serializable {
       failedTests = new ArrayList<>();
       failedTestsWithErrorDetail = new ArrayList<>();
       for (TestResult result : testResultAction.getFailedTests()) {
-          failedTests.add(result.getFullName());
-          failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(),result.getErrorDetails()));
+        failedTests.add(result.getFullName());
+        failedTestsWithErrorDetail.add(new FailedTest(result.getFullName(), result.getErrorDetails()));
       }
     }
 
-    public int getTotalCount()
-    {
-        return totalCount;
+    public int getTotalCount() {
+      return totalCount;
     }
 
-    public int getSkipCount()
-    {
-        return skipCount;
+    public int getSkipCount() {
+      return skipCount;
     }
 
-    public int getFailCount()
-    {
-        return failCount;
+    public int getFailCount() {
+      return failCount;
     }
 
-    public int getPassCount()
-    {
-        return passCount;
+    public int getPassCount() {
+      return passCount;
     }
 
-    public List<FailedTest> getFailedTestsWithErrorDetail()
-    {
-        return failedTestsWithErrorDetail;
+    public List<FailedTest> getFailedTestsWithErrorDetail() {
+      return failedTestsWithErrorDetail;
     }
 
-    public List<String> getFailedTests()
-    {
-        return failedTests;
+    public List<String> getFailedTests() {
+      return failedTests;
     }
   }
 
@@ -180,7 +174,8 @@ public class BuildData implements Serializable {
   private TestData testResults = null;
 
   // Freestyle project build
-  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
+  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener,
+      HashMap<String, String> additionalParams) {
     initData(build, currentTime);
 
     // build.getDuration() is always 0 in Notifiers
@@ -209,9 +204,10 @@ public class BuildData implements Serializable {
     }
     try {
       buildVariables.putAll(build.getEnvironment(listener));
+      buildVariables.putAll(additionalParams);
     } catch (Exception e) {
       // no base build env vars to merge
-      LOGGER.log(WARNING,"Unable update logstash buildVariables with EnvVars from " + build.getDisplayName(),e);
+      LOGGER.log(WARNING, "Unable update logstash buildVariables with EnvVars from " + build.getDisplayName(), e);
     }
     for (String key : sensitiveBuildVariables) {
       buildVariables.remove(key);
@@ -219,7 +215,8 @@ public class BuildData implements Serializable {
   }
 
   // Pipeline project build
-  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName) {
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName,
+      HashMap<String, String> additionalParams) {
     initData(build, currentTime);
 
     this.agentName = agentName;
@@ -230,10 +227,12 @@ public class BuildData implements Serializable {
     rootBuildNum = buildNum;
 
     try {
-      // TODO: sensitive variables are not filtered, c.f. https://stackoverflow.com/questions/30916085
+      // TODO: sensitive variables are not filtered, c.f.
+      // https://stackoverflow.com/questions/30916085
       buildVariables = build.getEnvironment(listener);
+      buildVariables.putAll(additionalParams);
     } catch (IOException | InterruptedException e) {
-      LOGGER.log(WARNING,"Unable to get environment for " + build.getDisplayName(),e);
+      LOGGER.log(WARNING, "Unable to get environment for " + build.getDisplayName(), e);
       buildVariables = new HashMap<>();
     }
   }
@@ -243,17 +242,17 @@ public class BuildData implements Serializable {
     this.build = build;
     Executor executor = build.getExecutor();
     if (executor == null) {
+      buildHost = "master";
+      buildLabel = "master";
+    } else {
+      Node node = executor.getOwner().getNode();
+      if (node == null) {
         buildHost = "master";
         buildLabel = "master";
-    } else {
-        Node node = executor.getOwner().getNode();
-        if (node == null) {
-          buildHost = "master";
-          buildLabel = "master";
-        } else {
-          buildHost = StringUtils.isBlank(node.getDisplayName()) ? "master" : node.getDisplayName();
-          buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
-        }
+      } else {
+        buildHost = StringUtils.isBlank(node.getDisplayName()) ? "master" : node.getDisplayName();
+        buildLabel = StringUtils.isBlank(node.getLabelString()) ? "master" : node.getLabelString();
+      }
     }
 
     id = build.getId();
@@ -269,8 +268,7 @@ public class BuildData implements Serializable {
     updateResult();
   }
 
-  public void updateResult()
-  {
+  public void updateResult() {
     if (build != null) {
       if (result == null && build.getResult() != null) {
         Result result = build.getResult();

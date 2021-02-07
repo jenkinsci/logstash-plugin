@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash.pipeline;
 
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,12 +60,14 @@ public class LogstashSendStep extends Step
 
     private transient final int maxLines;
     private transient final boolean failBuild;
+    private transient final HashMap<String, String> additionalParams;
 
-    Execution(StepContext context, int maxLines, boolean failBuild)
+    Execution(StepContext context, int maxLines, boolean failBuild, HashMap<String, String> additionalParams)
     {
       super(context);
       this.maxLines = maxLines;
       this.failBuild = failBuild;
+      this.additionalParams = additionalParams;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class LogstashSendStep extends Step
       TaskListener listener = getContext().get(TaskListener.class);
       PrintStream errorStream = listener.getLogger();
       LogstashWriter logstash = new LogstashWriter(run, errorStream, listener, run.getCharset());
-      logstash.writeBuildLog(maxLines);
+      logstash.writeBuildLog(maxLines, additionalParams);
       if (failBuild && logstash.isConnectionBroken())
       {
         throw new Exception("Failed to send data to Indexer");
