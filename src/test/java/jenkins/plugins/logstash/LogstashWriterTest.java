@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.After;
@@ -65,12 +66,12 @@ public class LogstashWriterTest {
       }
 
       @Override
-      BuildData getBuildData() {
+      BuildData getBuildData(HashMap<String, String> additionalParams) {
         assertNotNull("BuildData should never be requested for missing dao.", this.getDao());
 
         // For testing, providing null data means use the actual method
         if (data == null) {
-          return super.getBuildData();
+          return super.getBuildData(additionalParams);
         } else {
           return data;
         }
