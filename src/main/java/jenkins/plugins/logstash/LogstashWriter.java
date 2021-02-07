@@ -68,6 +68,10 @@ public class LogstashWriter implements Serializable {
   private final String stageName;
   private final String agentName;
 
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
+    this(run, error, listener, charset, null, null, null);
+  }
+
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, HashMap<String, String> additionalParams) {
     this(run, error, listener, charset, null, null, additionalParams);
   }
@@ -87,6 +91,10 @@ public class LogstashWriter implements Serializable {
       this.jenkinsUrl = getJenkinsUrl();
       this.buildData = getBuildData(additionalParams);
     }
+  }
+
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName) {
+    this(run, error, listener, charset, stageName, agentName, null);
   }
 
   /**

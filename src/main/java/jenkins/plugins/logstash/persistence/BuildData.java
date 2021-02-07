@@ -173,9 +173,11 @@ public class BuildData implements Serializable {
   private Set<String> sensitiveBuildVariables;
   private TestData testResults = null;
 
+  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
+    this(build, currentTime, listener, null);
+  }
   // Freestyle project build
-  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener,
-      HashMap<String, String> additionalParams) {
+  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener, HashMap<String, String> additionalParams) {
     initData(build, currentTime);
 
     // build.getDuration() is always 0 in Notifiers
@@ -214,6 +216,10 @@ public class BuildData implements Serializable {
     }
   }
 
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName){
+    this(build, currentTime, listener, stageName, agentName, null);
+  }
+
   // Pipeline project build
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName,
       HashMap<String, String> additionalParams) {
@@ -238,7 +244,6 @@ public class BuildData implements Serializable {
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {
-
     this.build = build;
     Executor executor = build.getExecutor();
     if (executor == null) {
