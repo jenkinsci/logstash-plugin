@@ -404,4 +404,48 @@ public class BuildDataTest {
       verifyMocks();
       verifyTestResultActions();
   }
+
+  @Test
+  public void additionalParamsAreAddedCorrectly() throws Exception 
+    {
+      when(mockBuild.getEnvironments()).thenReturn(new EnvironmentList(Arrays.asList(mockEnvironment)));
+      when(mockBuild.getBuildVariables()).thenReturn(new HashMap<String, String>());
+
+      when(mockComputer.getNode()).thenReturn(mockNode);
+
+      final String envVarKey = "EnvVarKey";
+      final String envVarVal = "EnvVarVal";
+      final String buildVarKey = "BuildVarKey";
+      final String buildVarVal = "BuildVarVal";
+      final String sensitiveVarKey = "SensitiveVarKey";
+      HashMap<String,String> additionalParams = new HashMap<String, String>();
+      additionalParams.put("param1", "value1");
+      additionalParams.put("param2", "value2");
+
+      doAnswer(new Answer<Void>() {
+        @SuppressWarnings("unchecked")
+        @Override
+        public Void answer(InvocationOnMock invocation) throws Throwable {
+          Map<String, String> output = (Map<String, String>) invocation.getArguments()[0];
+          output.put(envVarKey, envVarVal);
+          output.put(sensitiveVarKey, "privateKey");
+          return null;
+        }
+      }).when(mockEnvironment).buildEnvVars(any());
+      when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars(buildVarKey, buildVarVal));
+      when(mockBuild.getSensitiveBuildVariables()).thenReturn(new HashSet<>(Arrays.asList(sensitiveVarKey)));
+
+      // Unit under test
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener, additionalParams);
+
+    // Verify results
+    Assert.assertEquals("Wrong number of environment variables", 4, buildData.getBuildVariables().size());
+    Assert.assertEquals("Missing additionalParam: param1", "value1", buildData.getBuildVariables().get("param1"));
+    Assert.assertEquals("Missing additionalParam: param1", "value2", buildData.getBuildVariables().get("param2"));
+    Assert.assertNull("Found sensitive environment variable '" + sensitiveVarKey + "'", buildData.getBuildVariables().get(sensitiveVarKey));
+
+    verify(mockEnvironment).buildEnvVars(any());
+    verifyMocks();
+    verifyTestResultActions();
+  }
 }
