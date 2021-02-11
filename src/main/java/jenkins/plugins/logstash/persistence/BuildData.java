@@ -213,11 +213,13 @@ public class BuildData implements Serializable {
     }
     try {
       buildVariables.putAll(build.getEnvironment(listener));
-      buildVariables.putAll(additionalParams);
     } catch (Exception e) {
       // no base build env vars to merge
       LOGGER.log(WARNING, "Unable update logstash buildVariables with EnvVars from " + build.getDisplayName(), e);
     }
+
+    buildVariables.putAll(additionalParams);
+
     for (String key : sensitiveBuildVariables) {
       buildVariables.remove(key);
     }
@@ -243,11 +245,12 @@ public class BuildData implements Serializable {
       // TODO: sensitive variables are not filtered, c.f.
       // https://stackoverflow.com/questions/30916085
       buildVariables = build.getEnvironment(listener);
-      buildVariables.putAll(additionalParams);
     } catch (IOException | InterruptedException e) {
       LOGGER.log(WARNING, "Unable to get environment for " + build.getDisplayName(), e);
       buildVariables = new HashMap<>();
     }
+
+    buildVariables.putAll(additionalParams);
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {

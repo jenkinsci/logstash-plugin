@@ -76,6 +76,10 @@ public class LogstashWriter implements Serializable {
     this(run, error, listener, charset, null, null, additionalParams);
   }
 
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName) {
+    this(run, error, listener, charset, stageName, agentName, null);
+  }
+
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName, HashMap<String, String> additionalParams) {
     this.errorStream = error != null ? error : System.err;
     this.stageName = stageName;
@@ -93,9 +97,6 @@ public class LogstashWriter implements Serializable {
     }
   }
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName) {
-    this(run, error, listener, charset, stageName, agentName, null);
-  }
 
   /**
    * Gets the charset that Jenkins is using during this build.
