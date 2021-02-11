@@ -3,6 +3,7 @@ package jenkins.plugins.logstash.pipeline;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.jenkinsci.plugins.workflow.steps.Step;
@@ -60,7 +61,7 @@ public class LogstashSendStep extends Step
 
     private transient final int maxLines;
     private transient final boolean failBuild;
-    private transient final HashMap<String, String> additionalParams;
+    private transient final Map<String, String> additionalParams;
 
     Execution(StepContext context, int maxLines, boolean failBuild)
     {
@@ -70,7 +71,7 @@ public class LogstashSendStep extends Step
       this.additionalParams = new HashMap<String,String>();
     }
     
-    Execution(StepContext context, int maxLines, boolean failBuild, HashMap<String, String> additionalParams)
+    Execution(StepContext context, int maxLines, boolean failBuild, Map<String, String> additionalParams)
     {
       super(context);
       this.maxLines = maxLines;

@@ -183,9 +183,8 @@ public class BuildData implements Serializable {
     this(build, currentTime, listener, null);
   }
   // Freestyle project build
-  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener, HashMap<String, String> additionalParams) {
+  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener, Map<String, String> additionalParams) {
     initData(build, currentTime);
-    additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
 
     // build.getDuration() is always 0 in Notifiers
     rootProjectName = build.getRootBuild().getProject().getName();
@@ -193,6 +192,8 @@ public class BuildData implements Serializable {
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
+    buildVariables = new HashMap<>(buildVariables);
+    buildVariables.putAll(additionalParams);
     sensitiveBuildVariables = build.getSensitiveBuildVariables();
 
     // Get environment build variables and merge them into the buildVariables map
@@ -218,8 +219,6 @@ public class BuildData implements Serializable {
       LOGGER.log(WARNING, "Unable update logstash buildVariables with EnvVars from " + build.getDisplayName(), e);
     }
 
-    buildVariables.putAll(additionalParams);
-
     for (String key : sensitiveBuildVariables) {
       buildVariables.remove(key);
     }
@@ -231,26 +230,24 @@ public class BuildData implements Serializable {
 
   // Pipeline project build
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName,
-      HashMap<String, String> additionalParams) {
+      Map<String, String> additionalParams) {
     initData(build, currentTime);
-    additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
+    // additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
     this.agentName = agentName;
     this.stageName = stageName;
     rootProjectName = projectName;
     rootFullProjectName = fullProjectName;
     rootProjectDisplayName = displayName;
     rootBuildNum = buildNum;
+    this.buildVariables = new HashMap<String, String>(additionalParams);
 
     try {
       // TODO: sensitive variables are not filtered, c.f.
       // https://stackoverflow.com/questions/30916085
-      buildVariables = build.getEnvironment(listener);
+      buildVariables.putAll(build.getEnvironment(listener));
     } catch (IOException | InterruptedException e) {
       LOGGER.log(WARNING, "Unable to get environment for " + build.getDisplayName(), e);
-      buildVariables = new HashMap<>();
     }
-
-    buildVariables.putAll(additionalParams);
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {

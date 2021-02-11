@@ -42,8 +42,8 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A writer that wraps all Logstash DAOs.  Handles error reporting and per build connection state.
@@ -72,15 +72,14 @@ public class LogstashWriter implements Serializable {
     this(run, error, listener, charset, null, null, null);
   }
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, HashMap<String, String> additionalParams) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, Map<String, String> additionalParams) {
     this(run, error, listener, charset, null, null, additionalParams);
   }
-
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName) {
     this(run, error, listener, charset, stageName, agentName, null);
   }
 
-  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName, HashMap<String, String> additionalParams) {
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName, Map<String, String> additionalParams) {
     this.errorStream = error != null ? error : System.err;
     this.stageName = stageName;
     this.agentName = agentName;
@@ -171,7 +170,7 @@ public class LogstashWriter implements Serializable {
     return LogstashConfiguration.getInstance().getIndexerInstance();
   }
 
-  BuildData getBuildData(HashMap<String, String> additionalParams) {
+  BuildData getBuildData(Map<String, String> additionalParams) {
     if (build instanceof AbstractBuild) {
       return new BuildData((AbstractBuild<?, ?>) build, new Date(), listener, additionalParams);
     } else {
