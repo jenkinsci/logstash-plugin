@@ -149,11 +149,11 @@ public class LogstashWriterTest {
 
   @After
   public void after() throws Exception {
-    // verifyNoMoreInteractions(mockDao);
-    // verifyNoMoreInteractions(mockBuild);
-    // verifyNoMoreInteractions(mockBuildData);
-    // verifyNoMoreInteractions(mockTestResultAction);
-    // verifyNoMoreInteractions(mockProject);
+    verifyNoMoreInteractions(mockDao);
+    verifyNoMoreInteractions(mockBuild);
+    verifyNoMoreInteractions(mockBuildData);
+    verifyNoMoreInteractions(mockTestResultAction);
+    verifyNoMoreInteractions(mockProject);
     errorBuffer.close();
   }
 
