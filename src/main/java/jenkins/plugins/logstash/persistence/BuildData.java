@@ -188,11 +188,12 @@ public class BuildData implements Serializable {
 
     // build.getDuration() is always 0 in Notifiers
     rootProjectName = build.getRootBuild().getProject().getName();
+    additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
     rootFullProjectName = build.getRootBuild().getProject().getFullName();
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
-    buildVariables = new HashMap<>(buildVariables);
+    buildVariables = new HashMap<String,String>(buildVariables);
     buildVariables.putAll(additionalParams);
     sensitiveBuildVariables = build.getSensitiveBuildVariables();
 
@@ -232,7 +233,7 @@ public class BuildData implements Serializable {
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName,
       Map<String, String> additionalParams) {
     initData(build, currentTime);
-    // additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
+    additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
     this.agentName = agentName;
     this.stageName = stageName;
     rootProjectName = projectName;
