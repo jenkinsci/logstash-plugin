@@ -29,12 +29,14 @@ public class LogstashSendStep extends Step
 
   private int maxLines;
   private boolean failBuild;
+  private Map<String,String> additionalParams;
 
   @DataBoundConstructor
-  public LogstashSendStep(int maxLines, boolean failBuild)
+  public LogstashSendStep(int maxLines, boolean failBuild, Map<String,String> additionalParams)
   {
     this.maxLines = maxLines;
     this.failBuild = failBuild;
+    this.additionalParams = additionalParams;
   }
 
   public int getMaxLines()
@@ -50,7 +52,7 @@ public class LogstashSendStep extends Step
   @Override
   public StepExecution start(StepContext context) throws Exception
   {
-    return new Execution(context, maxLines, failBuild);
+    return new Execution(context, maxLines, failBuild, additionalParams);
   }
 
   @SuppressFBWarnings(value="SE_TRANSIENT_FIELD_NOT_RESTORED", justification="Only used when starting.")

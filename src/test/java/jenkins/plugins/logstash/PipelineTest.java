@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -120,6 +121,26 @@ public class PipelineTest
           "echo 'Message'\n" +
           "currentBuild.result = 'SUCCESS'\n" +
           "logstashSend  failBuild: true, maxLines: 5"
+    , true));
+    j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
+    List<JSONObject> dataLines = memoryDao.getOutput();
+    assertThat(dataLines.size(), equalTo(1));
+    JSONObject firstLine = dataLines.get(0);
+    JSONObject data = firstLine.getJSONObject("data");
+    assertThat(data.getString("result"),equalTo("SUCCESS"));
+  }
+
+  @Test
+  public void logstashSendWithAdditionalParams() throws Exception
+  {
+    WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
+    HashMap<String,String> additionalParams = new HashMap<String,String>();
+    additionalParams.put("param1", "value1");
+    additionalParams.put("param2", "value2");
+    p.setDefinition(new CpsFlowDefinition(
+          "echo 'Message'\n" +
+          "currentBuild.result = 'SUCCESS'\n" +
+          "logstashSend  failBuild: true, maxLines: 5, additionalParams: " + additionalParams.toString()
     , true));
     j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
     List<JSONObject> dataLines = memoryDao.getOutput();
