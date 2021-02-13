@@ -134,13 +134,10 @@ public class PipelineTest
   public void logstashSendWithAdditionalParams() throws Exception
   {
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
-    HashMap<String,String> additionalParams = new HashMap<String,String>();
-    additionalParams.put("param1", "value1");
-    additionalParams.put("param2", "value2");
     p.setDefinition(new CpsFlowDefinition(
           "echo 'Message'\n" +
           "currentBuild.result = 'SUCCESS'\n" +
-          "logstashSend  failBuild: true, maxLines: 5, additionalParams: " + additionalParams.toString()
+          "logstashSend  failBuild: true, maxLines: 5, additionalParams: {param1='value1', param2='value2'}" 
     , true));
     j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
     List<JSONObject> dataLines = memoryDao.getOutput();
