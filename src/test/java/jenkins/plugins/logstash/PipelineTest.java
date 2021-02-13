@@ -137,7 +137,10 @@ public class PipelineTest
     p.setDefinition(new CpsFlowDefinition(
           "echo 'Message'\n" +
           "currentBuild.result = 'SUCCESS'\n" +
-          "logstashSend  failBuild: true, maxLines: 5, additionalParams: {param1='value1', param2='value2'}" 
+          "HashMap<String, String> someMap = new HashMap<String,String>()\n" + 
+          "someMap.put('param1', 'value1')\n" +
+          "someMap.put('param2', 'value2')\n" + 
+          "logstashSend failBuild: true, maxLines: 5, additionalParams: someMap" 
     , true));
     j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
     List<JSONObject> dataLines = memoryDao.getOutput();
