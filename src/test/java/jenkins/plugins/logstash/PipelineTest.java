@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -134,12 +135,13 @@ public class PipelineTest
   public void logstashSendWithAdditionalParams() throws Exception
   {
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
+    HashMap<String, String> someMap = new HashMap<String,String>(); 
+    someMap.put("param1", "value1");
+    someMap.put("param2", "value2"); 
     p.setDefinition(new CpsFlowDefinition(
           "echo 'Message'\n" +
           "currentBuild.result = 'SUCCESS'\n" +
-          "HashMap<String, String> someMap = new HashMap<String,String>()\n" + 
-          "someMap.put('param1', 'value1')\n" +
-          "someMap.put('param2', 'value2')\n" + 
+          "def someMap = [param1:'value1', param2:'value2']\n" + 
           "logstashSend failBuild: true, maxLines: 5, additionalParams: someMap" 
     , true));
     j.assertBuildStatusSuccess(p.scheduleBuild2(0).get());
@@ -149,4 +151,22 @@ public class PipelineTest
     JSONObject data = firstLine.getJSONObject("data");
     assertThat(data.getString("result"),equalTo("SUCCESS"));
   }
+
+  public String mapFormatter(Map<String, Object> lhm1,String result) {
+           result=result+"["+"\n";
+           for (Map.Entry<String, Object> entry : lhm1.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+           if (value instanceof Map) {
+                Map<String, Object> subMap = (Map<String, Object>)value;
+                result=result+key+" : ";
+                result=result+mapFormatter(subMap,"");
+            }
+           else {
+                result=result+key+" : "+value+","+"\n";
+            }
+        }
+           result=result.replaceAll(",$", "")+"]"+"\n";
+        return result;
+    }
 }
