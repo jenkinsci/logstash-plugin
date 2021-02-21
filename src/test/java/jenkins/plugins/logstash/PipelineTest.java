@@ -149,24 +149,8 @@ public class PipelineTest
     assertThat(dataLines.size(), equalTo(1));
     JSONObject firstLine = dataLines.get(0);
     JSONObject data = firstLine.getJSONObject("data");
+    assertThat(data.getJSONObject("buildVariables").getString("param1"), equalTo("value1"));
+    assertThat(data.getJSONObject("buildVariables").getString("param2"), equalTo("value2"));
     assertThat(data.getString("result"),equalTo("SUCCESS"));
   }
-
-  public String mapFormatter(Map<String, Object> lhm1,String result) {
-           result=result+"["+"\n";
-           for (Map.Entry<String, Object> entry : lhm1.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-           if (value instanceof Map) {
-                Map<String, Object> subMap = (Map<String, Object>)value;
-                result=result+key+" : ";
-                result=result+mapFormatter(subMap,"");
-            }
-           else {
-                result=result+key+" : "+value+","+"\n";
-            }
-        }
-           result=result.replaceAll(",$", "")+"]"+"\n";
-        return result;
-    }
 }
