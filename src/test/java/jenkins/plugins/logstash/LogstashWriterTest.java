@@ -60,10 +60,7 @@ public class LogstashWriterTest {
                                              final String url,
                                              final LogstashIndexerDao indexer,
                                              final BuildData data) {
-    HashMap<String, String> additionalParams = new HashMap<String, String>();
-    additionalParams.put("param1", "value1");
-    additionalParams.put("param2", "value2");
-    return new LogstashWriter(testBuild, error, null, testBuild.getCharset(), additionalParams) {
+    return new LogstashWriter(testBuild, error, null, testBuild.getCharset(), Collections.emptyMap()) {
       @Override
       LogstashIndexerDao getIndexerDao() {
         return indexer;
