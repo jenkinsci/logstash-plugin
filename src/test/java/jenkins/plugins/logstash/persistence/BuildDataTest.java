@@ -52,7 +52,7 @@ import net.sf.json.test.JSONAssert;
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class BuildDataTest {
-
+  // \"additonalParams\":{},
   static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"fullProjectName\":\"parent/BuildDataTest\","
       + "\"projectName\":\"BuildDataTest\",\"displayName\":\"BuildData Test\",\"fullDisplayName\":\"BuildData Test #123456\","
       + "\"description\":\"Mock project for testing BuildData\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\","

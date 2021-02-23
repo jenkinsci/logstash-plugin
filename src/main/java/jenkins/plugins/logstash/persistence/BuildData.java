@@ -181,7 +181,7 @@ public class BuildData implements Serializable {
   private TestData testResults = null;
   
   public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
-    this(build, currentTime, listener, null);
+    this(build, currentTime, listener, Collections.emptyMap());
   }
   // Freestyle project build
   public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener, Map<String, String> additionalParams) {
@@ -189,12 +189,12 @@ public class BuildData implements Serializable {
 
     // build.getDuration() is always 0 in Notifiers
     rootProjectName = build.getRootBuild().getProject().getName();
-    this.additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
+    this.additionalParams = new HashMap<String,String>();
     rootFullProjectName = build.getRootBuild().getProject().getFullName();
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
-    buildVariables = new HashMap<String,String>(buildVariables);
+    // buildVariables = new HashMap<String,String>(buildVariables);
     // buildVariables.putAll(additionalParams);
     sensitiveBuildVariables = build.getSensitiveBuildVariables();
 
@@ -227,14 +227,14 @@ public class BuildData implements Serializable {
   }
 
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName){
-    this(build, currentTime, listener, stageName, agentName, null);
+    this(build, currentTime, listener, stageName, agentName, Collections.emptyMap());
   }
 
   // Pipeline project build
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName,
       Map<String, String> additionalParams) {
     initData(build, currentTime);
-    this.additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
+    this.additionalParams = new HashMap<String,String>();
     this.agentName = agentName;
     this.stageName = stageName;
     rootProjectName = projectName;
@@ -452,13 +452,13 @@ public class BuildData implements Serializable {
     this.buildVariables = buildVariables;
   }
 
-  public Map<String, String> getAdditionalParams() {
-    return additionalParams;
-  }
+  // public Map<String, String> getAdditionalParams() {
+  //   return additionalParams;
+  // }
 
-  public void setAdditionalParams(Map<String, String> additionalParams) {
-    this.additionalParams = additionalParams;
-  }
+  // public void setAdditionalParams(Map<String, String> additionalParams) {
+  //   this.additionalParams = additionalParams;
+  // }
 
   public Set<String> getSensitiveBuildVariables() {
     return sensitiveBuildVariables;
