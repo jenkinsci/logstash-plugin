@@ -452,13 +452,13 @@ public class BuildData implements Serializable {
     this.buildVariables = buildVariables;
   }
 
-  // public Map<String, String> getAdditionalParams() {
-  //   return additionalParams;
-  // }
+  public Map<String, String> getAdditionalParams() {
+    return additionalParams;
+  }
 
-  // public void setAdditionalParams(Map<String, String> additionalParams) {
-  //   this.additionalParams = additionalParams;
-  // }
+  public void setAdditionalParams(Map<String, String> additionalParams) {
+    this.additionalParams = additionalParams;
+  }
 
   public Set<String> getSensitiveBuildVariables() {
     return sensitiveBuildVariables;
