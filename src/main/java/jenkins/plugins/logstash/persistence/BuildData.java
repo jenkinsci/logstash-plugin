@@ -176,6 +176,7 @@ public class BuildData implements Serializable {
   private String rootProjectDisplayName;
   private int rootBuildNum;
   private Map<String, String> buildVariables;
+  private Map<String, String> additionalParams;
   private Set<String> sensitiveBuildVariables;
   private TestData testResults = null;
   
@@ -188,13 +189,13 @@ public class BuildData implements Serializable {
 
     // build.getDuration() is always 0 in Notifiers
     rootProjectName = build.getRootBuild().getProject().getName();
-    additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
+    this.additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
     rootFullProjectName = build.getRootBuild().getProject().getFullName();
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
     buildVariables = new HashMap<String,String>(buildVariables);
-    buildVariables.putAll(additionalParams);
+    // buildVariables.putAll(additionalParams);
     sensitiveBuildVariables = build.getSensitiveBuildVariables();
 
     // Get environment build variables and merge them into the buildVariables map
@@ -233,14 +234,14 @@ public class BuildData implements Serializable {
   public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName,
       Map<String, String> additionalParams) {
     initData(build, currentTime);
-    additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
+    this.additionalParams = additionalParams == null ? new HashMap<String, String>() : additionalParams;
     this.agentName = agentName;
     this.stageName = stageName;
     rootProjectName = projectName;
     rootFullProjectName = fullProjectName;
     rootProjectDisplayName = displayName;
     rootBuildNum = buildNum;
-    this.buildVariables = new HashMap<String, String>(additionalParams);
+    this.buildVariables = new HashMap<String, String>();
 
     try {
       // TODO: sensitive variables are not filtered, c.f.
@@ -449,6 +450,14 @@ public class BuildData implements Serializable {
 
   public void setBuildVariables(Map<String, String> buildVariables) {
     this.buildVariables = buildVariables;
+  }
+
+  public Map<String, String> getAdditionalParams() {
+    return additionalParams;
+  }
+
+  public void setAdditionalParams(Map<String, String> additionalParams) {
+    this.additionalParams = additionalParams;
   }
 
   public Set<String> getSensitiveBuildVariables() {

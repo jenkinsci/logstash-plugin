@@ -424,8 +424,8 @@ public class BuildDataTest {
         
       BuildData buildData = new BuildData(mockBuild, mockDate, mockListener, additionalParams);
 
-      Assert.assertEquals("Missing additionalParam: param1", "value1", buildData.getBuildVariables().get("param1"));
-      Assert.assertEquals("Missing additionalParam: param1", "value2", buildData.getBuildVariables().get("param2"));
+      Assert.assertEquals("Missing additionalParam: param1", "value1", buildData.getAdditionalParams().get("param1"));
+      Assert.assertEquals("Missing additionalParam: param1", "value2", buildData.getAdditionalParams().get("param2"));
 
       verify(mockEnvironment).buildEnvVars(any());
       verifyMocks();

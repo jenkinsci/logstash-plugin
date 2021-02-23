@@ -149,8 +149,8 @@ public class PipelineTest
     assertThat(dataLines.size(), equalTo(1));
     JSONObject firstLine = dataLines.get(0);
     JSONObject data = firstLine.getJSONObject("data");
-    assertThat(data.getJSONObject("buildVariables").getString("param1"), equalTo("value1"));
-    assertThat(data.getJSONObject("buildVariables").getString("param2"), equalTo("value2"));
+    assertThat(data.getJSONObject("additionalParams").getString("param1"), equalTo("value1"));
+    assertThat(data.getJSONObject("additionalParmas").getString("param2"), equalTo("value2"));
     assertThat(data.getString("result"),equalTo("SUCCESS"));
   }
 }
