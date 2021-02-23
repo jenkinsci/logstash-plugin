@@ -52,13 +52,12 @@ import net.sf.json.test.JSONAssert;
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class BuildDataTest {
-  // \"additonalParams\":{},
   static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"fullProjectName\":\"parent/BuildDataTest\","
       + "\"projectName\":\"BuildDataTest\",\"displayName\":\"BuildData Test\",\"fullDisplayName\":\"BuildData Test #123456\","
       + "\"description\":\"Mock project for testing BuildData\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\","
       + "\"buildHost\":\"master\",\"buildLabel\":\"master\",\"buildNum\":123456,\"buildDuration\":60,"
       + "\"rootProjectName\":\"RootBuildDataTest\",\"rootFullProjectName\":\"parent/RootBuildDataTest\","
-      + "\"rootProjectDisplayName\":\"Root BuildData Test\",\"rootBuildNum\":456,\"buildVariables\":{},"
+      + "\"rootProjectDisplayName\":\"Root BuildData Test\",\"rootBuildNum\":456,\"buildVariables\":{}, \"additionalParams\":{},"
       + "\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0, \"passCount\":0,"
       + "\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}}";
 
@@ -374,7 +373,7 @@ public class BuildDataTest {
       // Verify results
       JSONAssert.assertEquals("Results don't match", JSONObject.fromObject(FULL_STRING), result);
 
-      verifyMocks();
+      verifyMocks(); 
       verifyTestResultActions();
   }
 
