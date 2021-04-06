@@ -194,8 +194,6 @@ public class BuildData implements Serializable {
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
     buildVariables = build.getBuildVariables();
-    // buildVariables = new HashMap<String,String>(buildVariables);
-    // buildVariables.putAll(additionalParams);
     sensitiveBuildVariables = build.getSensitiveBuildVariables();
 
     // Get environment build variables and merge them into the buildVariables map
