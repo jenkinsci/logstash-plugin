@@ -124,6 +124,7 @@ public class LogstashWriterTest {
     when(mockBuild.getCharset()).thenReturn(Charset.defaultCharset());
     when(mockExecutor.getOwner()).thenReturn(mockComputer);
     when(mockComputer.getNode()).thenReturn(null);
+    when(mockBuild.getCauses()).thenReturn(Collections.emptyList());
 
     when(mockTestResultAction.getTotalCount()).thenReturn(0);
     when(mockTestResultAction.getSkipCount()).thenReturn(0);
@@ -160,7 +161,7 @@ public class LogstashWriterTest {
     // This also lets us verify that in the instantiation failure cases we do not construct BuildData.
     verify(mockBuild).getId();
     verify(mockBuild, times(2)).getResult();
-    verify(mockBuild, times(2)).getParent();
+    verify(mockBuild, times(3)).getParent();
     verify(mockBuild, times(2)).getProject();
     verify(mockBuild, times(1)).getStartTimeInMillis();
     verify(mockBuild, times(2)).getDisplayName();
@@ -177,6 +178,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getEnvironments();
     verify(mockBuild).getEnvironment(null);
     verify(mockBuild).getCharset();
+    verify(mockBuild).getCauses();
 
     verify(mockTestResultAction).getTotalCount();
     verify(mockTestResultAction).getSkipCount();
