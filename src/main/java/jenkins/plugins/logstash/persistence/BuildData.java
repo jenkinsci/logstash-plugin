@@ -25,6 +25,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import hudson.model.Action;
+import hudson.model.Cause;
 import hudson.model.Environment;
 import hudson.model.Executor;
 import hudson.model.Result;
@@ -34,6 +35,8 @@ import hudson.model.Run;
 import hudson.model.Node;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
+import hudson.triggers.SCMTrigger;
+import hudson.triggers.TimerTrigger;
 import jenkins.plugins.logstash.LogstashConfiguration;
 
 import java.util.ArrayList;
@@ -167,6 +170,7 @@ public class BuildData implements Serializable {
   private String buildLabel;
   private String stageName;
   private String agentName;
+  private String userId;
   private int buildNum;
   private long buildDuration;
   private transient String timestamp; // This belongs in the root object
@@ -266,6 +270,7 @@ public class BuildData implements Serializable {
     buildNum = build.getNumber();
     buildDuration = currentTime.getTime() - build.getStartTimeInMillis();
     timestamp = LogstashConfiguration.getInstance().getDateFormatter().format(build.getTimestamp().getTime());
+    userId = getUserIdFromRun(build);
     updateResult();
   }
 
@@ -281,6 +286,38 @@ public class BuildData implements Serializable {
         testResults = new TestData(testResultAction);
       }
     }
+  }
+
+  private String getUserIdFromRun(Run<?, ?> run) {
+    for (Cause cause : run.getCauses()) {
+      String userName = getUserIdFromCause(cause);
+      if (userName != null) {
+        return userName;
+      }
+    }
+
+    if (run.getParent().getClass().getName().equals("hudson.maven.MavenModule")) {
+      return "maven";
+    }
+    return "anonymous";
+  }
+
+  private String getUserIdFromCause(Cause cause){
+    if (cause instanceof TimerTrigger.TimerTriggerCause) {
+      return "timer";
+    } else if (cause instanceof SCMTrigger.SCMTriggerCause) {
+      return "scm";
+    } else if (cause instanceof Cause.UserIdCause) {
+      return ((Cause.UserIdCause) cause).getUserId();
+    } else if (cause instanceof Cause.UpstreamCause) {
+      for (Cause upstreamCause : ((Cause.UpstreamCause) cause).getUpstreamCauses()) {
+        String username = getUserIdFromCause(upstreamCause);
+        if (username != null) {
+          return username;
+        }
+      }
+    }
+    return null;
   }
 
   @Override
@@ -468,5 +505,13 @@ public class BuildData implements Serializable {
 
   public void setAgentName(String agentName) {
     this.agentName = agentName;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public void setUserId(String userId) {
+    this.userId = userId;
   }
 }
