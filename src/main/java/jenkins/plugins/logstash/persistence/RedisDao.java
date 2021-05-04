@@ -48,10 +48,11 @@ public class RedisDao extends HostBasedLogstashIndexerDao {
 
   private final String password;
   private final String key;
+  private final int dbindex;
 
   //primary constructor used by indexer factory
-  public RedisDao(String host, int port, String key, String password) {
-    this(null, host, port, key, password);
+  public RedisDao(String host, int port, String key, String password, int dbindex) {
+    this(null, host, port, key, password, dbindex);
   }
 
   /*
@@ -59,11 +60,12 @@ public class RedisDao extends HostBasedLogstashIndexerDao {
    *       With Powermock we can intercept the creation of the JedisPool and replace with a mock
    *       making this constructor obsolete
    */
-  RedisDao(JedisPool factory, String host, int port, String key, String password) {
+  RedisDao(JedisPool factory, String host, int port, String key, String password, int dbindex) {
     super(host, port);
 
     this.key = key;
     this.password = password;
+    this.dbindex = dbindex;
 
     if (StringUtils.isBlank(key)) {
       throw new IllegalArgumentException("redis key is required");
@@ -90,6 +92,11 @@ public class RedisDao extends HostBasedLogstashIndexerDao {
     return key;
   }
 
+  public int getDbindex()
+  {
+    return dbindex;
+  }
+
   @Override
   public void push(String data) throws IOException {
     Jedis jedis = null;
@@ -99,6 +106,9 @@ public class RedisDao extends HostBasedLogstashIndexerDao {
       jedis = pool.getResource();
       if (!StringUtils.isBlank(password)) {
         jedis.auth(password);
+      }
+      if (dbindex > 0) {
+        jedis.select(dbindex);
       }
 
       jedis.connect();
