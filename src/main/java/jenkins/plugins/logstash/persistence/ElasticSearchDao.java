@@ -24,8 +24,6 @@
 
 package jenkins.plugins.logstash.persistence;
 
-import static com.google.common.collect.Ranges.closedOpen;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -51,8 +49,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
-import com.google.common.collect.Range;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jenkins.plugins.logstash.utils.SSLHelper;
 
@@ -69,7 +65,6 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   private transient HttpClientBuilder clientBuilder;
   private final URI uri;
   private final String auth;
-  private final Range<Integer> successCodes = closedOpen(200,300);
 
   private String username;
   private String password;
@@ -218,7 +213,8 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     HttpPost post = getHttpPost(data);
 
     try (CloseableHttpClient httpClient = getClientBuilder().build(); CloseableHttpResponse response = httpClient.execute(post)) {
-      if (!successCodes.contains(response.getStatusLine().getStatusCode())) {
+      int statusCode = response.getStatusLine().getStatusCode();
+      if (statusCode < 200 || statusCode >= 300) {
         throw new IOException(this.getErrorMessage(response));
       }
     }
