@@ -1,6 +1,7 @@
 package jenkins.plugins.logstash.pipeline;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -25,8 +26,6 @@ import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.jenkinsci.plugins.workflow.support.steps.ExecutorStep;
 import org.jenkinsci.plugins.workflow.support.steps.StageStep;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import com.google.common.collect.ImmutableSet;
 
 import hudson.Extension;
 import hudson.model.Run;
@@ -166,7 +165,9 @@ public class LogstashStep extends Step {
 
     @Override
     public Set<? extends Class<?>> getRequiredContext() {
-      return ImmutableSet.of(Run.class, FlowNode.class);
+      Set<Class<?>> context = new HashSet<>();
+      Collections.addAll(context, Run.class, FlowNode.class);
+      return Collections.unmodifiableSet(context);
     }
   }
 
