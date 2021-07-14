@@ -17,6 +17,7 @@ public class Redis extends HostBasedLogstashIndexer<RedisDao>
 
   protected String key;
   protected Secret password;
+  protected int dbindex;
 
   @DataBoundConstructor
   public Redis()
@@ -43,6 +44,17 @@ public class Redis extends HostBasedLogstashIndexer<RedisDao>
   public void setPassword(Secret password)
   {
     this.password = password;
+  }
+
+  public int getDbindex()
+  {
+    return dbindex;
+  }
+
+  @DataBoundSetter
+  public void setDbindex(int dbindex)
+  {
+    this.dbindex = dbindex;
   }
 
   @Override
@@ -85,7 +97,7 @@ public class Redis extends HostBasedLogstashIndexer<RedisDao>
   @Override
   public RedisDao createIndexerInstance()
   {
-    return new RedisDao(getHost(), getPort(), key, Secret.toString(password));
+    return new RedisDao(getHost(), getPort(), key, Secret.toString(password), getDbindex());
   }
 
   @Extension
@@ -103,6 +115,11 @@ public class Redis extends HostBasedLogstashIndexer<RedisDao>
     public int getDefaultPort()
     {
       return 6379;
+    }
+
+    public int getDefaultDbindex()
+    {
+      return 0;
     }
 
     public FormValidation doCheckKey(@QueryParameter("value") String value)
