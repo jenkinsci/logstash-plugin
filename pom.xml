@@ -14,7 +14,7 @@
 
   <name>Logstash</name>
   <description>A Logstash agent to send Jenkins logs to a Logstash indexer.</description>
-  <url>https://wiki.jenkins.io/display/JENKINS/Logstash+Plugin</url>
+  <url>https://github.com/jenkinsci/logstash-plugin</url>
   <licenses>
     <license>
       <name>MIT License</name>
