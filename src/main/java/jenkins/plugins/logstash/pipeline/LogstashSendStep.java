@@ -1,7 +1,9 @@
 package jenkins.plugins.logstash.pipeline;
 
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.jenkinsci.plugins.workflow.steps.Step;
@@ -27,12 +29,14 @@ public class LogstashSendStep extends Step
 
   private int maxLines;
   private boolean failBuild;
+  private Map<String,String> additionalParams;
 
   @DataBoundConstructor
-  public LogstashSendStep(int maxLines, boolean failBuild)
+  public LogstashSendStep(int maxLines, boolean failBuild, Map<String,String> additionalParams)
   {
     this.maxLines = maxLines;
     this.failBuild = failBuild;
+    this.additionalParams = additionalParams;
   }
 
   public int getMaxLines()
@@ -48,7 +52,7 @@ public class LogstashSendStep extends Step
   @Override
   public StepExecution start(StepContext context) throws Exception
   {
-    return new Execution(context, maxLines, failBuild);
+    return new Execution(context, maxLines, failBuild, additionalParams);
   }
 
   @SuppressFBWarnings(value="SE_TRANSIENT_FIELD_NOT_RESTORED", justification="Only used when starting.")
@@ -59,29 +63,36 @@ public class LogstashSendStep extends Step
 
     private transient final int maxLines;
     private transient final boolean failBuild;
+    private transient final Map<String, String> additionalParams;
 
     Execution(StepContext context, int maxLines, boolean failBuild)
     {
       super(context);
       this.maxLines = maxLines;
       this.failBuild = failBuild;
+      this.additionalParams = new HashMap<String,String>();
+    }
+    
+    Execution(StepContext context, int maxLines, boolean failBuild, Map<String, String> additionalParams)
+    {
+      super(context);
+      this.maxLines = maxLines;
+      this.failBuild = failBuild;
+      this.additionalParams = additionalParams;
     }
 
     @Override
-    protected Void run() throws Exception
-    {
+    protected Void run() throws Exception {
       Run<?, ?> run = getContext().get(Run.class);
       TaskListener listener = getContext().get(TaskListener.class);
       PrintStream errorStream = listener.getLogger();
-      LogstashWriter logstash = new LogstashWriter(run, errorStream, listener, run.getCharset());
+      LogstashWriter logstash = new LogstashWriter(run, errorStream, listener, run.getCharset(), this.additionalParams);
       logstash.writeBuildLog(maxLines);
-      if (failBuild && logstash.isConnectionBroken())
-      {
+      if (failBuild && logstash.isConnectionBroken()) {
         throw new Exception("Failed to send data to Indexer");
       }
       return null;
     }
-
   }
 
   @Extension

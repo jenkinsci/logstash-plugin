@@ -2,6 +2,7 @@ package jenkins.plugins.logstash.persistence;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -51,13 +52,12 @@ import net.sf.json.test.JSONAssert;
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class BuildDataTest {
-
   static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"fullProjectName\":\"parent/BuildDataTest\","
       + "\"projectName\":\"BuildDataTest\",\"displayName\":\"BuildData Test\",\"fullDisplayName\":\"BuildData Test #123456\","
       + "\"description\":\"Mock project for testing BuildData\",\"url\":\"http://localhost:8080/jenkins/jobs/PROJECT_NAME/123\","
       + "\"buildHost\":\"master\",\"buildLabel\":\"master\",\"buildNum\":123456,\"buildDuration\":60,"
       + "\"rootProjectName\":\"RootBuildDataTest\",\"rootFullProjectName\":\"parent/RootBuildDataTest\","
-      + "\"rootProjectDisplayName\":\"Root BuildData Test\",\"rootBuildNum\":456,\"buildVariables\":{},"
+      + "\"rootProjectDisplayName\":\"Root BuildData Test\",\"rootBuildNum\":456,\"buildVariables\":{}, \"additionalParams\":{},"
       + "\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0, \"passCount\":0,"
       + "\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}}";
 
@@ -373,7 +373,7 @@ public class BuildDataTest {
       // Verify results
       JSONAssert.assertEquals("Results don't match", JSONObject.fromObject(FULL_STRING), result);
 
-      verifyMocks();
+      verifyMocks(); 
       verifyTestResultActions();
   }
 
@@ -401,6 +401,32 @@ public class BuildDataTest {
 
       Assert.assertEquals(buildData.getRootFullProjectName(), "parent/RootBuildDataTest");
 
+      verifyMocks();
+      verifyTestResultActions();
+  }
+
+  @Test
+  public void additionalParamsAreAddedCorrectly() throws Exception 
+  {
+      when(mockBuild.getEnvironments()).thenReturn(new EnvironmentList(Arrays.asList(mockEnvironment)));
+      when(mockBuild.getBuildVariables()).thenReturn(new HashMap<String, String>());
+      when(mockComputer.getNode()).thenReturn(mockNode);
+      final String buildVarKey = "BuildVarKey";
+      final String buildVarVal = "BuildVarVal";
+      when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars(buildVarKey, buildVarVal));
+      when(mockBuild.getSensitiveBuildVariables()).thenReturn(new HashSet<>());
+      doNothing().when(mockEnvironment).buildEnvVars(any());
+
+      HashMap<String,String> additionalParams = new HashMap<String, String>();
+      additionalParams.put("param1", "value1");
+      additionalParams.put("param2", "value2");
+        
+      BuildData buildData = new BuildData(mockBuild, mockDate, mockListener, additionalParams);
+
+      Assert.assertEquals("Missing additionalParam: param1", "value1", buildData.getAdditionalParams().get("param1"));
+      Assert.assertEquals("Missing additionalParam: param1", "value2", buildData.getAdditionalParams().get("param2"));
+
+      verify(mockEnvironment).buildEnvVars(any());
       verifyMocks();
       verifyTestResultActions();
   }

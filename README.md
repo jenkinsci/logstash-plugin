@@ -58,6 +58,12 @@ timestamps {
 }
 ```
 
+You can also send extra parameters to the indexer by:
+```Groovy
+  logstashSend failBuild: true, maxLines: 1000, additionalParams: [param1: "value1", param2: "value2"]
+```
+Note: this feature won't work in freestyle builds
+
 License
 =======
 
