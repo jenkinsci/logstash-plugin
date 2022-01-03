@@ -35,13 +35,16 @@ public class GlobalDecorator extends TaskListenerDecorator {
     this.run = run;
     this.stageName = stageName;
     this.agentName = agentName;
-    this.writer = new LogstashWriter(run, null, null, StandardCharsets.UTF_8, stageName, agentName);
+
   }
 
   @Override
   public OutputStream decorate(OutputStream logger) throws IOException, InterruptedException {
-    this.writer.setErrorStream(logger);
-    LogstashOutputStream out = new LogstashOutputStream(logger, this.writer);
+    writer = new LogstashWriter(run, logger, null, StandardCharsets.UTF_8, stageName, agentName);
+    // this.writer = new LogstashWriter(run, logger, null, StandardCharsets.UTF_8, stageName, agentName);
+
+    // writer.setErrorStream(logger);
+    LogstashOutputStream out = new LogstashOutputStream(logger, writer);
     return out;
   }
 
