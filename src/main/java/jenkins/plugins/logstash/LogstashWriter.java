@@ -57,7 +57,7 @@ import java.util.List;
 @SuppressFBWarnings(value="SE_NO_SERIALVERSIONID")
 public class LogstashWriter implements Serializable {
 
-  private final OutputStream errorStream;
+  private OutputStream errorStream;
   private final transient Run<?, ?> build;
   private final TaskListener listener;
   private final BuildData buildData;
@@ -67,6 +67,10 @@ public class LogstashWriter implements Serializable {
   private final String charset;
   private final String stageName;
   private final String agentName;
+
+  public LogstashWriter(Run<?, ?> run, TaskListener listener, Charset charset) {
+    this(run, null, listener, charset, null, null);
+  }
 
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
     this(run, error, listener, charset, null, null);
@@ -88,6 +92,20 @@ public class LogstashWriter implements Serializable {
       this.buildData = getBuildData();
     }
   }
+
+
+
+  /**
+   * Sets the errorStream for logstash.
+   *
+   * @param error
+   *          OutputStream.
+   */
+  public void setErrorStream(OutputStream error)
+  {
+    this.errorStream = error;
+  }
+
 
   /**
    * Gets the charset that Jenkins is using during this build.
