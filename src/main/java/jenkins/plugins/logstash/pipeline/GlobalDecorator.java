@@ -35,7 +35,7 @@ public class GlobalDecorator extends TaskListenerDecorator {
     this.run = run;
     this.stageName = stageName;
     this.agentName = agentName;
-    this.writer = new LogstashWriter(run, null, StandardCharsets.UTF_8);
+    this.writer = new LogstashWriter(run, null, null, StandardCharsets.UTF_8, stageName, agentName);
   }
 
   @Override
