@@ -27,6 +27,7 @@ package jenkins.plugins.logstash;
 import hudson.console.ConsoleNote;
 import hudson.console.LineTransformationOutputStream;
 
+import java.lang.Boolean;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -40,12 +41,19 @@ import java.io.OutputStream;
 public class LogstashOutputStream extends LineTransformationOutputStream {
   private final OutputStream delegate;
   private final LogstashWriter logstash;
+  private Boolean buildScopedDecoratorConnectionBroken;
 
   public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash) {
+    this(delegate, logstash, false);
+    // this(delegate, logstash, new Boolean("True"));
+  }
+
+  public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash, Boolean buildScopedDecoratorConnectionBroken) {
     super();
     this.delegate = delegate;
     this.logstash = logstash;
   }
+
 
   // for testing purposes
   LogstashWriter getLogstashWriter()
@@ -58,10 +66,12 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
     delegate.write(b, 0, len);
     this.flush();
 
-    if(!logstash.isConnectionBroken()) {
+    if(!logstash.isConnectionBroken() || !buildScopedDecoratorConnectionBroken) {
       String line = new String(b, 0, len, logstash.getCharset());
       line = ConsoleNote.removeNotes(line).trim();
       logstash.write(line);
+    } else {
+      buildScopedDecoratorConnectionBroken = true;
     }
   }
 
