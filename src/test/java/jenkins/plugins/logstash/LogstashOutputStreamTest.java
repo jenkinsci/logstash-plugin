@@ -112,6 +112,7 @@ public class LogstashOutputStreamTest {
   public void eolSuccessNoDao() throws Exception {
     when(mockWriter.isConnectionBroken()).thenReturn(true);
     LogstashOutputStream los = new LogstashOutputStream(buffer, mockWriter);
+    when(los.getIsConnectionBroken().get()).thenReturn(true);
     String msg = "test";
     buffer.reset();
 
