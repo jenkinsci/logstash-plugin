@@ -186,6 +186,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jxr-plugin</artifactId>
+      <version>3.0.0</version>
+      <systemPath>${project.basedir}/src/main/resources/jar/maven-jxr-plugin-3.0.0.jar</systemPath>
+    </dependency>
+    <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-cps</artifactId>
       <scope>test</scope>
@@ -206,6 +212,18 @@
     <repository>
       <id>repo.jenkins-ci.org</id>
       <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+    <repository>
+      <id>mvnrepository</id>
+      <url>https://mvnrepository.com/</url>
+    </repository>
+    <repository>
+      <!-- id必须唯一 -->
+      <id>aliyun-repository</id>
+      <!-- 见名知意即可 -->
+      <name>aliyun repository</name>
+      <!-- 仓库的url地址 -->
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -258,6 +276,22 @@
       </plugin>
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>3.0.0-M5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>3.0.0</version>
+<!--        <scope>system</scope>-->
+<!--        <systemPath>${project.basedir}/src/main/resources/jar/maven-jxr-plugin-3.0.0.jar</systemPath>-->
+      </plugin>
+    </plugins>
+  </reporting>
   <profiles>
     <profile>
       <id>verify-pom-sorting</id>
