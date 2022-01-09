@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.lang.Boolean;
 
 import org.jenkinsci.plugins.workflow.flow.FlowExecutionOwner;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -27,7 +26,7 @@ public class GlobalDecorator extends TaskListenerDecorator {
   private transient Run<?, ?> run;
   private String stageName;
   private String agentName;
-  AtomicBoolean isBuildScopedDecoratorConnectionBroken;
+  AtomicBoolean isBuildScopedConnectionBroken;
 
   public GlobalDecorator(WorkflowRun run) {
     this(run, null, null);
@@ -37,15 +36,13 @@ public class GlobalDecorator extends TaskListenerDecorator {
     this.run = run;
     this.stageName = stageName;
     this.agentName = agentName;
-    this.isBuildScopedDecoratorConnectionBroken = new AtomicBoolean(false);
+    this.isBuildScopedConnectionBroken = new AtomicBoolean(false);
   }
 
   @Override
   public OutputStream decorate(OutputStream logger) throws IOException, InterruptedException {
     LogstashWriter writer = new LogstashWriter(run, logger, null, StandardCharsets.UTF_8, stageName, agentName);
-    LOGGER.log(Level.INFO, "[Before]-isBuildScopedDecoratorConnectionBroken: {0}", isBuildScopedDecoratorConnectionBroken.toString());
-    LogstashOutputStream out = new LogstashOutputStream(logger, writer, isBuildScopedDecoratorConnectionBroken);
-    LOGGER.log(Level.INFO, "[After]- isBuildScopedDecoratorConnectionBroken: {0}", isBuildScopedDecoratorConnectionBroken.toString());
+    LogstashOutputStream out = new LogstashOutputStream(logger, writer, isBuildScopedConnectionBroken);
     return out;
   }
 
