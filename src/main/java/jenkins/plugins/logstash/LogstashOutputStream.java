@@ -45,17 +45,19 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
 
   private final OutputStream delegate;
   private final LogstashWriter logstash;
-  private AtomicBoolean isBuildConnectionBroken;
+  private final AtomicBoolean isBuildConnectionBroken;
+  private final String run;
 
   public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash) {
-    this(delegate, logstash, new AtomicBoolean(false));
+    this(delegate, logstash, new AtomicBoolean(false), "");
   }
 
-  public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash, AtomicBoolean isBuildConnectionBroken) {
+  public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash, AtomicBoolean isBuildConnectionBroken, String run) {
     super();
     this.delegate = delegate;
     this.logstash = logstash;
     this.isBuildConnectionBroken = isBuildConnectionBroken;
+    this.run = run;
 
   }
 
@@ -83,7 +85,7 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
       // Once it gets connection broken, set the build connection flag to true.
       if (logstash.isConnectionBroken()) {
         getIsBuildConnectionBroken().set(true);
-        LOGGER.log(Level.WARNING, "Mark logstash connection broken for build!");
+        LOGGER.log(Level.WARNING, "Mark logstash connection broken for build: {0}.", run);
       }
     }
 

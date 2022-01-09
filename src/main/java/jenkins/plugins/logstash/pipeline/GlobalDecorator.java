@@ -42,7 +42,7 @@ public class GlobalDecorator extends TaskListenerDecorator {
   @Override
   public OutputStream decorate(OutputStream logger) throws IOException, InterruptedException {
     LogstashWriter writer = new LogstashWriter(run, logger, null, StandardCharsets.UTF_8, stageName, agentName);
-    LogstashOutputStream out = new LogstashOutputStream(logger, writer, isBuildScopedConnectionBroken);
+    LogstashOutputStream out = new LogstashOutputStream(logger, writer, isBuildScopedConnectionBroken, run.toString());
     return out;
   }
 
