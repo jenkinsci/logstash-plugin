@@ -104,15 +104,15 @@ public class LogstashOutputStreamTest {
     }
 
     //Verify calls were made to the dao logging twice, not three times.
-    verify(mockWriter, times(3)).write(msg);
+    verify(mockWriter, times(2)).write(msg);
     verify(mockWriter, times(6)).isConnectionBroken();
-    verify(mockWriter, times(3)).getCharset();
+    verify(mockWriter, times(2)).getCharset();
   }
 
   @Test
   public void eolSuccessNoDao() throws Exception {
     when(mockWriter.isConnectionBroken()).thenReturn(true);
-    LogstashOutputStream los = new LogstashOutputStream(buffer, mockWriter, new AtomicBoolean(true));
+    LogstashOutputStream los = new LogstashOutputStream(buffer, mockWriter, new AtomicBoolean(false));
     String msg = "test";
     buffer.reset();
 

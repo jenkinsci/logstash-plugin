@@ -27,7 +27,6 @@ package jenkins.plugins.logstash;
 import hudson.console.ConsoleNote;
 import hudson.console.LineTransformationOutputStream;
 
-import java.lang.Boolean;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,26 +41,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LogstashOutputStream extends LineTransformationOutputStream {
   private final OutputStream delegate;
   private final LogstashWriter logstash;
-  private AtomicBoolean isConnectionBroken;
+  private AtomicBoolean isBuildConnectionBroken;
 
   public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash) {
     this(delegate, logstash, new AtomicBoolean(false));
   }
 
-  public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash, AtomicBoolean isConnectionBroken) {
+  public LogstashOutputStream(OutputStream delegate, LogstashWriter logstash, AtomicBoolean isBuildConnectionBroken) {
     super();
     this.delegate = delegate;
     this.logstash = logstash;
-    this.isConnectionBroken = isConnectionBroken;
+    this.isBuildConnectionBroken = isBuildConnectionBroken;
 
   }
 
-  public AtomicBoolean getIsConnectionBroken() {
-    return isConnectionBroken;
+  public AtomicBoolean getIsBuildConnectionBroken() {
+    return isBuildConnectionBroken;
   }
 
   public void setIsConnectionBroken(boolean value) {
-    isConnectionBroken.set(value);
+    isBuildConnectionBroken.set(value);
   }
   // for testing purposes
   LogstashWriter getLogstashWriter()
@@ -74,14 +73,18 @@ public class LogstashOutputStream extends LineTransformationOutputStream {
     delegate.write(b, 0, len);
     this.flush();
 
-    if(!logstash.isConnectionBroken() || !getIsConnectionBroken().get()) {
-      String line = new String(b, 0, len, logstash.getCharset());
-      line = ConsoleNote.removeNotes(line).trim();
-      logstash.write(line);
+    if (!getIsBuildConnectionBroken().get()) {
+      if (!logstash.isConnectionBroken()) {
+        String line = new String(b, 0, len, logstash.getCharset());
+        line = ConsoleNote.removeNotes(line).trim();
+        logstash.write(line);
+      }
+      // Once it gets connection broken, set the build connection flag to true.
+      if (logstash.isConnectionBroken()) {
+        getIsBuildConnectionBroken().set(true);
+      }
     }
-    if (logstash.isConnectionBroken()) {
-      getIsConnectionBroken().set(true);
-    }
+
   }
 
   /**
