@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 import hudson.util.Secret;
 import org.kohsuke.stapler.StaplerRequest;

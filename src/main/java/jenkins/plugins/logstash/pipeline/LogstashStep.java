@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.jenkinsci.plugins.workflow.actions.LabelAction;
 import org.jenkinsci.plugins.workflow.actions.WorkspaceAction;
@@ -136,7 +136,7 @@ public class LogstashStep extends Step {
 
     /** {@inheritDoc} */
     @Override
-    public void stop(@Nonnull Throwable cause) throws Exception {
+    public void stop(@NonNull Throwable cause) throws Exception {
       getContext().onFailure(cause);
     }
   }

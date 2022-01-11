@@ -8,7 +8,7 @@ import java.net.URL;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import java.security.cert.CertificateException;
 

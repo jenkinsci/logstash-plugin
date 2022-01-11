@@ -1,6 +1,6 @@
 package jenkins.plugins.logstash.configuration;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
@@ -37,7 +37,7 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    *
    * @return {@link AbstractLogstashIndexerDao} instance
    */
-  @Nonnull
+  @NonNull
   public synchronized T getInstance()
   {
     if (instance == null)
