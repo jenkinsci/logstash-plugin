@@ -45,31 +45,25 @@ import hudson.tasks.BuildWrapperDescriptor;
  * @author K Jonathan Harker
  */
 @Deprecated
-public class LogstashBuildWrapper extends BuildWrapper
-{
+public class LogstashBuildWrapper extends BuildWrapper {
 
   /**
    * Create a new {@link LogstashBuildWrapper}.
    */
   @DataBoundConstructor
-  public LogstashBuildWrapper()
-  {}
+  public LogstashBuildWrapper() {}
 
   /**
    * {@inheritDoc}
    */
   @Override
   public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener)
-      throws IOException, InterruptedException
-  {
-    return new Environment()
-    {
-    };
+      throws IOException, InterruptedException {
+    return new Environment() {};
   }
 
   @Override
-  public DescriptorImpl getDescriptor()
-  {
+  public DescriptorImpl getDescriptor() {
     return (DescriptorImpl)super.getDescriptor();
   }
 
@@ -77,11 +71,9 @@ public class LogstashBuildWrapper extends BuildWrapper
    * Registers {@link LogstashBuildWrapper} as a {@link BuildWrapper}.
    */
   @Extension
-  public static class DescriptorImpl extends BuildWrapperDescriptor
-  {
+  public static class DescriptorImpl extends BuildWrapperDescriptor {
 
-    public DescriptorImpl()
-    {
+    public DescriptorImpl() {
       super(LogstashBuildWrapper.class);
       load();
     }
@@ -90,8 +82,7 @@ public class LogstashBuildWrapper extends BuildWrapper
      * {@inheritDoc}
      */
     @Override
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
       return Messages.DisplayName();
     }
 
@@ -99,8 +90,7 @@ public class LogstashBuildWrapper extends BuildWrapper
      * {@inheritDoc}
      */
     @Override
-    public boolean isApplicable(AbstractProject<?, ?> item)
-    {
+    public boolean isApplicable(AbstractProject<?, ?> item) {
       return false;
     }
   }

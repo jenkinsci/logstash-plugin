@@ -14,8 +14,7 @@ public class LogstashDao extends HostBasedLogstashIndexerDao {
   @Override
   public void push(String data) throws IOException {
 
-    try (Socket logstashClientSocket = new Socket(getHost(), getPort()))
-    {
+    try (Socket logstashClientSocket = new Socket(getHost(), getPort())) {
       OutputStream out = logstashClientSocket.getOutputStream();
       out.write(data.getBytes(StandardCharsets.UTF_8));
       out.write(10);

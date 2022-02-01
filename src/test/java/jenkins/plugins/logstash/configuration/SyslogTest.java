@@ -8,15 +8,13 @@ import org.junit.Test;
 
 import com.cloudbees.syslog.MessageFormat;
 
-public class SyslogTest
-{
+public class SyslogTest {
 
   private Syslog indexer;
   private Syslog indexer2;
 
   @Before
-  public void setup()
-  {
+  public void setup() {
     indexer = new Syslog();
     indexer.setHost("localhost");
     indexer.setPort(4567);
@@ -26,17 +24,15 @@ public class SyslogTest
     indexer2.setHost("localhost");
     indexer2.setPort(4567);
     indexer2.setMessageFormat(MessageFormat.RFC_3164);
-}
+  }
 
   @Test
-  public void sameSettingsAreEqual()
-  {
+  public void sameSettingsAreEqual() {
     assertThat(indexer.equals(indexer2), is(true));
   }
 
   @Test
-  public void messageFormatChangeIsNotEqual()
-  {
+  public void messageFormatChangeIsNotEqual() {
     indexer.setMessageFormat(MessageFormat.RFC_5424);
     assertThat(indexer.equals(indexer2), is(false));
   }

@@ -76,7 +76,6 @@ public class BuildDataTest {
 
   @Before
   public void before() throws Exception {
-
     PowerMockito.mockStatic(LogstashConfiguration.class);
     when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
@@ -127,8 +126,7 @@ public class BuildDataTest {
     verifyNoMoreInteractions(mockRootProject);
   }
 
-  private void verifyMocks() throws Exception
-  {
+  private void verifyMocks() throws Exception {
     verify(mockProject).getName();
     verify(mockProject).getFullName();
 
@@ -360,8 +358,7 @@ public class BuildDataTest {
   }
 
   @Test
-  public void toJsonSuccess() throws Exception
-  {
+  public void toJsonSuccess() throws Exception {
       when(mockBuild.getId()).thenReturn("TEST_JOB_123");
       when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
 
@@ -378,8 +375,7 @@ public class BuildDataTest {
   }
 
   @Test
-  public void fullName() throws Exception
-  {
+  public void fullName() throws Exception {
       when(mockBuild.getId()).thenReturn("TEST_JOB_123");
       when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
 
@@ -392,8 +388,7 @@ public class BuildDataTest {
   }
 
   @Test
-  public void rootProjectFullName() throws Exception
-  {
+  public void rootProjectFullName() throws Exception {
       when(mockBuild.getId()).thenReturn("TEST_JOB_123");
       when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
 

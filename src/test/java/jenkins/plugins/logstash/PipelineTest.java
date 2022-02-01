@@ -21,8 +21,7 @@ import jenkins.plugins.logstash.configuration.MemoryIndexer;
 import jenkins.plugins.logstash.persistence.MemoryDao;
 import net.sf.json.JSONObject;
 
-public class PipelineTest
-{
+public class PipelineTest {
 
   @ClassRule public static BuildWatcher buildWatcher = new BuildWatcher();
 
@@ -31,8 +30,7 @@ public class PipelineTest
   private MemoryDao memoryDao;
 
   @Before
-  public void setup() throws Exception
-  {
+  public void setup() throws Exception {
       memoryDao = new MemoryDao();
       LogstashConfiguration config = LogstashConfiguration.getInstance();
       MemoryIndexer indexer = new MemoryIndexer(memoryDao);
@@ -41,8 +39,7 @@ public class PipelineTest
   }
 
   @Test
-  public void logstash() throws Exception
-  {
+  public void logstash() throws Exception {
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
     p.setDefinition(new CpsFlowDefinition("logstash {\n" +
         "currentBuild.result = 'SUCCESS'\n" +
@@ -57,8 +54,7 @@ public class PipelineTest
   }
 
   @Test
-  public void logstashStageAndAgent() throws Exception
-  {
+  public void logstashStageAndAgent() throws Exception {
     Slave slave = j.createOnlineSlave();
     String agentName = slave.getNodeName();
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
@@ -79,8 +75,7 @@ public class PipelineTest
   }
 
   @Test
-  public void globalLogstash() throws Exception
-  {
+  public void globalLogstash() throws Exception {
     LogstashConfiguration config = LogstashConfiguration.getInstance();
     config.setEnableGlobally(true);
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
@@ -96,8 +91,7 @@ public class PipelineTest
   }
 
   @Test
-  public void logstashSendNotifier() throws Exception
-  {
+  public void logstashSendNotifier() throws Exception {
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
     p.setDefinition(new CpsFlowDefinition("node {" +
           "echo 'Message'\n" +
@@ -113,8 +107,7 @@ public class PipelineTest
   }
 
   @Test
-  public void logstashSend() throws Exception
-  {
+  public void logstashSend() throws Exception {
     WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
     p.setDefinition(new CpsFlowDefinition(
           "echo 'Message'\n" +

@@ -80,13 +80,11 @@ public class RedisDao extends HostBasedLogstashIndexerDao {
     }
   }
 
-  public String getPassword()
-  {
+  public String getPassword() {
     return password;
   }
 
-  public String getKey()
-  {
+  public String getKey() {
     return key;
   }
 

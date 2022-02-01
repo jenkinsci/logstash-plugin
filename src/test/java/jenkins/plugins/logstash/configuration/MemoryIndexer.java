@@ -2,18 +2,16 @@ package jenkins.plugins.logstash.configuration;
 
 import jenkins.plugins.logstash.persistence.MemoryDao;
 
-public class MemoryIndexer extends LogstashIndexer<MemoryDao>
-{
+public class MemoryIndexer extends LogstashIndexer<MemoryDao> {
+
   final MemoryDao dao;
 
-  public MemoryIndexer(MemoryDao dao)
-  {
+  public MemoryIndexer(MemoryDao dao) {
     this.dao = dao;
   }
 
   @Override
-  protected MemoryDao createIndexerInstance()
-  {
+  protected MemoryDao createIndexerInstance() {
     return dao;
   }
 

@@ -19,8 +19,7 @@ import jenkins.plugins.logstash.LogstashConfigurationTestBase;
 import jenkins.plugins.logstash.LogstashConfigurationTestBase.LogstashConfigurationForTest;
 import jenkins.plugins.logstash.persistence.RabbitMqDao;
 
-public class RabbitMqTest extends LogstashConfigurationTestBase
-{
+public class RabbitMqTest extends LogstashConfigurationTestBase {
 
   @Rule
   public JenkinsRule j = new JenkinsRule();
@@ -30,8 +29,7 @@ public class RabbitMqTest extends LogstashConfigurationTestBase
   private RabbitMq indexer3;
 
   @Before
-  public void setup()
-  {
+  public void setup() {
     indexer = new RabbitMq("UTF-8");
     indexer.setHost("localhost");
     indexer.setPort(4567);
@@ -58,47 +56,40 @@ public class RabbitMqTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void sameSettingsAreEqual()
-  {
+  public void sameSettingsAreEqual() {
     assertThat(indexer.equals(indexer2), is(true));
   }
 
   @Test
-  public void passwordChangeIsNotEqual()
-  {
+  public void passwordChangeIsNotEqual() {
     indexer.setPassword(Secret.fromString("newPassword"));
     assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void usernameChangeIsNotEqual()
-  {
+  public void usernameChangeIsNotEqual() {
     indexer.setUsername("newUser");
     assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void queueChangeIsNotEqual()
-  {
+  public void queueChangeIsNotEqual() {
     indexer.setQueue("newQueue");
     assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void charsetChangeIsNotEqual()
-  {
+  public void charsetChangeIsNotEqual() {
     assertThat(indexer.equals(indexer3), is(false));
   }
 
-  public void vhostChangeIsNotEqual()
-  {
+  public void vhostChangeIsNotEqual() {
     indexer.setVirtualHost("newVhost");
     assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void rabbitMqBrokenCharset_returns_default_charset()
-  {
+  public void rabbitMqBrokenCharset_returns_default_charset() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq_brokenCharset.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RabbitMqDao.class));

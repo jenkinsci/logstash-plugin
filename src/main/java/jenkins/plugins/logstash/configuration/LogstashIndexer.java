@@ -27,8 +27,8 @@ import net.sf.json.JSONObject;
  */
 public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
     extends AbstractDescribableImpl<LogstashIndexer<?>>
-    implements ExtensionPoint, ReconfigurableDescribable<LogstashIndexer<?>>
-{
+    implements ExtensionPoint, ReconfigurableDescribable<LogstashIndexer<?>> {
+
   protected transient T instance;
 
   /**
@@ -38,10 +38,8 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    * @return {@link AbstractLogstashIndexerDao} instance
    */
   @NonNull
-  public synchronized T getInstance()
-  {
-    if (instance == null)
-    {
+  public synchronized T getInstance() {
+    if (instance == null) {
       instance = createIndexerInstance();
     }
     return instance;
@@ -53,10 +51,7 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    *
    * @throws Exception on erroneous input
    */
-  public void validate() throws Exception {
-  }
-
-
+  public void validate() throws Exception {}
 
   /**
    * Creates a new {@link AbstractLogstashIndexerDao} instance corresponding to this configuration.
@@ -65,36 +60,27 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    */
   protected abstract T createIndexerInstance();
 
-
   @SuppressWarnings("unchecked")
-  public static DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>> all()
-  {
+  public static DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>> all() {
     return (DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>>) Jenkins.getInstance().getDescriptorList(LogstashIndexer.class);
   }
 
-  public static abstract class LogstashIndexerDescriptor extends Descriptor<LogstashIndexer<?>>
-  {
+  public static abstract class LogstashIndexerDescriptor extends Descriptor<LogstashIndexer<?>> {
     /*
      * Form validation methods
      */
-    public FormValidation doCheckPort(@QueryParameter("value") String value)
-    {
-      try
-      {
+    public FormValidation doCheckPort(@QueryParameter("value") String value) {
+      try {
         Integer.parseInt(value);
-      }
-      catch (NumberFormatException e)
-      {
+      } catch (NumberFormatException e) {
         return FormValidation.error(Messages.ValueIsInt());
       }
 
       return FormValidation.ok();
     }
 
-    public FormValidation doCheckHost(@QueryParameter("value") String value)
-    {
-      if (StringUtils.isBlank(value))
-      {
+    public FormValidation doCheckHost(@QueryParameter("value") String value) {
+      if (StringUtils.isBlank(value)) {
         return FormValidation.warning(Messages.PleaseProvideHost());
       }
 
@@ -108,8 +94,7 @@ public abstract class LogstashIndexer<T extends AbstractLogstashIndexerDao>
    * {@inheritDoc}
    */
   @Override
-  public LogstashIndexer<T> reconfigure(StaplerRequest req, JSONObject form) throws FormException
-  {
+  public LogstashIndexer<T> reconfigure(StaplerRequest req, JSONObject form) throws FormException {
     req.bindJSON(this, form);
     return this;
   }

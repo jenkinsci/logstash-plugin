@@ -12,37 +12,30 @@ import net.sf.json.JSONObject;
 
 /**
  * This JobProperty is a marker to decide if logs should be sent to an indexer.
- *
  */
-public class LogstashJobProperty extends JobProperty<Job<?, ?>>
-{
+public class LogstashJobProperty extends JobProperty<Job<?, ?>> {
 
   @DataBoundConstructor
-  public LogstashJobProperty()
-  {}
+  public LogstashJobProperty() {}
 
   @Extension
-  public static class DescriptorImpl extends JobPropertyDescriptor
-  {
+  public static class DescriptorImpl extends JobPropertyDescriptor {
+
     @Override
-    public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws FormException
-    {
-      if (formData.containsKey("enable"))
-      {
+    public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+      if (formData.containsKey("enable")) {
         return new LogstashJobProperty();
       }
       return null;
     }
 
     @Override
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
       return Messages.DisplayName();
     }
 
     @Override
-    public boolean isApplicable(Class<? extends Job> jobType)
-    {
+    public boolean isApplicable(Class<? extends Job> jobType) {
       return AbstractProject.class.isAssignableFrom(jobType);
     }
   }

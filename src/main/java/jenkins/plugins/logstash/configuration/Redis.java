@@ -12,68 +12,58 @@ import hudson.util.Secret;
 import jenkins.plugins.logstash.Messages;
 import jenkins.plugins.logstash.persistence.RedisDao;
 
-public class Redis extends HostBasedLogstashIndexer<RedisDao>
-{
+public class Redis extends HostBasedLogstashIndexer<RedisDao> {
 
   protected String key;
   protected Secret password;
 
   @DataBoundConstructor
-  public Redis()
-  {
-  }
+  public Redis() {}
 
-  public String getKey()
-  {
+  public String getKey() {
     return key;
   }
 
   @DataBoundSetter
-  public void setKey(String key)
-  {
+  public void setKey(String key) {
     this.key = key;
   }
 
-  public Secret getPassword()
-  {
+  public Secret getPassword() {
     return password;
   }
 
   @DataBoundSetter
-  public void setPassword(Secret password)
-  {
+  public void setPassword(Secret password) {
     this.password = password;
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
+  public boolean equals(Object obj) {
     if (this == obj)
       return true;
     if (!super.equals(obj))
       return false;
     if (getClass() != obj.getClass())
       return false;
+
     Redis other = (Redis) obj;
-    if (!Secret.toString(password).equals(Secret.toString(other.getPassword())))
-    {
+
+    if (!Secret.toString(password).equals(Secret.toString(other.getPassword()))) {
       return false;
     }
-    if (key == null)
-    {
+    if (key == null) {
       if (other.key != null)
         return false;
-    }
-    else if (!key.equals(other.key))
-    {
+    } else if (!key.equals(other.key)) {
       return false;
     }
+
     return true;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((key == null) ? 0 : key.hashCode());
@@ -83,32 +73,26 @@ public class Redis extends HostBasedLogstashIndexer<RedisDao>
 
 
   @Override
-  public RedisDao createIndexerInstance()
-  {
+  public RedisDao createIndexerInstance() {
     return new RedisDao(getHost(), getPort(), key, Secret.toString(password));
   }
 
   @Extension
   @Symbol("redis")
-  public static class RedisDescriptor extends LogstashIndexerDescriptor
-  {
+  public static class RedisDescriptor extends LogstashIndexerDescriptor {
 
     @Override
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
       return "Redis";
     }
 
     @Override
-    public int getDefaultPort()
-    {
+    public int getDefaultPort() {
       return 6379;
     }
 
-    public FormValidation doCheckKey(@QueryParameter("value") String value)
-    {
-      if (StringUtils.isBlank(value))
-      {
+    public FormValidation doCheckKey(@QueryParameter("value") String value) {
+      if (StringUtils.isBlank(value)) {
         return FormValidation.error(Messages.ValueIsRequired());
       }
 
