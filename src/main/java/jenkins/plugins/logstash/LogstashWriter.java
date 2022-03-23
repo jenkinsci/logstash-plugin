@@ -24,7 +24,6 @@
 
 package jenkins.plugins.logstash;
 
-
 import hudson.model.AbstractBuild;
 import hudson.model.TaskListener;
 import hudson.model.Run;
@@ -44,6 +43,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A writer that wraps all Logstash DAOs.  Handles error reporting and per build connection state.
@@ -69,10 +69,17 @@ public class LogstashWriter implements Serializable {
   private final String agentName;
 
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset) {
-    this(run, error, listener, charset, null, null);
+    this(run, error, listener, charset, null, null, null);
   }
 
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, Map<String, String> additionalParams) {
+    this(run, error, listener, charset, null, null, additionalParams);
+  }
   public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName) {
+    this(run, error, listener, charset, stageName, agentName, null);
+  }
+
+  public LogstashWriter(Run<?, ?> run, OutputStream error, TaskListener listener, Charset charset, String stageName, String agentName, Map<String, String> additionalParams) {
     this.errorStream = error != null ? error : System.err;
     this.stageName = stageName;
     this.agentName = agentName;
@@ -85,9 +92,10 @@ public class LogstashWriter implements Serializable {
       this.buildData = null;
     } else {
       this.jenkinsUrl = getJenkinsUrl();
-      this.buildData = getBuildData();
+      this.buildData = getBuildData(additionalParams);
     }
   }
+
 
   /**
    * Gets the charset that Jenkins is using during this build.
@@ -162,11 +170,11 @@ public class LogstashWriter implements Serializable {
     return LogstashConfiguration.getInstance().getIndexerInstance();
   }
 
-  BuildData getBuildData() {
+  BuildData getBuildData(Map<String, String> additionalParams) {
     if (build instanceof AbstractBuild) {
-      return new BuildData((AbstractBuild<?, ?>) build, new Date(), listener);
+      return new BuildData((AbstractBuild<?, ?>) build, new Date(), listener, additionalParams);
     } else {
-      return new BuildData(build, new Date(), listener, stageName, agentName);
+      return new BuildData(build, new Date(), listener, stageName, agentName, additionalParams);
     }
   }
 

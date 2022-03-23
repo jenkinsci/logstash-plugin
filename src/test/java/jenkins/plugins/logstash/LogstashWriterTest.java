@@ -21,7 +21,9 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -58,19 +60,19 @@ public class LogstashWriterTest {
                                              final String url,
                                              final LogstashIndexerDao indexer,
                                              final BuildData data) {
-    return new LogstashWriter(testBuild, error, null, testBuild.getCharset()) {
+    return new LogstashWriter(testBuild, error, null, testBuild.getCharset(), Collections.emptyMap()) {
       @Override
       LogstashIndexerDao getIndexerDao() {
         return indexer;
       }
 
       @Override
-      BuildData getBuildData() {
+      BuildData getBuildData(Map<String, String> additionalParams) {
         assertNotNull("BuildData should never be requested for missing dao.", this.getDao());
 
         // For testing, providing null data means use the actual method
         if (data == null) {
-          return super.getBuildData();
+          return super.getBuildData(additionalParams);
         } else {
           return data;
         }

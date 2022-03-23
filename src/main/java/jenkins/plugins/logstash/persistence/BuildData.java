@@ -176,15 +176,20 @@ public class BuildData implements Serializable {
   private String rootProjectDisplayName;
   private int rootBuildNum;
   private Map<String, String> buildVariables;
+  private Map<String, String> additionalParams;
   private Set<String> sensitiveBuildVariables;
   private TestData testResults = null;
-
-  // Freestyle project build
+  
   public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener) {
+    this(build, currentTime, listener, Collections.emptyMap());
+  }
+  // Freestyle project build
+  public BuildData(AbstractBuild<?, ?> build, Date currentTime, TaskListener listener, Map<String, String> additionalParams) {
     initData(build, currentTime);
 
     // build.getDuration() is always 0 in Notifiers
     rootProjectName = build.getRootBuild().getProject().getName();
+    this.additionalParams = additionalParams;
     rootFullProjectName = build.getRootBuild().getProject().getFullName();
     rootProjectDisplayName = build.getRootBuild().getDisplayName();
     rootBuildNum = build.getRootBuild().getNumber();
@@ -211,30 +216,37 @@ public class BuildData implements Serializable {
       buildVariables.putAll(build.getEnvironment(listener));
     } catch (Exception e) {
       // no base build env vars to merge
-      LOGGER.log(WARNING,"Unable update logstash buildVariables with EnvVars from " + build.getDisplayName(),e);
+      LOGGER.log(WARNING, "Unable update logstash buildVariables with EnvVars from " + build.getDisplayName(), e);
     }
+
     for (String key : sensitiveBuildVariables) {
       buildVariables.remove(key);
     }
   }
 
-  // Pipeline project build
-  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName) {
-    initData(build, currentTime);
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName){
+    this(build, currentTime, listener, stageName, agentName, Collections.emptyMap());
+  }
 
+  // Pipeline project build
+  public BuildData(Run<?, ?> build, Date currentTime, TaskListener listener, String stageName, String agentName,
+      Map<String, String> additionalParams) {
+    initData(build, currentTime);
+    this.additionalParams = additionalParams;
     this.agentName = agentName;
     this.stageName = stageName;
     rootProjectName = projectName;
     rootFullProjectName = fullProjectName;
     rootProjectDisplayName = displayName;
     rootBuildNum = buildNum;
+    this.buildVariables = new HashMap<String, String>();
 
     try {
-      // TODO: sensitive variables are not filtered, c.f. https://stackoverflow.com/questions/30916085
-      buildVariables = build.getEnvironment(listener);
+      // TODO: sensitive variables are not filtered, c.f.
+      // https://stackoverflow.com/questions/30916085
+      buildVariables.putAll(build.getEnvironment(listener));
     } catch (IOException | InterruptedException e) {
-      LOGGER.log(WARNING,"Unable to get environment for " + build.getDisplayName(),e);
-      buildVariables = new HashMap<>();
+      LOGGER.log(WARNING, "Unable to get environment for " + build.getDisplayName(), e);
     }
   }
 
@@ -436,6 +448,14 @@ public class BuildData implements Serializable {
 
   public void setBuildVariables(Map<String, String> buildVariables) {
     this.buildVariables = buildVariables;
+  }
+
+  public Map<String, String> getAdditionalParams() {
+    return additionalParams;
+  }
+
+  public void setAdditionalParams(Map<String, String> additionalParams) {
+    this.additionalParams = additionalParams;
   }
 
   public Set<String> getSensitiveBuildVariables() {
