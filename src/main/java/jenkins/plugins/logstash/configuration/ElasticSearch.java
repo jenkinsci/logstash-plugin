@@ -52,6 +52,11 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   private URI uri;
   private String mimeType;
   private String customServerCertificateId;
+  private Boolean awsEnabled;
+  private String awsKeyId;
+  private Secret awsSecret;
+  private String awsRegion;
+  private Secret awsSessionToken;
 
   @DataBoundConstructor
   public ElasticSearch()
@@ -119,6 +124,61 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     this.customServerCertificateId = customServerCertificateId;
   }
 
+  public Boolean getAwsEnabled()
+  {
+    return awsEnabled;
+  }
+
+  @DataBoundSetter
+  public void setAwsEnabled(Boolean awsEnabled)
+  {
+    this.awsEnabled = awsEnabled;
+  }
+
+  public String getAwsRegion()
+  {
+    return awsRegion;
+  }
+
+  @DataBoundSetter
+  public void setAwsRegion(String awsRegion)
+  {
+    this.awsRegion = awsRegion;
+  }
+
+  public String getAwsKeyId()
+  {
+    return awsKeyId;
+  }
+
+  @DataBoundSetter
+  public void setAwsKeyId(String awsKeyId)
+  {
+    this.awsKeyId = awsKeyId;
+  }
+
+  public Secret getAwsSecret()
+  {
+    return awsSecret;
+  }
+
+  @DataBoundSetter
+  public void setAwsSecret(Secret awsSecret)
+  {
+    this.awsSecret = awsSecret;
+  }
+
+  public Secret getAwsSessionToken()
+  {
+    return awsSessionToken;
+  }
+
+  @DataBoundSetter
+  public void setAwsSessionToken(Secret awsSessionToken)
+  {
+    this.awsSessionToken = awsSessionToken;
+  }
+
   public String getCustomServerCertificateId()
   {
     return customServerCertificateId;
@@ -170,6 +230,55 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     {
       return false;
     }
+
+    if (awsEnabled == null)
+    {
+        if (other.awsEnabled != null)
+            return false;
+    }else if (!awsEnabled.equals(other.awsEnabled))
+    {
+      return false;
+    }
+
+    if (awsRegion == null)
+    {
+      if (other.awsRegion != null)
+        return false;
+    }
+    else if (!awsRegion.equals(other.awsRegion))
+    {
+      return false;
+    }
+
+    if (awsKeyId == null)
+    {
+        if (other.awsKeyId != null)
+            return false;
+    }
+    else if (!awsKeyId.equals(other.awsKeyId))
+    {
+        return false;
+    }
+
+    if (awsSecret == null)
+    {
+        if (other.awsSecret != null)
+            return false;
+    }
+    else if (!awsSecret.equals(other.awsSecret))
+    {
+        return false;
+    }
+
+    if (awsSessionToken == null)
+    {
+        if (other.awsSessionToken != null)
+            return false;
+    }
+    else if (!awsSessionToken.equals(other.awsSessionToken))
+    {
+        return false;
+    }
     return true;
   }
 
@@ -187,7 +296,10 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   @Override
   public ElasticSearchDao createIndexerInstance()
   {
-    ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password));
+    ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password),
+            awsEnabled==null? false : awsEnabled.booleanValue(),
+            awsRegion, awsKeyId, Secret.toString(awsSecret), Secret.toString(awsSessionToken)
+    );
 
     esDao.setMimeType(getMimeType());
     if (!StringUtils.isBlank(customServerCertificateId)) {

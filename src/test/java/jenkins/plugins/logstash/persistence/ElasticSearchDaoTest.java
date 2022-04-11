@@ -23,8 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,6 +41,11 @@ public class ElasticSearchDaoTest {
   ElasticSearchDao createDao(String url, String username, String password) throws URISyntaxException {
     URI uri = new URI(url);
     return new ElasticSearchDao(mockClientBuilder, uri, username, password);
+  }
+
+  ElasticSearchDao createAwsDao(String url, String region, String keyId, String secret, String sessionToken) throws URISyntaxException {
+    URI uri = new URI(url);
+    return new ElasticSearchDao(mockClientBuilder, uri, "", "",true, region, keyId, secret, sessionToken);
   }
 
   @Before
@@ -213,5 +217,24 @@ public class ElasticSearchDaoTest {
     HttpPost post = dao.getHttpPost(json);
     HttpEntity entity = post.getEntity();
     assertEquals("Content type do not match", ContentType.APPLICATION_JSON.toString(), entity.getContentType().getValue());
+  }
+  @Test
+  public void aws() throws Exception {
+    String json = "{ 'foo': 'bar' }";
+    dao = createAwsDao("http://localhost:8200/jenkins/logstash",
+        "us-west-1","keyId1", "secret1", "");
+    HttpPost post = dao.getHttpPost(json);
+    assertNotNull(post.getFirstHeader("Authorization"));
+    assertNotNull(post.getFirstHeader("X-Amz-Date"));
+  }
+  @Test
+  public void awsWithSessionToken() throws Exception {
+    String json = "{ 'foo': 'bar' }";
+    dao = createAwsDao("http://localhost:8200/jenkins/logstash",
+        "us-west-1","keyId1", "secret1", "session-token1");
+    HttpPost post = dao.getHttpPost(json);
+    assertNotNull(post.getFirstHeader("Authorization"));
+    assertNotNull(post.getFirstHeader("X-Amz-Date"));
+    assertEquals("session-token1", post.getFirstHeader("X-Amz-Security-Token").getValue());
   }
 }

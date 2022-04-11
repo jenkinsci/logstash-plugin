@@ -13,6 +13,20 @@
       <f:textbox default="application/json"/>
     </f:entry>
 
+    <f:optionalBlock name="awsEnabled" title="AWS OpenSearch" inline="true" field="awsEnabled">
+        <f:entry title="${%Region}" field="awsRegion">
+            <f:textbox/>
+        </f:entry>
+        <f:entry title="${%Key ID}" field="awsKeyId">
+            <f:textbox/>
+        </f:entry>
+        <f:entry title="${%Secret}" field="awsSecret">
+            <f:password/>
+        </f:entry>
+        <f:entry title="${%Session Token}" field="awsSessionToken">
+            <f:password/>
+        </f:entry>
+    </f:optionalBlock>
     <f:advanced>
         <f:entry title="${%Custom Server Certificate}" field="customServerCertificateId">
             <c:select/>

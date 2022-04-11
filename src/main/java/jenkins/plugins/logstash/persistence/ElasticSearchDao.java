@@ -27,6 +27,7 @@ package jenkins.plugins.logstash.persistence;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -48,9 +49,24 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.Collections;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jenkins.plugins.logstash.utils.SSLHelper;
+import org.apache.tools.ant.filters.StringInputStream;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.signer.Aws4Signer;
+import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
+import software.amazon.awssdk.http.SdkHttpFullRequest;
+import software.amazon.awssdk.http.SdkHttpMethod;
+import software.amazon.awssdk.regions.Region;
 
 
 /**
@@ -72,14 +88,32 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   private byte[] keystoreBytes;
   private String keyStorePassword;
 
+  private final Boolean awsEnabled;
+  private final String awsKeyId;
+  private final String awsSecret;
+  private final String awsRegion;
+  private final String awsSessionToken;
+
   //primary constructor used by indexer factory
   public ElasticSearchDao(URI uri, String username, String password) {
     this(null, uri, username, password);
   }
 
+  public ElasticSearchDao(URI uri, String username, String password,
+                          boolean awsEnabled, String awsRegion, String awsKeyId, String awsSecret, String awsSessionToken) {
+    this(null, uri, username, password,
+        awsEnabled, awsRegion, awsKeyId, awsSecret, awsSessionToken);
+  }
+
   // Factored for unit testing
   ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password) {
+    this(factory, uri, username, password,
+        false, null, null, null, null);
+  }
 
+
+  ElasticSearchDao(HttpClientBuilder factory, URI uri, String username, String password,
+                   boolean awsEnabled, String awsRegion, String awsKeyId, String awsSecret, String awsSessionToken) {
     if (uri == null)
     {
       throw new IllegalArgumentException("uri field must not be empty");
@@ -89,6 +123,11 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     this.username = username;
     this.password = password;
 
+    this.awsEnabled = awsEnabled;
+    this.awsRegion = awsRegion;
+    this.awsKeyId = awsKeyId;
+    this.awsSecret = awsSecret;
+    this.awsSessionToken = awsSessionToken;
 
     try
     {
@@ -205,6 +244,49 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     if (auth != null) {
       postRequest.addHeader("Authorization", "Basic " + auth);
     }
+    if (awsEnabled){
+      postRequest = awsSign(data, postRequest);
+    }
+    return postRequest;
+  }
+
+  private HttpPost awsSign(String data, HttpPost postRequest)
+  {
+    Aws4Signer singer = Aws4Signer.create();
+    AwsCredentials awsCredentials;
+    if (StringUtils.isNotEmpty(awsKeyId) && StringUtils.isNotEmpty( awsSecret) && StringUtils.isEmpty(awsSessionToken)){
+      awsCredentials= AwsBasicCredentials.create(awsKeyId,awsSecret);
+    } else if (StringUtils.isNotEmpty(awsKeyId) && StringUtils.isNotEmpty( awsSecret) && StringUtils.isNotEmpty(awsSessionToken)){
+      awsCredentials= AwsSessionCredentials.create(awsKeyId,awsSecret,awsSessionToken);
+    }else{
+      awsCredentials = DefaultCredentialsProvider.builder().build().resolveCredentials();
+    }
+    Aws4SignerParams params = Aws4SignerParams.builder()
+        .awsCredentials(awsCredentials)
+        .signingName("es")
+        .signingRegion(Region.of(awsRegion))
+        .build();
+    SdkHttpFullRequest sdkHttpFullRequest = SdkHttpFullRequest.builder()
+        .uri(uri)
+        .headers(StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(
+                postRequest.headerIterator(),
+                Spliterator.ORDERED),
+            false)
+            .map(Header.class::cast)
+            .collect(Collectors.toMap(
+                Header::getName,
+                header -> Collections.singletonList(header.getValue())))
+        )
+        .contentStreamProvider(() -> new StringInputStream(data))
+        .method(SdkHttpMethod.fromValue(postRequest.getMethod()))
+        .build();
+    SdkHttpFullRequest singedRequest = singer.sign(sdkHttpFullRequest, params);
+    singedRequest.headers()
+        .entrySet()
+        .stream()
+        .filter(headEntry -> !"Host".equals(headEntry.getKey()))
+        .forEach(headEntry-> postRequest.setHeader(headEntry.getKey(), headEntry.getValue().get(0)));
     return postRequest;
   }
 
