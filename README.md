@@ -27,34 +27,69 @@ Supported methods of input/output:
 * Syslog (format => cee/json ([RFC-5424](https://tools.ietf.org/html/rfc5424),[RFC-3164](https://tools.ietf.org/html/rfc3164)), protocol => UDP)
 
 Pipeline
-========
+=========
 
-Logstash plugin can be used as a publisher in pipeline jobs to send the whole log as a single document.
+Publisher
+---------
+
+Logstash plugin can be used as a publisher in pipeline jobs to send the
+tail of the log as a single document.
+
+**Example for publisher in pipeline**
 
 ```Groovy
- node('master') {
-        sh'''
+node('master') {
+    sh'''
         echo 'Hello, world!'
-        '''
-        logstashSend failBuild: true, maxLines: 1000
- }
+    '''
+    logstashSend failBuild: true, maxLines: 1000
+}
 ```
+
+Note: Due to the way logging works in pipeline currently, the
+logstashSend step might not transfer the lines logged directly before
+the step is called. Adding a sleep of 1 second might help here.
+
+Note: In order to get the the result set in pipeline it must be [set
+before the logstashSend
+step](https://support.cloudbees.com/hc/en-us/articles/218554077-How-to-set-current-build-result-in-Pipeline-).
+
+Note: the `logstashSend` step requires a node to run.
+
+Step with Block
+---------------
 
 It can be used as a wrapper step to send each log line separately.
 
-Note: when you combine with timestamps step, you should make the timestamps the outermost block. Otherwise you get the timestamps as part of the log lines, basically duplicating the timestamp information.
+Once the result is set, it will appear in the data sent to the indexer.
+
+Note: when you combine with timestamps step, you should make the
+timestamps the outermost block. Otherwise you get the timestamps as
+part of the log lines, basically duplicating the timestamp information.
+
+**Example for pipeline step**
 
 ```Groovy
 timestamps {
   logstash {
     node('somelabel') {
       sh'''
-      echo 'Hello, World!'
+        echo 'Hello, World!'
       '''
+      try {
+        // do something that fails
+        sh "exit 1"
+        currentBuild.result = 'SUCCESS'
+      } catch (Exception err) {
+        currentBuild.result = 'FAILURE'
+      }    
     }
   }
 }
 ```
+
+Note: Information on which agent the steps are executed is not available
+at the moment.
 
 Enable Globally
 =======
