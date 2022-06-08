@@ -66,6 +66,7 @@
     <skipIntegrationTests>true</skipIntegrationTests>
     <jenkins.version>2.249.1</jenkins.version>
     <hpi.compatibleSinceVersion>2.0</hpi.compatibleSinceVersion>
+    <mockito.version>3.12.4</mockito.version>
   </properties>
 
   <dependencyManagement>
