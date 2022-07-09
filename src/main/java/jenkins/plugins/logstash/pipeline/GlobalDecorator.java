@@ -47,6 +47,14 @@ public class GlobalDecorator extends TaskListenerDecorator {
   public static final class Factory implements TaskListenerDecorator.Factory {
 
     @Override
+    /*
+      Data stream is passed to this decorator first (it actually sees data in the last)
+     */
+    public boolean isAppliedBeforeMainDecorator() {
+      return true;
+    }
+
+    @Override
     public TaskListenerDecorator of(FlowExecutionOwner owner) {
       if (!LogstashConfiguration.getInstance().isEnableGlobally()) {
         return null;
