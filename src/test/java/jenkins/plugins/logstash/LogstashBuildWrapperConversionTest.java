@@ -21,32 +21,28 @@ import com.gargoylesoftware.htmlunit.WebRequest;
 
 import hudson.model.Project;
 
-public class LogstashBuildWrapperConversionTest
-{
+public class LogstashBuildWrapperConversionTest {
+
   @Rule
   public JenkinsRule j;
 
-  public LogstashBuildWrapperConversionTest() throws Exception
-  {
+  public LogstashBuildWrapperConversionTest() throws Exception {
     j = new JenkinsRule().withExistingHome(new File("src/test/resources/home"));
   }
 
   @Test
-  public void existingJobIsConvertedAtStartup()
-  {
+  public void existingJobIsConvertedAtStartup() {
     Project<?, ?> project = (Project<?, ?>)j.getInstance().getItem("test");
     checkNoBuildWrapper(project);
   }
 
   @Before
-  public void setup()
-  {
+  public void setup() {
     j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
   }
 
   @Test
-  public void buildWrapperIsConvertedToJobPropertyWhenPostingXMLToNewJob() throws IOException
-  {
+  public void buildWrapperIsConvertedToJobPropertyWhenPostingXMLToNewJob() throws IOException {
     j.jenkins.setCrumbIssuer(null);
     String newJobName = "newJob";
     URL apiURL = new URL(MessageFormat.format(
@@ -56,8 +52,7 @@ public class LogstashBuildWrapperConversionTest
     request.setAdditionalHeader("Content-Type", "application/xml");
 
     int result = -1;
-    try
-    {
+    try {
       request.setRequestBody("<?xml version='1.0' encoding='UTF-8'?>\n<project>\n" +
           "<properties/>" +
           "<buildWrappers>" +
@@ -65,9 +60,7 @@ public class LogstashBuildWrapperConversionTest
           "</buildWrappers>" +
           "</project>");
       result = j.createWebClient().getPage(request).getWebResponse().getStatusCode();
-    }
-    catch (FailingHttpStatusCodeException e)
-    {
+    } catch (FailingHttpStatusCodeException e) {
       result = e.getResponse().getStatusCode();
     }
 
@@ -77,8 +70,7 @@ public class LogstashBuildWrapperConversionTest
   }
 
   @Test
-  public void buildWrapperIsConvertedToJobPropertyWhenPostingXMLToExistingJob() throws IOException
-  {
+  public void buildWrapperIsConvertedToJobPropertyWhenPostingXMLToExistingJob() throws IOException {
     j.jenkins.setCrumbIssuer(null);
     String newJobName = "newJob";
     j.createFreeStyleProject(newJobName);
@@ -89,8 +81,7 @@ public class LogstashBuildWrapperConversionTest
     request.setAdditionalHeader("Content-Type", "application/xml");
 
     int result = -1;
-    try
-    {
+    try {
       request.setRequestBody("<?xml version='1.0' encoding='UTF-8'?>\n<project>\n" +
           "<properties/>" +
           "<buildWrappers>" +
@@ -98,9 +89,7 @@ public class LogstashBuildWrapperConversionTest
           "</buildWrappers>" +
           "</project>");
       result = j.createWebClient().getPage(request).getWebResponse().getStatusCode();
-    }
-    catch (FailingHttpStatusCodeException e)
-    {
+    } catch (FailingHttpStatusCodeException e) {
       result = e.getResponse().getStatusCode();
     }
 
@@ -109,8 +98,7 @@ public class LogstashBuildWrapperConversionTest
     checkNoBuildWrapper(project);
   }
 
-  private void checkNoBuildWrapper(Project<?, ?> project)
-  {
+  private void checkNoBuildWrapper(Project<?, ?> project) {
     assertThat(project.getBuildWrappersList().get(LogstashBuildWrapper.class), equalTo(null));
     assertThat(project.getProperty(LogstashJobProperty.class), not(equalTo(null)));
   }

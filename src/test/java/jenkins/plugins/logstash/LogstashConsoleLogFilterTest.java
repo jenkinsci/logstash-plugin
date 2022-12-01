@@ -131,8 +131,7 @@ public class LogstashConsoleLogFilterTest {
   }
 
   @Test
-  public void decorateLoggerSuccessEnabledGlobally() throws IOException, InterruptedException
-  {
+  public void decorateLoggerSuccessEnabledGlobally() throws IOException, InterruptedException {
     when(logstashConfiguration.isEnableGlobally()).thenReturn(true);
     MockLogstashConsoleLogFilter buildWrapper = new MockLogstashConsoleLogFilter(mockWriter);
 

@@ -24,15 +24,13 @@ import jenkins.plugins.logstash.persistence.RabbitMqDao;
 import jenkins.plugins.logstash.persistence.RedisDao;
 import jenkins.plugins.logstash.persistence.SyslogDao;
 
-public class LogstashConfigurationTest extends LogstashConfigurationTestBase
-{
+public class LogstashConfigurationTest extends LogstashConfigurationTestBase {
 
   @Rule
   public JenkinsRule j = new JenkinsRule();
 
   @Test
-  public void unconfiguredWillReturnNull()
-  {
+  public void unconfiguredWillReturnNull() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/notExisting.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), equalTo(null));
@@ -40,16 +38,14 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void disabled()
-  {
+  public void disabled() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/disabled.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.isEnabled(), equalTo(false));
   }
 
   @Test
-  public void elasticSearchIsProperlyConfigured()
-  {
+  public void elasticSearchIsProperlyConfigured() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/elasticSearch.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(ElasticSearchDao.class));
@@ -57,8 +53,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void rabbitMqIsProperlyConfigured()
-  {
+  public void rabbitMqIsProperlyConfigured() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RabbitMqDao.class));
@@ -67,8 +62,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void redisIsProperlyConfigured()
-  {
+  public void redisIsProperlyConfigured() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/redis.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(RedisDao.class));
@@ -76,8 +70,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void syslogIsProperlyConfigured()
-  {
+  public void syslogIsProperlyConfigured() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/syslog.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.getIndexerInstance(), IsInstanceOf.instanceOf(SyslogDao.class));
@@ -85,8 +78,7 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
   }
 
   @Test
-  public void milliSecondsConfigured()
-  {
+  public void milliSecondsConfigured() {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     assertThat(configuration.isMilliSecondTimestamps(),equalTo(true));
@@ -99,16 +91,14 @@ public class LogstashConfigurationTest extends LogstashConfigurationTestBase
    * changing anything i.e. plugin is disabled. (JENKINS-51793)
    */
   @Test
-  public void jenkinsInitialConfigurationCanBeSaved() throws Exception
-  {
+  public void jenkinsInitialConfigurationCanBeSaved() throws Exception {
     HtmlPage p = j.createWebClient().goTo("configure");
     HtmlForm f = p.getFormByName("config");
     j.submit(f);
   }
 
   @Test
-  public void programmaticConfigurationChangesActiveIndexer() throws Exception
-  {
+  public void programmaticConfigurationChangesActiveIndexer() throws Exception {
     LogstashConfigurationTestBase.configFile = new File("src/test/resources/rabbitmq.xml");
     LogstashConfiguration configuration = new LogstashConfigurationForTest();
     ElasticSearch es = new ElasticSearch();

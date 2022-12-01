@@ -52,5 +52,4 @@ public abstract class AbstractLogstashIndexerDao implements LogstashIndexerDao, 
 
     return payload;
   }
-
 }

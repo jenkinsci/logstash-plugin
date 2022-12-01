@@ -22,7 +22,6 @@
 
 package jenkins.plugins.logstash.persistence;
 
-
 import org.apache.commons.lang.StringUtils;
 
 /**

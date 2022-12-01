@@ -36,8 +36,7 @@ import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogFormat;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ LogstashInstallation.class, Descriptor.class })
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
-public class LogstashConfigurationMigrationTest extends LogstashConfigurationTestBase
-{
+public class LogstashConfigurationMigrationTest extends LogstashConfigurationTestBase {
 
   @Rule
   public JenkinsRule j = new JenkinsRule();
@@ -48,8 +47,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   LogstashConfiguration configuration;
 
   @Before
-  public void setup()
-  {
+  public void setup() {
     mockStatic(LogstashInstallation.class);
     configFile = new File("notExisting.xml");
     when(LogstashInstallation.getLogstashDescriptor()).thenAnswer(invocationOnMock -> descriptor);
@@ -62,16 +60,14 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void NoConfigMigration()
-  {
+  public void NoConfigMigration() {
     when(descriptor.getType()).thenReturn(null);
     configuration.migrateData();
     assertThat(configuration.isEnabled(),equalTo(false));
   }
 
   @Test
-  public void redisMigration()
-  {
+  public void redisMigration() {
     when(descriptor.getType()).thenReturn(IndexerType.REDIS);
     configuration.migrateData();
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();
@@ -86,8 +82,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void syslogMigrationRFC3164()
-  {
+  public void syslogMigrationRFC3164() {
     when(descriptor.getType()).thenReturn(IndexerType.SYSLOG);
     when(descriptor.getSyslogFormat()).thenReturn(SyslogFormat.RFC3164);
     configuration.migrateData();
@@ -102,8 +97,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void syslogMigrationRFC5424()
-  {
+  public void syslogMigrationRFC5424() {
     when(descriptor.getType()).thenReturn(IndexerType.SYSLOG);
     when(descriptor.getSyslogFormat()).thenReturn(SyslogFormat.RFC5424);
     configuration.migrateData();
@@ -118,8 +112,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void elasticSearchMigration() throws URISyntaxException, MalformedURLException
-  {
+  public void elasticSearchMigration() throws URISyntaxException, MalformedURLException {
     when(descriptor.getType()).thenReturn(IndexerType.ELASTICSEARCH);
     when(descriptor.getHost()).thenReturn("http://localhost");
     configuration.migrateData();
@@ -135,8 +128,7 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
-  public void rabbitMqMigration()
-  {
+  public void rabbitMqMigration() {
     when(descriptor.getType()).thenReturn(IndexerType.RABBIT_MQ);
     configuration.migrateData();
     LogstashIndexer<?> indexer = configuration.getLogstashIndexer();

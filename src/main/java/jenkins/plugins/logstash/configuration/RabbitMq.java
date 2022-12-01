@@ -16,8 +16,7 @@ import hudson.util.Secret;
 import jenkins.plugins.logstash.Messages;
 import jenkins.plugins.logstash.persistence.RabbitMqDao;
 
-public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
-{
+public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao> {
 
   private String queue;
   private String username;
@@ -26,129 +25,102 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   private String virtualHost;
 
   @DataBoundConstructor
-  public RabbitMq(String charset)
-  {
-    if (charset == null || charset.isEmpty())
-    {
+  public RabbitMq(String charset) {
+    if (charset == null || charset.isEmpty()) {
       this.charset = Charset.defaultCharset().toString();
-    }
-    else
-    {
+    } else {
       this.charset = Charset.forName(charset).toString();
     }
   }
 
-  protected Object readResolve()
-  {
-    if (charset == null)
-    {
+  protected Object readResolve() {
+    if (charset == null) {
       charset = Charset.defaultCharset().toString();
     }
-    if (virtualHost == null)
-    {
+    if (virtualHost == null) {
       virtualHost = "/";
     }
     return this;
   }
 
-  public String getCharset()
-  {
+  public String getCharset() {
     return charset;
   }
 
   // package visibility for testing only
   @Restricted(NoExternalUse.class)
-  Charset getEffectiveCharset()
-  {
-    try
-    {
+  Charset getEffectiveCharset() {
+    try {
       return Charset.forName(charset);
-
-    }
-    catch (IllegalArgumentException e)
-    {
+    } catch (IllegalArgumentException e) {
       return Charset.defaultCharset();
     }
   }
 
-  public String getVirtualHost()
-  {
+  public String getVirtualHost() {
     return virtualHost;
   }
 
   @DataBoundSetter
-  public void setVirtualHost(String virtualHost)
-  {
+  public void setVirtualHost(String virtualHost) {
     this.virtualHost = virtualHost;
   }
 
-  public String getQueue()
-  {
+  public String getQueue() {
     return queue;
   }
 
   @DataBoundSetter
-  public void setQueue(String queue)
-  {
+  public void setQueue(String queue) {
     this.queue = queue;
   }
 
-  public String getUsername()
-  {
+  public String getUsername() {
     return username;
   }
 
   @DataBoundSetter
-  public void setUsername(String username)
-  {
+  public void setUsername(String username) {
     this.username = username;
   }
 
-  public Secret getPassword()
-  {
+  public Secret getPassword() {
     return password;
   }
 
   @DataBoundSetter
-  public void setPassword(Secret password)
-  {
+  public void setPassword(Secret password) {
     this.password = password;
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
+  public boolean equals(Object obj) {
     if (this == obj)
       return true;
     if (!super.equals(obj))
       return false;
     if (getClass() != obj.getClass())
       return false;
+
     RabbitMq other = (RabbitMq) obj;
-    if (!Secret.toString(password).equals(Secret.toString(other.getPassword())))
-    {
+
+    if (!Secret.toString(password).equals(Secret.toString(other.getPassword()))) {
       return false;
     }
-    if (!StringUtils.equals(queue, other.queue))
-    {
+    if (!StringUtils.equals(queue, other.queue)) {
         return false;
     }
-    if (!StringUtils.equals(username, other.username))
-    {
+    if (!StringUtils.equals(username, other.username)) {
         return false;
     }
-    if (!StringUtils.equals(virtualHost, other.virtualHost))
-    {
+    if (!StringUtils.equals(virtualHost, other.virtualHost)) {
         return false;
     }
-    if (charset == null)
-    {
-      if (other.charset != null)
-      {
+    if (charset == null) {
+      if (other.charset != null) {
         return false;
       }
-    } else if (!charset.equals(other.charset))
-    {
+    } else if (!charset.equals(other.charset)) {
       return false;
     }
 
@@ -156,8 +128,7 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((queue == null) ? 0 : queue.hashCode());
@@ -169,36 +140,29 @@ public class RabbitMq extends HostBasedLogstashIndexer<RabbitMqDao>
   }
 
   @Override
-  public RabbitMqDao createIndexerInstance()
-  {
+  public RabbitMqDao createIndexerInstance() {
     return new RabbitMqDao(getHost(), getPort(), queue, username, Secret.toString(password), getEffectiveCharset(), getVirtualHost());
   }
 
   @Extension
   @Symbol("rabbitMq")
-  public static class RabbitMqDescriptor extends LogstashIndexerDescriptor
-  {
+  public static class RabbitMqDescriptor extends LogstashIndexerDescriptor {
     @Override
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
       return "RabbitMQ";
     }
 
     @Override
-    public int getDefaultPort()
-    {
+    public int getDefaultPort() {
       return 5672;
     }
 
-    public FormValidation doCheckQueue(@QueryParameter("value") String value)
-    {
-      if (StringUtils.isBlank(value))
-      {
+    public FormValidation doCheckQueue(@QueryParameter("value") String value) {
+      if (StringUtils.isBlank(value)) {
         return FormValidation.error(Messages.ValueIsRequired());
       }
 
       return FormValidation.ok();
     }
-
   }
 }

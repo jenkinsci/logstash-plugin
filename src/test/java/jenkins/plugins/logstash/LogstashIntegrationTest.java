@@ -37,8 +37,8 @@ import jenkins.plugins.logstash.persistence.MemoryDao;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
-public class LogstashIntegrationTest
-{
+public class LogstashIntegrationTest {
+
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
 
@@ -52,8 +52,7 @@ public class LogstashIntegrationTest
     private MemoryDao memoryDao;
 
     @Before
-    public void setup() throws Exception
-    {
+    public void setup() throws Exception {
         memoryDao = new MemoryDao();
         LogstashConfiguration config = LogstashConfiguration.getInstance();
         MemoryIndexer indexer = new MemoryIndexer(memoryDao);
@@ -66,8 +65,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void dataIsSetWhenEnabledViaJobPropertyOnMaster() throws Exception
-    {
+    public void dataIsSetWhenEnabledViaJobPropertyOnMaster() throws Exception {
         project.addProperty(new LogstashJobProperty());
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
         FreeStyleBuild build = f.get();
@@ -83,8 +81,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void dataIsSetWhenEnabledViaJobPropertyOnSlave() throws Exception
-    {
+    public void dataIsSetWhenEnabledViaJobPropertyOnSlave() throws Exception {
         project.addProperty(new LogstashJobProperty());
         project.setAssignedNode(slave);
 
@@ -102,8 +99,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void dataIsSetForNotifierOnMaster() throws Exception
-    {
+    public void dataIsSetForNotifierOnMaster() throws Exception {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
         FreeStyleBuild build = f.get();
@@ -117,8 +113,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void dataIsSetForNotifierOnSlave() throws Exception
-    {
+    public void dataIsSetForNotifierOnSlave() throws Exception {
         project.getPublishersList().add(new LogstashNotifier(10, false));
         project.setAssignedNode(slave);
         QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -133,8 +128,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void buildJobPropertyUpdatesResult() throws Exception
-    {
+    public void buildJobPropertyUpdatesResult() throws Exception {
       project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
       FreeStyleBuild build = f.get();
@@ -152,8 +146,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void passwordsAreMaskedWithMaskpasswordsBuildWrapper() throws Exception
-    {
+    public void passwordsAreMaskedWithMaskpasswordsBuildWrapper() throws Exception {
       EnvInjectJobPropertyInfo info = new EnvInjectJobPropertyInfo(null, "PWD=myPassword", null, null, false, null);
       EnvInjectBuildWrapper e = new EnvInjectBuildWrapper(info);
 
@@ -170,8 +163,7 @@ public class LogstashIntegrationTest
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      for (JSONObject line: dataLines)
-      {
+      for (JSONObject line : dataLines) {
         JSONArray message = line.getJSONArray("message");
         String logline = (String) message.get(0);
         assertThat(logline,not(containsString("myPassword")));
@@ -179,8 +171,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void passwordsAreMaskedWithGlobalMaskPasswordsConfiguration() throws Exception
-    {
+    public void passwordsAreMaskedWithGlobalMaskPasswordsConfiguration() throws Exception {
       MaskPasswordsConfig config = MaskPasswordsConfig.getInstance();
       config.setGlobalVarEnabledGlobally(true);
       VarPasswordPair pwdPair = new VarPasswordPair("PWD", "myPassword");
@@ -195,8 +186,7 @@ public class LogstashIntegrationTest
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      for (JSONObject line: dataLines)
-      {
+      for (JSONObject line : dataLines) {
         JSONArray message = line.getJSONArray("message");
         String logline = (String) message.get(0);
         assertThat(logline,not(containsString("myPassword")));
@@ -204,8 +194,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void enableGlobally() throws Exception
-    {
+    public void enableGlobally() throws Exception {
       LogstashConfiguration.getInstance().setEnableGlobally(true);
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
@@ -222,9 +211,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void milliSecondTimestamps() throws Exception
-    {
-
+    public void milliSecondTimestamps() throws Exception {
       LogstashConfiguration.getInstance().setMilliSecondTimestamps(true);
       project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -232,16 +219,14 @@ public class LogstashIntegrationTest
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      for (JSONObject line: dataLines)
-      {
+      for (JSONObject line : dataLines) {
         String timestamp = line.getString("@timestamp");
         assertThat(timestamp,matchesPattern("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+-]\\d{4}$"));
       }
     }
 
     @Test
-    public void secondTimestamps() throws Exception
-    {
+    public void secondTimestamps() throws Exception {
       LogstashConfiguration.getInstance().setMilliSecondTimestamps(false);
       project.addProperty(new LogstashJobProperty());
       QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
@@ -249,16 +234,14 @@ public class LogstashIntegrationTest
       FreeStyleBuild build = f.get();
       assertThat(build.getResult(), equalTo(Result.SUCCESS));
       List<JSONObject> dataLines = memoryDao.getOutput();
-      for (JSONObject line: dataLines)
-      {
+      for (JSONObject line : dataLines) {
         String timestamp = line.getString("@timestamp");
         assertThat(timestamp,matchesPattern("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{4}$"));
       }
     }
 
     @Test
-    public void ansiColorAnnotationsAreNotIncluded() throws Exception
-    {
+    public void ansiColorAnnotationsAreNotIncluded() throws Exception {
       AnsiColorBuildWrapper ansi = new AnsiColorBuildWrapper("vga");
       project.addProperty(new LogstashJobProperty());
       project.getBuildWrappersList().add(ansi);
@@ -273,8 +256,7 @@ public class LogstashIntegrationTest
     }
 
     @Test
-    public void disabledWillNotWrite() throws Exception
-    {
+    public void disabledWillNotWrite() throws Exception {
       LogstashConfiguration.getInstance().setEnabled(false);
       project.addProperty(new LogstashJobProperty());
       Cause cause = new Cause.UserIdCause();

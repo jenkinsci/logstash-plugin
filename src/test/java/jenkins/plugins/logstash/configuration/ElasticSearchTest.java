@@ -13,8 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-public class ElasticSearchTest
-{
+public class ElasticSearchTest {
 
   @Rule
   public JenkinsRule j = new JenkinsRule();
@@ -23,8 +22,7 @@ public class ElasticSearchTest
   private ElasticSearch indexer2;
 
   @Before
-  public void setup() throws MalformedURLException, URISyntaxException
-  {
+  public void setup() throws MalformedURLException, URISyntaxException {
     URL url = new URL("http://localhost:4567/key");
     indexer = new ElasticSearch();
     indexer.setUri(url);
@@ -37,31 +35,27 @@ public class ElasticSearchTest
     indexer2.setPassword(Secret.fromString("password"));
     indexer2.setUsername("user");
     indexer2.setMimeType("application/json");
-}
+  }
 
   @Test
-  public void sameSettingsAreEqual()
-  {
+  public void sameSettingsAreEqual() {
     assertThat(indexer.equals(indexer2), is(true));
   }
 
   @Test
-  public void passwordChangeIsNotEqual()
-  {
+  public void passwordChangeIsNotEqual() {
     indexer.setPassword(Secret.fromString("newPassword"));
     assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void urlChangeIsNotEqual() throws MalformedURLException, URISyntaxException
-  {
+  public void urlChangeIsNotEqual() throws MalformedURLException, URISyntaxException {
     indexer.setUri(new URL("https://localhost:4567/key"));
     assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void usernameChangeIsNotEqual()
-  {
+  public void usernameChangeIsNotEqual() {
     indexer.setUsername("newUser");
     assertThat(indexer.equals(indexer2), is(false));
   }

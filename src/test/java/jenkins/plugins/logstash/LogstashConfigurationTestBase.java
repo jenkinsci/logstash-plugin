@@ -4,21 +4,17 @@ import java.io.File;
 
 import hudson.XmlFile;
 
-public class LogstashConfigurationTestBase
-{
+public class LogstashConfigurationTestBase {
+
   protected static File configFile;
 
-  public static class LogstashConfigurationForTest extends LogstashConfiguration
-  {
+  public static class LogstashConfigurationForTest extends LogstashConfiguration {
 
     @Override
-    public synchronized void save()
-    {
-    }
+    public synchronized void save() {}
 
     @Override
-    protected XmlFile getConfigFile()
-    {
+    protected XmlFile getConfigFile() {
       return new XmlFile(configFile);
     }
   }

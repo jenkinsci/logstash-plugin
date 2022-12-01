@@ -9,8 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-public class RedisTest
-{
+public class RedisTest {
 
   @Rule
   public JenkinsRule j = new JenkinsRule();
@@ -19,8 +18,7 @@ public class RedisTest
   private Redis indexer2;
 
   @Before
-  public void setup()
-  {
+  public void setup() {
     indexer = new Redis();
     indexer.setHost("localhost");
     indexer.setPort(4567);
@@ -32,24 +30,21 @@ public class RedisTest
     indexer2.setPort(4567);
     indexer2.setKey("key");
     indexer2.setPassword(Secret.fromString("password"));
-}
+  }
 
   @Test
-  public void sameSettingsAreEqual()
-  {
+  public void sameSettingsAreEqual() {
     assertThat(indexer.equals(indexer2), is(true));
   }
 
   @Test
-  public void passwordChangeIsNotEqual()
-  {
+  public void passwordChangeIsNotEqual() {
     indexer.setPassword(Secret.fromString("newPassword"));
     assertThat(indexer.equals(indexer2), is(false));
   }
 
   @Test
-  public void keyChangeIsNotEqual()
-  {
+  public void keyChangeIsNotEqual() {
     indexer.setKey("newKey");
     assertThat(indexer.equals(indexer2), is(false));
   }

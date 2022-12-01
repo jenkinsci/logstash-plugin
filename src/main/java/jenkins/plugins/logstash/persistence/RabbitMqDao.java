@@ -95,8 +95,7 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
   }
 
   private void initPool() {
-    if (pool != null)
-    {
+    if (pool != null) {
       pool.setHost(getHost());
       pool.setPort(getPort());
       if (virtualHost != null) {
@@ -110,23 +109,19 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     }
   }
 
-  public String getQueue()
-  {
+  public String getQueue() {
     return queue;
   }
 
-  public String getUsername()
-  {
+  public String getUsername() {
     return username;
   }
 
-  public String getPassword()
-  {
+  public String getPassword() {
       return password;
   }
 
-  public String getVirtualHost()
-  {
+  public String getVirtualHost() {
     return virtualHost;
   }
 

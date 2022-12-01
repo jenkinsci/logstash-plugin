@@ -15,14 +15,12 @@ import jenkins.plugins.logstash.configuration.Logstash;
 import jenkins.plugins.logstash.configuration.RabbitMq;
 import jenkins.plugins.logstash.configuration.Redis;
 
-public class ConfigAsCodeTest
-{
+public class ConfigAsCodeTest {
 
   @Rule public JenkinsRule r = new JenkinsRule();
 
   @Test
-  public void elasticSearch() throws ConfiguratorException
-  {
+  public void elasticSearch() throws ConfiguratorException {
     ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("/jcasc/elasticSearch.yaml").toString());
     LogstashConfiguration c = LogstashConfiguration.getInstance();
     assertThat(c.isEnabled(), is(true));
@@ -36,8 +34,7 @@ public class ConfigAsCodeTest
   }
 
   @Test
-  public void logstash() throws ConfiguratorException
-  {
+  public void logstash() throws ConfiguratorException {
     ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("/jcasc/logstash.yaml").toString());
     LogstashConfiguration c = LogstashConfiguration.getInstance();
     assertThat(c.isEnabled(), is(true));
@@ -50,8 +47,7 @@ public class ConfigAsCodeTest
   }
 
   @Test
-  public void rabbitMq() throws ConfiguratorException
-  {
+  public void rabbitMq() throws ConfiguratorException {
     ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("/jcasc/rabbitmq.yaml").toString());
     LogstashConfiguration c = LogstashConfiguration.getInstance();
     assertThat(c.isEnabled(), is(true));
@@ -66,8 +62,7 @@ public class ConfigAsCodeTest
   }
 
   @Test
-  public void redis() throws ConfiguratorException
-  {
+  public void redis() throws ConfiguratorException {
     ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("/jcasc/redis.yaml").toString());
     LogstashConfiguration c = LogstashConfiguration.getInstance();
     assertThat(c.isEnabled(), is(true));

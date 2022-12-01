@@ -70,6 +70,7 @@ public class BuildData implements Serializable {
 
   // ISO 8601 date format
   private final static Logger LOGGER = Logger.getLogger(MethodHandles.lookup().lookupClass().getCanonicalName());
+
   public static class TestData implements Serializable {
     private final int totalCount, skipCount, failCount, passCount;
     private final List<FailedTest> failedTestsWithErrorDetail;
@@ -77,19 +78,18 @@ public class BuildData implements Serializable {
 
     public static class FailedTest implements Serializable {
       private final String fullName, errorDetails;
+
       public FailedTest(String fullName, String errorDetails) {
         super();
         this.fullName = fullName;
         this.errorDetails = errorDetails;
       }
 
-      public String getFullName()
-      {
+      public String getFullName() {
         return fullName;
       }
 
-      public String getErrorDetails()
-      {
+      public String getErrorDetails() {
         return errorDetails;
       }
     }
@@ -124,33 +124,27 @@ public class BuildData implements Serializable {
       }
     }
 
-    public int getTotalCount()
-    {
+    public int getTotalCount() {
         return totalCount;
     }
 
-    public int getSkipCount()
-    {
+    public int getSkipCount() {
         return skipCount;
     }
 
-    public int getFailCount()
-    {
+    public int getFailCount() {
         return failCount;
     }
 
-    public int getPassCount()
-    {
+    public int getPassCount() {
         return passCount;
     }
 
-    public List<FailedTest> getFailedTestsWithErrorDetail()
-    {
+    public List<FailedTest> getFailedTestsWithErrorDetail() {
         return failedTestsWithErrorDetail;
     }
 
-    public List<String> getFailedTests()
-    {
+    public List<String> getFailedTests() {
         return failedTests;
     }
   }
@@ -239,7 +233,6 @@ public class BuildData implements Serializable {
   }
 
   private void initData(Run<?, ?> build, Date currentTime) {
-
     this.build = build;
     Executor executor = build.getExecutor();
     if (executor == null) {
@@ -269,8 +262,7 @@ public class BuildData implements Serializable {
     updateResult();
   }
 
-  public void updateResult()
-  {
+  public void updateResult() {
     if (build != null) {
       if (result == null && build.getResult() != null) {
         Result result = build.getResult();

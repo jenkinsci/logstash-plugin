@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import org.kohsuke.stapler.Stapler;
 
 public class PluginImpl extends Plugin {
+
   private final static Logger LOG = Logger.getLogger(PluginImpl.class.getName());
 
   /*
@@ -49,8 +50,7 @@ public class PluginImpl extends Plugin {
     Stapler.CONVERT_UTILS.register(new URIConverter(), URI.class);
   }
 
-  public DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>> getAllIndexers()
-  {
+  public DescriptorExtensionList<LogstashIndexer<?>, Descriptor<LogstashIndexer<?>>> getAllIndexers() {
     return LogstashIndexer.all();
   }
 }

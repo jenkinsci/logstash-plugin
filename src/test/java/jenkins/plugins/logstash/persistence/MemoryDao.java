@@ -7,30 +7,26 @@ import java.util.List;
 import jenkins.plugins.logstash.persistence.AbstractLogstashIndexerDao;
 import net.sf.json.JSONObject;
 
-public class MemoryDao extends AbstractLogstashIndexerDao
-{
+public class MemoryDao extends AbstractLogstashIndexerDao {
+
     final List<JSONObject> output = new ArrayList<>();
 
-    public MemoryDao()
-    {
+    public MemoryDao() {
         super();
     }
 
     @Override
-    public void push(String data) throws IOException
-    {
+    public void push(String data) throws IOException {
         JSONObject json = JSONObject.fromObject(data);
         output.add(json);
     }
 
-    public List<JSONObject> getOutput()
-    {
+    public List<JSONObject> getOutput() {
         return output;
     }
 
     @Override
-    public String getDescription()
-    {
+    public String getDescription() {
       return "test";
     }
 }

@@ -6,36 +6,28 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
 import jenkins.plugins.logstash.persistence.LogstashDao;
 
-public class Logstash extends HostBasedLogstashIndexer<LogstashDao>
-{
+public class Logstash extends HostBasedLogstashIndexer<LogstashDao> {
 
   @DataBoundConstructor
-  public Logstash()
-  {
-  }
+  public Logstash() {}
 
   @Override
-  protected LogstashDao createIndexerInstance()
-  {
+  protected LogstashDao createIndexerInstance() {
     return new LogstashDao(getHost(), getPort());
   }
 
   @Extension
   @Symbol("logstash")
-  public static class Descriptor extends LogstashIndexerDescriptor
-  {
+  public static class Descriptor extends LogstashIndexerDescriptor {
 
     @Override
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
       return "Logstash TCP";
     }
 
     @Override
-    public int getDefaultPort()
-    {
+    public int getDefaultPort() {
       return 9000;
     }
-
   }
 }

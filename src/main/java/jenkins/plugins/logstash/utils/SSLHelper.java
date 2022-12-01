@@ -39,28 +39,24 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-
 public class SSLHelper {
 
   public static void setClientBuilderSSLContext(HttpClientBuilder clientBuilder, KeyStore customKeyStore)
-      throws CertificateException, NoSuchAlgorithmException,
-          IOException, KeyStoreException, KeyManagementException
-  {
-    if (customKeyStore == null)
+      throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, KeyManagementException {
+    if (customKeyStore == null) {
       return;
+    }
     String alias = customKeyStore.aliases().nextElement();
     X509Certificate certificate = (X509Certificate) customKeyStore.getCertificate(alias);
-    if (certificate != null)
+    if (certificate != null) {
       clientBuilder.setSslcontext(SSLHelper.createSSLContext(alias, certificate));
+    }
   }
 
   public static SSLContext createSSLContext(String alias, X509Certificate certificate)
-          throws CertificateException, NoSuchAlgorithmException,
-                 IOException, KeyStoreException, KeyManagementException
-  {
+          throws CertificateException, NoSuchAlgorithmException, IOException, KeyStoreException, KeyManagementException {
     // Step 1: Get all defaults
-    TrustManagerFactory tmf = TrustManagerFactory
-        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
     // Using null here initialises the TMF with the default trust store.
     tmf.init((KeyStore) null);
 
@@ -79,8 +75,7 @@ public class SSLHelper {
     ks.setEntry(alias, new KeyStore.TrustedCertificateEntry(certificate), null);
 
     // Create TMF with our custom cert's KS
-    tmf = TrustManagerFactory
-        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+    tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
     tmf.init(ks);
 
     // Get hold of the custom trust manager

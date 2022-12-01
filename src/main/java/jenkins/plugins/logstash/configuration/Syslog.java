@@ -10,40 +10,34 @@ import hudson.Extension;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogProtocol;
 import jenkins.plugins.logstash.persistence.SyslogDao;
 
-public class Syslog extends HostBasedLogstashIndexer<SyslogDao>
-{
+public class Syslog extends HostBasedLogstashIndexer<SyslogDao> {
+
   private MessageFormat messageFormat;
   private SyslogProtocol syslogProtocol;
 
   @DataBoundConstructor
-  public Syslog()
-  {}
+  public Syslog() {}
 
-  public MessageFormat getMessageFormat()
-  {
+  public MessageFormat getMessageFormat() {
     return messageFormat;
   }
 
   @DataBoundSetter
-  public void setMessageFormat(MessageFormat messageFormat)
-  {
+  public void setMessageFormat(MessageFormat messageFormat) {
     this.messageFormat = messageFormat;
   }
 
-  public SyslogProtocol getSyslogProtocol()
-  {
+  public SyslogProtocol getSyslogProtocol() {
     return syslogProtocol;
   }
 
   @DataBoundSetter()
-  public void setSyslogProtocol(SyslogProtocol syslogProtocol)
-  {
+  public void setSyslogProtocol(SyslogProtocol syslogProtocol) {
     this.syslogProtocol = syslogProtocol;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((messageFormat == null) ? 0 : messageFormat.hashCode());
@@ -52,25 +46,26 @@ public class Syslog extends HostBasedLogstashIndexer<SyslogDao>
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
+  public boolean equals(Object obj) {
     if (this == obj)
       return true;
     if (!super.equals(obj))
       return false;
     if (getClass() != obj.getClass())
       return false;
+
     Syslog other = (Syslog)obj;
+
     if (messageFormat != other.messageFormat)
       return false;
     if (syslogProtocol != other.syslogProtocol)
       return false;
+
     return true;
   }
 
   @Override
-  public SyslogDao createIndexerInstance()
-  {
+  public SyslogDao createIndexerInstance() {
     SyslogDao syslogDao = new SyslogDao(getHost(), getPort());
     syslogDao.setMessageFormat(messageFormat);
     return syslogDao;
@@ -78,18 +73,15 @@ public class Syslog extends HostBasedLogstashIndexer<SyslogDao>
 
   @Extension
   @Symbol("syslog")
-  public static class SyslogDescriptor extends LogstashIndexerDescriptor
-  {
+  public static class SyslogDescriptor extends LogstashIndexerDescriptor {
 
     @Override
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
       return "Syslog";
     }
 
     @Override
-    public int getDefaultPort()
-    {
+    public int getDefaultPort() {
       return 519;
     }
   }

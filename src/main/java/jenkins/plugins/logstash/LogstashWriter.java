@@ -80,6 +80,7 @@ public class LogstashWriter implements Serializable {
     this.listener = listener;
     this.charset = charset.toString();
     this.dao = this.getDaoOrNull();
+
     if (this.dao == null) {
       this.jenkinsUrl = "";
       this.buildData = null;
@@ -94,14 +95,12 @@ public class LogstashWriter implements Serializable {
    *
    * @return the charset
    */
-  public String getCharset()
-  {
+  public String getCharset() {
     return charset;
   }
 
   // for testing only
-  LogstashIndexerDao getDao()
-  {
+  LogstashIndexerDao getDao() {
     return dao;
   }
 
@@ -199,8 +198,7 @@ public class LogstashWriter implements Serializable {
   private LogstashIndexerDao getDaoOrNull() {
     try {
       LogstashIndexerDao dao = getIndexerDao();
-      if (dao == null)
-      {
+      if (dao == null) {
         logErrorMessage("[logstash-plugin]: Unable to instantiate LogstashIndexerDao with current configuration.\n");
       }
       return dao;
@@ -228,5 +226,4 @@ public class LogstashWriter implements Serializable {
       ex.printStackTrace();
     }
   }
-
 }

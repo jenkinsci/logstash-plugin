@@ -24,6 +24,7 @@ import jenkins.plugins.logstash.LogstashConfiguration;
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest(LogstashConfiguration.class)
 public class AbstractLogstashIndexerDaoTest {
+
   static final String EMPTY_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
   static final String ONE_LINE_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[\"LINE 1\"],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
   static final String TWO_LINE_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[\"LINE 1\", \"LINE 2\"],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
@@ -81,11 +82,10 @@ public class AbstractLogstashIndexerDaoTest {
     return new AbstractLogstashIndexerDao() {
 
       @Override
-    public void push(String data) throws IOException {}
+      public void push(String data) throws IOException {}
 
       @Override
-      public String getDescription()
-      {
+      public String getDescription() {
         return "test";
       }
     };

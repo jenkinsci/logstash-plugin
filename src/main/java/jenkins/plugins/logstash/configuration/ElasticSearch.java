@@ -43,8 +43,8 @@ import jenkins.model.Jenkins;
 import jenkins.plugins.logstash.Messages;
 import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 
-public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
-{
+public class ElasticSearch extends LogstashIndexer<ElasticSearchDao> {
+
   private static final Logger LOGGER = Logger.getLogger(ElasticSearch.class.getName());
 
   private String username;
@@ -54,17 +54,14 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   private String customServerCertificateId;
 
   @DataBoundConstructor
-  public ElasticSearch()
-  {
-  }
+  public ElasticSearch() {}
 
-  public URI getUri()
-  {
+  public URI getUri() {
     return uri;
   }
 
   @Override
- public void validate() throws MimeTypeParseException {
+  public void validate() throws MimeTypeParseException {
     new MimeType(this.mimeType);
   }
 
@@ -72,35 +69,29 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
    * We use URL for the setter as stapler can autoconvert a string to a URL but not to a URI
    */
   @DataBoundSetter
-  public void setUri(URL url) throws URISyntaxException
-  {
+  public void setUri(URL url) throws URISyntaxException {
     this.uri = url.toURI();
   }
 
-  public void setUri(URI uri)
-  {
+  public void setUri(URI uri) {
     this.uri = uri;
   }
 
-  public String getUsername()
-  {
+  public String getUsername() {
     return username;
   }
 
   @DataBoundSetter
-  public void setUsername(String username)
-  {
+  public void setUsername(String username) {
     this.username = username;
   }
 
-  public Secret getPassword()
-  {
+  public Secret getPassword() {
     return password;
   }
 
   @DataBoundSetter
-  public void setPassword(Secret password)
-  {
+  public void setPassword(Secret password) {
     this.password = password;
   }
 
@@ -114,68 +105,54 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   }
 
   @DataBoundSetter
-  public void setCustomServerCertificateId(String customServerCertificateId)
-  {
+  public void setCustomServerCertificateId(String customServerCertificateId) {
     this.customServerCertificateId = customServerCertificateId;
   }
 
-  public String getCustomServerCertificateId()
-  {
+  public String getCustomServerCertificateId() {
     return customServerCertificateId;
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
+  public boolean equals(Object obj) {
     if (obj == null)
       return false;
     if (this == obj)
       return true;
     if (getClass() != obj.getClass())
       return false;
+
     ElasticSearch other = (ElasticSearch) obj;
-    if (!Secret.toString(password).equals(Secret.toString(other.getPassword())))
-    {
+
+    if (!Secret.toString(password).equals(Secret.toString(other.getPassword()))) {
       return false;
     }
-    if (uri == null)
-    {
+    if (uri == null) {
       if (other.uri != null)
         return false;
-    }
-    else if (!uri.equals(other.uri))
-    {
+    } else if (!uri.equals(other.uri)) {
       return false;
     }
-    if (username == null)
-    {
+    if (username == null) {
       if (other.username != null)
         return false;
-    }
-    else if (!username.equals(other.username))
-    {
+    } else if (!username.equals(other.username)) {
+      return false;
+    } else if (!mimeType.equals(other.mimeType)) {
       return false;
     }
-    else if (!mimeType.equals(other.mimeType))
-    {
+    if (this.customServerCertificateId == null) {
+      if (other.customServerCertificateId != null)
+        return false;
+    } else if (!this.customServerCertificateId.equals(other.customServerCertificateId)) {
       return false;
     }
 
-    if (this.customServerCertificateId == null)
-    {
-      if (other.customServerCertificateId != null)
-        return false;
-    }
-    else if (!this.customServerCertificateId.equals(other.customServerCertificateId))
-    {
-      return false;
-    }
     return true;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((uri == null) ? 0 : uri.hashCode());
@@ -185,8 +162,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   }
 
   @Override
-  public ElasticSearchDao createIndexerInstance()
-  {
+  public ElasticSearchDao createIndexerInstance() {
     ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password));
 
     esDao.setMimeType(getMimeType());
@@ -205,8 +181,7 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     return esDao;
   }
 
-  private StandardCertificateCredentials getCredentials(String credentials)
-  {
+  private StandardCertificateCredentials getCredentials(String credentials) {
     return (StandardCertificateCredentials) CredentialsMatchers.firstOrNull(
         CredentialsProvider.lookupCredentials(StandardCertificateCredentials.class,
             Jenkins.get(), ACL.SYSTEM, Collections.emptyList()),
@@ -216,24 +191,20 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
 
   @Extension
   @Symbol("elasticSearch")
-  public static class ElasticSearchDescriptor extends LogstashIndexerDescriptor
-  {
+  public static class ElasticSearchDescriptor extends LogstashIndexerDescriptor {
     @Override
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
       return "Elastic Search";
     }
 
     @Override
-    public int getDefaultPort()
-    {
+    public int getDefaultPort() {
       return 0;
     }
 
     public ListBoxModel doFillCustomServerCertificateIdItems(
         @AncestorInPath Item item,
-        @QueryParameter String customServerCertificateId)
-    {
+        @QueryParameter String customServerCertificateId) {
       return new StandardListBoxModel().withEmptySelection()
           .withMatching( //
               CredentialsMatchers.anyOf(
@@ -247,33 +218,28 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
           );
     }
 
-    public FormValidation doCheckUrl(@QueryParameter("value") String value)
-    {
-      if (StringUtils.isBlank(value))
-      {
+    public FormValidation doCheckUrl(@QueryParameter("value") String value) {
+      if (StringUtils.isBlank(value)) {
         return FormValidation.warning(Messages.PleaseProvideHost());
       }
-      try
-      {
+      try {
         URL url = new URL(value);
 
-        if (url.getUserInfo() != null)
-        {
+        if (url.getUserInfo() != null) {
           return FormValidation.error("Please specify user and password not as part of the url.");
         }
 
-        if(StringUtils.isBlank(url.getPath()) || url.getPath().trim().matches("^\\/+$")) {
+        if (StringUtils.isBlank(url.getPath()) || url.getPath().trim().matches("^\\/+$")) {
           return FormValidation.warning("Elastic Search requires a key to be able to index the logs.");
         }
 
         url.toURI();
-      }
-      catch (MalformedURLException | URISyntaxException e)
-      {
+      } catch (MalformedURLException | URISyntaxException e) {
         return FormValidation.error(e.getMessage());
       }
       return FormValidation.ok();
     }
+
     public FormValidation doCheckMimeType(@QueryParameter("value") String value) {
       if (StringUtils.isBlank(value)) {
         return FormValidation.error(Messages.ValueIsRequired());
