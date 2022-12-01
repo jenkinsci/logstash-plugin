@@ -1,10 +1,14 @@
 package jenkins.plugins.logstash.persistence;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.Arrays;
@@ -13,8 +17,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
+import hudson.model.Cause;
+import hudson.triggers.SCMTrigger;
+import hudson.triggers.TimerTrigger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,7 +67,7 @@ public class BuildDataTest {
       + "\"rootProjectName\":\"RootBuildDataTest\",\"rootFullProjectName\":\"parent/RootBuildDataTest\","
       + "\"rootProjectDisplayName\":\"Root BuildData Test\",\"rootBuildNum\":456,\"buildVariables\":{},"
       + "\"sensitiveBuildVariables\":[],\"testResults\":{\"totalCount\":0,\"skipCount\":0,\"failCount\":0, \"passCount\":0,"
-      + "\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}}";
+      + "\"failedTests\":[], \"failedTestsWithErrorDetail\":[]}, \"userId\":\"anonymous\"}";
 
   @Mock AbstractBuild mockBuild;
   @Mock AbstractBuild mockRootBuild;
@@ -130,11 +138,12 @@ public class BuildDataTest {
   private void verifyMocks() throws Exception
   {
     verify(mockProject).getName();
-    verify(mockProject).getFullName();
+    verify(mockProject, atLeastOnce()).getFullName();
+    verify(mockProject, atMostOnce()).getUrl();
 
     verify(mockBuild).getId();
     verify(mockBuild, times(2)).getResult();
-    verify(mockBuild, times(2)).getParent();
+    verify(mockBuild, atLeast(2)).getParent();
     verify(mockBuild).getDisplayName();
     verify(mockBuild).getFullDisplayName();
     verify(mockBuild).getDescription();
@@ -149,6 +158,7 @@ public class BuildDataTest {
     verify(mockBuild).getSensitiveBuildVariables();
     verify(mockBuild).getEnvironments();
     verify(mockBuild).getEnvironment(mockListener);
+    verify(mockBuild).getCauses();
 
     verify(mockExecutor).getOwner();
 
@@ -403,5 +413,83 @@ public class BuildDataTest {
 
       verifyMocks();
       verifyTestResultActions();
+  }
+
+  @Test
+  public void userIdCauseToUserId() throws Exception {
+    when(mockBuild.getId()).thenReturn("TEST_JOB_123");
+    when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
+    when(mockBuild.getCauses()).thenReturn(Collections.singletonList(new Cause.UserIdCause("myUserId")));
+
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+    Assert.assertEquals(buildData.getUserId(), "myUserId");
+
+    verifyMocks();
+    verifyTestResultActions();
+  }
+
+  @Test
+  public void timerCauseToUserId() throws Exception {
+    when(mockBuild.getId()).thenReturn("TEST_JOB_123");
+    when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
+    when(mockBuild.getCauses()).thenReturn(Collections.singletonList(new TimerTrigger.TimerTriggerCause()));
+
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+    Assert.assertEquals(buildData.getUserId(), "timer");
+
+    verifyMocks();
+    verifyTestResultActions();
+  }
+
+  @Test
+  public void scmCauseToUserId() throws Exception {
+    when(mockBuild.getId()).thenReturn("TEST_JOB_123");
+    when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
+    when(mockBuild.getCauses()).thenReturn(Collections.singletonList(new SCMTrigger.SCMTriggerCause()));
+
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+    Assert.assertEquals(buildData.getUserId(), "scm");
+
+    verifyMocks();
+    verifyTestResultActions();
+  }
+
+  @Test
+  public void upstreamCauseToUserId() throws Exception {
+    AbstractBuild upstreamProject = mock(AbstractBuild.class);
+
+    when(upstreamProject.getCauses()).thenReturn(Collections.singletonList(new Cause.UserIdCause("myUpstreamUserId")));
+    when(upstreamProject.getParent()).thenReturn(mockProject);
+    when(upstreamProject.getNumber()).thenReturn(10);
+
+
+    when(mockBuild.getId()).thenReturn("TEST_JOB_123");
+    when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
+    List<Cause> causes = Collections.singletonList(new Cause.UpstreamCause(upstreamProject));
+    when(mockBuild.getCauses()).thenReturn(causes);
+
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+    Assert.assertEquals(buildData.getUserId(), "myUpstreamUserId");
+
+    verifyMocks();
+    verifyTestResultActions();
+  }
+
+  @Test
+  public void fallBackUserId() throws Exception {
+    when(mockBuild.getId()).thenReturn("TEST_JOB_123");
+    when(mockBuild.getUrl()).thenReturn("http://localhost:8080/jenkins/jobs/PROJECT_NAME/123");
+    when(mockBuild.getCauses()).thenReturn(Collections.emptyList());
+
+    BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);
+
+    Assert.assertEquals(buildData.getUserId(), "anonymous");
+
+    verifyMocks();
+    verifyTestResultActions();
   }
 }
