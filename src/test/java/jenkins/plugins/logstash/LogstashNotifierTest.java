@@ -2,8 +2,11 @@ package jenkins.plugins.logstash;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import hudson.Launcher;
 import hudson.model.BuildListener;
@@ -25,19 +28,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@SuppressWarnings("rawtypes")
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
-@PrepareForTest(LogstashConfiguration.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LogstashNotifierTest {
+
+  private MockedStatic<LogstashConfiguration> mockedLogstashConfiguration;
 
   // Extension of the unit under test that avoids making calls to Jenkins.getInstance() to get the DAO singleton
   static class MockLogstashNotifier extends LogstashNotifier {
@@ -99,8 +99,8 @@ public class LogstashNotifierTest {
     errorBuffer = new ByteArrayOutputStream();
     errorStream = new PrintStream(errorBuffer, true);
 
-    PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
+    mockedLogstashConfiguration = Mockito.mockStatic(LogstashConfiguration.class);
+    mockedLogstashConfiguration.when(LogstashConfiguration::getInstance).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.isEnabled()).thenReturn(true);
 
 
@@ -123,6 +123,7 @@ public class LogstashNotifierTest {
     verifyNoMoreInteractions(mockListener);
     verifyNoMoreInteractions(mockWriter);
     errorStream.close();
+    mockedLogstashConfiguration.closeOnDemand();
   }
 
   @Test

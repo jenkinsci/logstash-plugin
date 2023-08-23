@@ -1,7 +1,7 @@
 package jenkins.plugins.logstash.persistence;
 
 import static net.sf.json.test.JSONAssert.assertEquals;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,21 +9,22 @@ import java.util.Arrays;
 
 import net.sf.json.JSONObject;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import jenkins.plugins.logstash.LogstashConfiguration;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
-@PrepareForTest(LogstashConfiguration.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AbstractLogstashIndexerDaoTest {
+
+  private MockedStatic<LogstashConfiguration> mockedLogstashConfiguration;
+
   static final String EMPTY_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
   static final String ONE_LINE_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[\"LINE 1\"],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
   static final String TWO_LINE_STRING = "{\"@buildTimestamp\":\"2000-01-01\",\"data\":{},\"message\":[\"LINE 1\", \"LINE 2\"],\"source\":\"jenkins\",\"source_host\":\"http://localhost:8080/jenkins\",\"@version\":1}";
@@ -33,12 +34,17 @@ public class AbstractLogstashIndexerDaoTest {
 
   @Before
   public void before() throws Exception {
-    PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
+    mockedLogstashConfiguration = Mockito.mockStatic(LogstashConfiguration.class);
+    mockedLogstashConfiguration.when(LogstashConfiguration::getInstance).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuildData.toJson()).thenReturn(JSONObject.fromObject("{}"));
     when(mockBuildData.getTimestamp()).thenReturn("2000-01-01");
+  }
+
+  @After
+  public void after() throws Exception {
+    mockedLogstashConfiguration.closeOnDemand();
   }
 
   @Test

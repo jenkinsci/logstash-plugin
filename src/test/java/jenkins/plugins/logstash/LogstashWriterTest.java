@@ -12,7 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,11 +30,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
@@ -48,10 +46,11 @@ import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
 import net.sf.json.JSONObject;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
-@PrepareForTest(LogstashConfiguration.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LogstashWriterTest {
+
+  private MockedStatic<LogstashConfiguration> mockedLogstashConfiguration;
+
   // Extension of the unit under test that avoids making calls to getInstance() to get the DAO singleton
   static LogstashWriter createLogstashWriter(final AbstractBuild<?, ?> testBuild,
                                              OutputStream error,
@@ -103,8 +102,8 @@ public class LogstashWriterTest {
   @Before
   public void before() throws Exception {
 
-    PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
+    mockedLogstashConfiguration = Mockito.mockStatic(LogstashConfiguration.class);
+    mockedLogstashConfiguration.when(LogstashConfiguration::getInstance).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
@@ -150,6 +149,7 @@ public class LogstashWriterTest {
     verifyNoMoreInteractions(mockTestResultAction);
     verifyNoMoreInteractions(mockProject);
     errorBuffer.close();
+    mockedLogstashConfiguration.closeOnDemand();
   }
 
   @Test

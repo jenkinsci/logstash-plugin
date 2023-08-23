@@ -3,8 +3,8 @@ package jenkins.plugins.logstash;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -12,15 +12,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.cloudbees.syslog.MessageFormat;
 
@@ -33,11 +33,11 @@ import jenkins.plugins.logstash.configuration.Syslog;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.SyslogFormat;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ LogstashInstallation.class, Descriptor.class })
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
+@RunWith(MockitoJUnitRunner.class)
 public class LogstashConfigurationMigrationTest extends LogstashConfigurationTestBase
 {
+
+  private MockedStatic<LogstashInstallation> mockedLogstashInstallation;
 
   @Rule
   public JenkinsRule j = new JenkinsRule();
@@ -50,15 +50,20 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   @Before
   public void setup()
   {
-    mockStatic(LogstashInstallation.class);
     configFile = new File("notExisting.xml");
-    when(LogstashInstallation.getLogstashDescriptor()).thenAnswer(invocationOnMock -> descriptor);
+    mockedLogstashInstallation = mockStatic(LogstashInstallation.class);
+    mockedLogstashInstallation.when(LogstashInstallation::getLogstashDescriptor).thenAnswer(invocationOnMock -> descriptor);
     when(descriptor.getHost()).thenReturn("localhost");
     when(descriptor.getPort()).thenReturn(4567);
     when(descriptor.getKey()).thenReturn("logstash");
     when(descriptor.getUsername()).thenReturn("user");
     when(descriptor.getPassword()).thenReturn("pwd");
     configuration = new LogstashConfigurationForTest();
+  }
+
+  @After
+  public void after() throws Exception {
+    mockedLogstashInstallation.closeOnDemand();
   }
 
   @Test

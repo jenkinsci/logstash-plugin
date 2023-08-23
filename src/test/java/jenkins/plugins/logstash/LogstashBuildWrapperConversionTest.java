@@ -15,9 +15,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.gargoylesoftware.htmlunit.WebRequest;
+import org.htmlunit.FailingHttpStatusCodeException;
+import org.htmlunit.HttpMethod;
+import org.htmlunit.WebRequest;
 
 import hudson.model.Project;
 

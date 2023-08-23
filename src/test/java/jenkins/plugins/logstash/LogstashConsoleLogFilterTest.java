@@ -1,9 +1,9 @@
 package jenkins.plugins.logstash;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.powermock.api.mockito.PowerMockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import hudson.model.AbstractBuild;
 import hudson.model.Project;
@@ -20,15 +20,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
-@PrepareForTest(LogstashConfiguration.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LogstashConsoleLogFilterTest {
+
+  private MockedStatic<LogstashConfiguration> mockedLogstashConfiguration;
 
   @Mock
   private LogstashConfiguration logstashConfiguration;
@@ -64,8 +63,8 @@ public class LogstashConsoleLogFilterTest {
 
   @Before
   public void before() throws Exception {
-    PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
+    mockedLogstashConfiguration = Mockito.mockStatic(LogstashConfiguration.class);
+    mockedLogstashConfiguration.when(LogstashConfiguration::getInstance).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.isEnableGlobally()).thenReturn(false);
     when(logstashConfiguration.isEnabled()).thenReturn(true);
 
@@ -81,6 +80,7 @@ public class LogstashConsoleLogFilterTest {
     verifyNoMoreInteractions(mockWriter);
     verifyNoMoreInteractions(mockBuildData);
     buffer.close();
+    mockedLogstashConfiguration.closeOnDemand();
   }
 
   @Test

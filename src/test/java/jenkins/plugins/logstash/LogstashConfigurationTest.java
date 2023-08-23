@@ -14,8 +14,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 
 import jenkins.plugins.logstash.configuration.ElasticSearch;
 import jenkins.plugins.logstash.configuration.RabbitMq;

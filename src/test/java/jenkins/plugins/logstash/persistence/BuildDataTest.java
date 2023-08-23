@@ -5,7 +5,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,13 +21,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
@@ -46,11 +44,10 @@ import jenkins.plugins.logstash.persistence.BuildData.TestData;
 import net.sf.json.JSONObject;
 import net.sf.json.test.JSONAssert;
 
-@SuppressWarnings("rawtypes")
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.crypto.*", "javax.xml.*", "org.xml.*"})
-@PrepareForTest(LogstashConfiguration.class)
+@RunWith(MockitoJUnitRunner.class)
 public class BuildDataTest {
+
+  private MockedStatic<LogstashConfiguration> mockedLogstashConfiguration;
 
   static final String FULL_STRING = "{\"id\":\"TEST_JOB_123\",\"result\":\"SUCCESS\",\"fullProjectName\":\"parent/BuildDataTest\","
       + "\"projectName\":\"BuildDataTest\",\"displayName\":\"BuildData Test\",\"fullDisplayName\":\"BuildData Test #123456\","
@@ -77,8 +74,8 @@ public class BuildDataTest {
   @Before
   public void before() throws Exception {
 
-    PowerMockito.mockStatic(LogstashConfiguration.class);
-    when(LogstashConfiguration.getInstance()).thenAnswer(invocationOnMock -> logstashConfiguration);
+    mockedLogstashConfiguration = Mockito.mockStatic(LogstashConfiguration.class);
+    mockedLogstashConfiguration.when(LogstashConfiguration::getInstance).thenAnswer(invocationOnMock -> logstashConfiguration);
     when(logstashConfiguration.getDateFormatter()).thenCallRealMethod();
 
     when(mockBuild.getResult()).thenReturn(Result.SUCCESS);
@@ -125,6 +122,7 @@ public class BuildDataTest {
     verifyNoMoreInteractions(mockDate);
     verifyNoMoreInteractions(mockRootBuild);
     verifyNoMoreInteractions(mockRootProject);
+    mockedLogstashConfiguration.closeOnDemand();
   }
 
   private void verifyMocks() throws Exception
