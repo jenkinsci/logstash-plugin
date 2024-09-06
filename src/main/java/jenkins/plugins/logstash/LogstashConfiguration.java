@@ -1,5 +1,6 @@
 package jenkins.plugins.logstash;
 
+import java.lang.Object;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
