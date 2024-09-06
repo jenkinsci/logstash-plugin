@@ -159,10 +159,10 @@ public class LogstashWriter implements Serializable {
 
   // Method to encapsulate calls for unit-testing
   LogstashIndexerDao getIndexerDao() {
-    if (Jenkins.getInstanceOrNull() == null) {
+    if (!JenkinsJVM.isJenkinsJVM()){
       return null;
     }
-
+    
     return LogstashConfiguration.getInstance().getIndexerInstance();
   }
 
