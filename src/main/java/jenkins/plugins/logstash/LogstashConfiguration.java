@@ -29,7 +29,7 @@ import jenkins.plugins.logstash.configuration.Redis;
 import jenkins.plugins.logstash.configuration.Syslog;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao.IndexerType;
-import jenkins.util;
+import jenkins.util.JenkinsJVM;
 import net.sf.json.JSONObject;
 
 @Extension
