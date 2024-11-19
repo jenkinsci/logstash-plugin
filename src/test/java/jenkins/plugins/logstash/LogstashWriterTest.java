@@ -116,7 +116,7 @@ public class LogstashWriterTest {
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
-    when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
+    when(mockBuild.getActions()).thenReturn(Collections.singletonList(mockTestResultAction));
     when(mockBuild.getLog(3)).thenReturn(Arrays.asList("line 1", "line 2", "line 3", "Log truncated..."));
     when(mockBuild.getEnvironment(null)).thenReturn(new EnvVars());
     when(mockBuild.getExecutor()).thenReturn(mockExecutor);
@@ -167,7 +167,7 @@ public class LogstashWriterTest {
     verify(mockBuild).getFullDisplayName();
     verify(mockBuild).getDescription();
     verify(mockBuild).getUrl();
-    verify(mockBuild).getAction(AbstractTestResultAction.class);
+    verify(mockBuild).getActions();
     verify(mockBuild).getExecutor();
     verify(mockBuild, times(2)).getNumber();
     verify(mockBuild).getTimestamp();

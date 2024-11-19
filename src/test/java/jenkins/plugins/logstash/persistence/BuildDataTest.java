@@ -89,7 +89,7 @@ public class BuildDataTest {
     when(mockBuild.getBuildVariables()).thenReturn(Collections.emptyMap());
     when(mockBuild.getSensitiveBuildVariables()).thenReturn(Collections.emptySet());
     when(mockBuild.getEnvironments()).thenReturn(null);
-    when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(mockTestResultAction);
+    when(mockBuild.getActions()).thenReturn(Collections.singletonList(mockTestResultAction));
     when(mockBuild.getEnvironment(mockListener)).thenReturn(new EnvVars());
     when(mockBuild.getRootBuild()).thenReturn(mockRootBuild);
 
@@ -138,7 +138,7 @@ public class BuildDataTest {
     verify(mockBuild).getDescription();
     verify(mockBuild).getStartTimeInMillis();
     verify(mockBuild).getUrl();
-    verify(mockBuild).getAction(AbstractTestResultAction.class);
+    verify(mockBuild).getActions();
     verify(mockBuild).getExecutor();
     verify(mockBuild).getNumber();
     verify(mockBuild).getTimestamp();
@@ -264,7 +264,7 @@ public class BuildDataTest {
 
   @Test
   public void constructorSuccessNoTests() throws Exception {
-    when(mockBuild.getAction(AbstractTestResultAction.class)).thenReturn(null);
+    when(mockBuild.getActions()).thenReturn(Collections.emptyList());
 
     // Unit under test
     BuildData buildData = new BuildData(mockBuild, mockDate, mockListener);

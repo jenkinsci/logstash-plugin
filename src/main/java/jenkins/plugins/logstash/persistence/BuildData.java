@@ -276,7 +276,10 @@ public class BuildData implements Serializable {
         Result result = build.getResult();
         this.result = result == null ? null : result.toString();
       }
-      Action testResultAction = build.getAction(AbstractTestResultAction.class);
+      @SuppressWarnings("deprecation") // We don't need transient actions
+      Action testResultAction = build.getActions().stream()
+          .filter(action -> action instanceof AbstractTestResultAction).findFirst()
+          .orElse(null);
       if (testResults == null && testResultAction != null) {
         testResults = new TestData(testResultAction);
       }
