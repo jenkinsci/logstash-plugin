@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 
+import hudson.ExtensionList;
 import hudson.util.Secret;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -286,7 +287,7 @@ public class LogstashConfiguration extends GlobalConfiguration
 
   public static LogstashConfiguration getInstance()
   {
-    return GlobalConfiguration.all().get(LogstashConfiguration.class);
+    return ExtensionList.lookupSingleton(LogstashConfiguration.class);
   }
 
 }
