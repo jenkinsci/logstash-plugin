@@ -1,10 +1,7 @@
 package jenkins.plugins.logstash;
 
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -44,12 +41,14 @@ import hudson.model.TaskListener;
 import hudson.tasks.test.AbstractTestResultAction;
 import jenkins.plugins.logstash.persistence.BuildData;
 import jenkins.plugins.logstash.persistence.LogstashIndexerDao;
+import jenkins.util.JenkinsJVM;
 import net.sf.json.JSONObject;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LogstashWriterTest {
 
   private MockedStatic<LogstashConfiguration> mockedLogstashConfiguration;
+  private MockedStatic<JenkinsJVM> mockedJenkinsJVM;
 
   // Extension of the unit under test that avoids making calls to getInstance() to get the DAO singleton
   static LogstashWriter createLogstashWriter(final AbstractBuild<?, ?> testBuild,
@@ -150,6 +149,9 @@ public class LogstashWriterTest {
     verifyNoMoreInteractions(mockProject);
     errorBuffer.close();
     mockedLogstashConfiguration.closeOnDemand();
+    if (mockedJenkinsJVM != null) {
+      mockedJenkinsJVM.closeOnDemand();
+    }
   }
 
   @Test
@@ -345,5 +347,20 @@ public class LogstashWriterTest {
 
     assertThat("The exception was not sent to Logstash", actualLogLines.get(0), containsString(expectedErrorLines.get(0)));
     assertThat("The exception was not sent to Logstash", actualLogLines.get(1), containsString(expectedErrorLines.get(1)));
+  }
+
+  @Test
+  public void testGetIndexerDao_returnsNull_whenNotInJenkinsJVM() throws Exception {
+    mockedJenkinsJVM = Mockito.mockStatic(JenkinsJVM.class);
+    mockedJenkinsJVM.when(JenkinsJVM::isJenkinsJVM).thenReturn(false);
+
+    // Create a test instance that uses the real getIndexerDao method
+    LogstashWriter writer = new LogstashWriter(mockBuild, errorBuffer, mockListener, Charset.defaultCharset());
+
+    // Verify that getIndexerDao returns null when not in Jenkins JVM
+    LogstashIndexerDao dao = writer.getDao();
+
+    // Verify results
+    assertNull("getIndexerDao should return null when not in Jenkins JVM", dao);
   }
 }
