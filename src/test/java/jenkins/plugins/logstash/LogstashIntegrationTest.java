@@ -212,24 +212,28 @@ public class LogstashIntegrationTest
     @Test
     public void enableGlobally() throws Exception
     {
-      LogstashConfiguration.getInstance().setEnableGlobally(true);
-      QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
+        boolean isEnableGloballyInit = LogstashConfiguration.getInstance().isEnableGlobally();
+        LogstashConfiguration.getInstance().setEnableGlobally(true);
+        QueueTaskFuture<FreeStyleBuild> f = project.scheduleBuild2(0);
 
-      FreeStyleBuild build = f.get();
-      assertThat(build.getResult(), equalTo(Result.SUCCESS));
-      List<JSONObject> dataLines = memoryDao.getOutput();
-      assertThat(dataLines.size(), greaterThan(3));
-      JSONObject firstLine = dataLines.get(0);
+        FreeStyleBuild build = f.get();
+        assertThat(build.getResult(), equalTo(Result.SUCCESS));
+        List<JSONObject> dataLines = memoryDao.getOutput();
+        assertThat(dataLines.size(), greaterThan(3));
+        JSONObject firstLine = dataLines.get(0);
       JSONObject lastLine = dataLines.get(dataLines.size()-1);
-      JSONObject data = firstLine.getJSONObject("data");
+        JSONObject data = firstLine.getJSONObject("data");
       assertThat(data.getString("buildHost"),equalTo("Jenkins"));
       assertThat(data.getString("buildLabel"),equalTo("master"));
       assertThat(lastLine.getJSONArray("message").get(0).toString(),equalTo("Finished: SUCCESS"));
+
+        LogstashConfiguration.getInstance().setEnableGlobally(isEnableGloballyInit);
     }
 
     @Test
     public void enableGloballyOnRemote() throws Exception
     {
+        boolean isEnableGloballyInit = LogstashConfiguration.getInstance().isEnableGlobally();
         LogstashConfiguration.getInstance().setEnableGlobally(true);
 
         WorkflowJob p = jenkins.jenkins.createProject(WorkflowJob.class, "pipelineOnWorkerNode");
@@ -250,6 +254,8 @@ public class LogstashIntegrationTest
         assertThat(data.getString("buildHost"),equalTo("Jenkins"));
         assertThat(data.getString("buildLabel"),equalTo("master"));
         assertThat(lastLine.getJSONArray("message").get(0).toString(),equalTo("Finished: SUCCESS"));
+
+        LogstashConfiguration.getInstance().setEnableGlobally(isEnableGloballyInit);
     }
 
     @Test
