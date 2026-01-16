@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.72</version>
+    <version>4.87</version>
   </parent>
 
   <artifactId>logstash</artifactId>
@@ -64,7 +64,7 @@
     <changelist>-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/logstash-plugin</gitHubRepo>
     <skipIntegrationTests>true</skipIntegrationTests>
-    <jenkins.version>2.387.3</jenkins.version>
+    <jenkins.version>2.440.3</jenkins.version>
     <hpi.compatibleSinceVersion>2.0</hpi.compatibleSinceVersion>
   </properties>
 
@@ -72,8 +72,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.387.x</artifactId>
-        <version>2357.v1043f8578392</version>
+        <artifactId>bom-2.440.x</artifactId>
+        <version>3307.v2769886db_63b_</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
