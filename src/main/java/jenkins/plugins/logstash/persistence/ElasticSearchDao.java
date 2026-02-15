@@ -27,7 +27,6 @@ package jenkins.plugins.logstash.persistence;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -72,8 +71,6 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
   private String mimeType;
   private byte[] keystoreBytes;
   private String keyStorePassword;
-  private int connectTimeout = 10;
-  private int socketTimeout = 60;
 
   //primary constructor used by indexer factory
   public ElasticSearchDao(URI uri, String username, String password) {
@@ -188,14 +185,6 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     return auth;
   }
 
-  public int getConnectTimeout() {
-    return connectTimeout;
-  }
-
-  public int getSocketTimeout() {
-    return socketTimeout;
-  }
-
   public void setCustomKeyStore(KeyStore customKeyStore, String keyStorePassword) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
     if (customKeyStore != null) {
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -207,13 +196,6 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
 
   HttpPost getHttpPost(String data) {
     HttpPost postRequest = new HttpPost(uri);
-
-    RequestConfig perRequest = RequestConfig.custom()
-            .setConnectTimeout(connectTimeout)
-            .setSocketTimeout(socketTimeout)
-            .build();
-    postRequest.setConfig(perRequest);
-
     String mimeType = this.getMimeType();
     // char encoding is set to UTF_8 since this request posts a JSON string
     StringEntity input = new StringEntity(data, StandardCharsets.UTF_8);
