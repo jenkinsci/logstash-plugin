@@ -26,6 +26,7 @@ package jenkins.plugins.logstash.persistence;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -160,6 +161,8 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
       }
 
       channel.basicPublish("", queue, null, data.getBytes(charset));
+    } catch (TimeoutException t) {
+      throw new IOException(t);
     } finally {
       finalizeChannel(channel);
       finalizeConnection(connection);
@@ -183,7 +186,7 @@ public class RabbitMqDao extends HostBasedLogstashIndexerDao {
     if (channel != null && channel.isOpen()) {
       try {
         channel.close();
-      } catch (IOException e) {
+      } catch (IOException | TimeoutException e) {
         // This shouldn't happen but if it does there's nothing we can do
         e.printStackTrace();
       }
