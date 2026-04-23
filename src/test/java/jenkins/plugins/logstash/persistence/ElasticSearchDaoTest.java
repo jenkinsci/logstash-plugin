@@ -112,6 +112,8 @@ public class ElasticSearchDaoTest {
     assertEquals("Wrong password", null, dao.getPassword());
     assertEquals("Wrong auth", "dXNlcmxvbmdlcm5hbWU6", dao.getAuth());
     assertEquals("Wrong uri", new URI("http://localhost:8200/jenkins//logstash/"), dao.getUri());
+    assertEquals("Wrong connect timeout", 10, dao.getConnectTimeout());
+    assertEquals("Wrong socket timeout", 60, dao.getSocketTimeout());
   }
 
   @Test
@@ -120,6 +122,7 @@ public class ElasticSearchDaoTest {
     dao = createDao("http://localhost:8200/jenkins/logstash", "", "");
 
     // Unit under test
+
     HttpPost post = dao.getHttpPost(json);
     HttpEntity entity = post.getEntity();
 
