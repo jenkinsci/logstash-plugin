@@ -209,8 +209,8 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     HttpPost postRequest = new HttpPost(uri);
 
     RequestConfig perRequest = RequestConfig.custom()
-            .setConnectTimeout(connectTimeout)
-            .setSocketTimeout(socketTimeout)
+            .setConnectTimeout(connectTimeout * 1000)
+            .setSocketTimeout(socketTimeout * 1000)
             .build();
     postRequest.setConfig(perRequest);
 
