@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.72</version>
+    <version>6.2152.ve00a_731c3ce9</version>
   </parent>
 
   <artifactId>logstash</artifactId>
@@ -64,16 +64,19 @@
     <changelist>-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/logstash-plugin</gitHubRepo>
     <skipIntegrationTests>true</skipIntegrationTests>
-    <jenkins.version>2.387.3</jenkins.version>
+    <jenkins.baseline>2.492</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <hpi.compatibleSinceVersion>2.0</hpi.compatibleSinceVersion>
+    <hpi.bundledArtifacts>amqp-client,commons-pool2,jedis,syslog-java-client</hpi.bundledArtifacts>
+    <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.387.x</artifactId>
-        <version>2357.v1043f8578392</version>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
+        <version>5473.vb_9533d9e5d88</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -88,9 +91,23 @@
     <dependency>
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
-      <version>2.6.0</version>
+      <version>5.1.0</version>
       <exclusions>
+        <!-- Provided by Jenkins gson API plugin -->
+        <exclusion>
+          <groupId>com.google.code.gson</groupId>
+          <artifactId>gson</artifactId>
+        </exclusion>
+        <!-- Provided by Jenkins JSON API plugin -->
+        <exclusion>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+        </exclusion>
         <!-- Provided by Jenkins core -->
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.ow2.asm</groupId>
           <artifactId>*</artifactId>
@@ -100,17 +117,23 @@
     <dependency>
       <groupId>com.rabbitmq</groupId>
       <artifactId>amqp-client</artifactId>
-      <version>3.3.5</version>
+      <version>5.20.0</version>
+      <exclusions>
+        <!-- Provided by Jenkins core -->
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.8.9</version>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>gson-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.cloudbees</groupId>
       <artifactId>syslog-java-client</artifactId>
-      <version>1.0.6</version>
+      <version>1.1.7</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -136,6 +159,10 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-job</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>javax-activation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>io.jenkins</groupId>
@@ -167,7 +194,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mask-passwords</artifactId>
-      <version>2.13</version>
+      <version>173.v6a_077a_291eb_5</version>
       <scope>test</scope>
     </dependency>
     <dependency>

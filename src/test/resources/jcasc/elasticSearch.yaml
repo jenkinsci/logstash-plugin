@@ -1,7 +1,4 @@
 jenkins:
-  agentProtocols:
-  - "JNLP4-connect"
-  - "Ping"
   disableRememberMe: false
   mode: NORMAL
   numExecutors: 2

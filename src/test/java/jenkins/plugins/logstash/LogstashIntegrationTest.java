@@ -35,6 +35,7 @@ import hudson.model.Result;
 import hudson.model.Slave;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.ansicolor.AnsiColorBuildWrapper;
+import hudson.util.Secret;
 import net.sf.json.JSONArray;
 import jenkins.plugins.logstash.configuration.MemoryIndexer;
 import jenkins.plugins.logstash.persistence.MemoryDao;
@@ -164,7 +165,7 @@ public class LogstashIntegrationTest
       EnvInjectBuildWrapper e = new EnvInjectBuildWrapper(info);
 
       List<VarPasswordPair> pwdPairs = new ArrayList<>();
-      VarPasswordPair pwdPair = new VarPasswordPair("PWD", "myPassword");
+      VarPasswordPair pwdPair = new VarPasswordPair("PWD", Secret.fromString("myPassword"));
       pwdPairs.add(pwdPair);
       MaskPasswordsBuildWrapper maskPwdWrapper = new MaskPasswordsBuildWrapper(pwdPairs);
 
@@ -189,7 +190,7 @@ public class LogstashIntegrationTest
     {
       MaskPasswordsConfig config = MaskPasswordsConfig.getInstance();
       config.setGlobalVarEnabledGlobally(true);
-      VarPasswordPair pwdPair = new VarPasswordPair("PWD", "myPassword");
+      VarPasswordPair pwdPair = new VarPasswordPair("PWD", Secret.fromString("myPassword"));
       config.addGlobalVarPasswordPair(pwdPair);
       EnvInjectJobPropertyInfo info = new EnvInjectJobPropertyInfo(null, "PWD=myPassword", null, null, false, null);
       EnvInjectBuildWrapper e = new EnvInjectBuildWrapper(info);
