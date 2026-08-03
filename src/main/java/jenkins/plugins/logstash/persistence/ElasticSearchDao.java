@@ -192,8 +192,16 @@ public class ElasticSearchDao extends AbstractLogstashIndexerDao {
     return connectTimeout;
   }
 
+  public void setConnectTimeout(int connectTimeout) {
+    this.connectTimeout = connectTimeout;
+  }
+
   public int getSocketTimeout() {
     return socketTimeout;
+  }
+
+  public void setSocketTimeout(int socketTimeout) {
+    this.socketTimeout = socketTimeout;
   }
 
   public void setCustomKeyStore(KeyStore customKeyStore, String keyStorePassword) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {

@@ -66,4 +66,18 @@ public class ElasticSearchTest
     assertThat(indexer.equals(indexer2), is(false));
   }
 
+  @Test
+  public void connectTimeoutChangeIsNotEqual()
+  {
+    indexer.setConnectTimeout(30);
+    assertThat(indexer.equals(indexer2), is(false));
+  }
+
+  @Test
+  public void socketTimeoutChangeIsNotEqual()
+  {
+    indexer.setSocketTimeout(120);
+    assertThat(indexer.equals(indexer2), is(false));
+  }
+
 }

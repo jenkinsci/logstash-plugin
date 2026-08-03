@@ -153,7 +153,7 @@ public class LogstashConfiguration extends GlobalConfiguration
     if (!dataMigrated)
     {
       Descriptor descriptor = LogstashInstallation.getLogstashDescriptor();
-      if (descriptor.getType() != null)
+      if (descriptor != null && descriptor.getType() != null)
       {
         IndexerType type = descriptor.getType();
         switch (type)

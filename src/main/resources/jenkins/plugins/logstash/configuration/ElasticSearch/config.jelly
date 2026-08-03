@@ -14,6 +14,12 @@
     </f:entry>
 
     <f:advanced>
+        <f:entry title="${%Connect Timeout (seconds)}" field="connectTimeout">
+          <f:number default="10" min="1" clazz="required"/>
+        </f:entry>
+        <f:entry title="${%Socket Timeout (seconds)}" field="socketTimeout">
+          <f:number default="60" min="1" clazz="required"/>
+        </f:entry>
         <f:entry title="${%Custom Server Certificate}" field="customServerCertificateId">
             <c:select/>
         </f:entry>

@@ -33,6 +33,8 @@ public class ConfigAsCodeTest
     assertThat(es.getUri().toString(), is("http://localhost:9200/jenkins/test"));
     assertThat(es.getMimeType(), is("application/json"));
     assertThat(es.getUsername(), is("es"));
+    assertThat(es.getConnectTimeout(), is(30));
+    assertThat(es.getSocketTimeout(), is(120));
   }
 
   @Test
