@@ -75,6 +75,14 @@ public class LogstashConfigurationMigrationTest extends LogstashConfigurationTes
   }
 
   @Test
+  public void nullDescriptorSkipsMigration()
+  {
+    mockedLogstashInstallation.when(LogstashInstallation::getLogstashDescriptor).thenReturn(null);
+    configuration.migrateData();
+    assertThat(configuration.isEnabled(),equalTo(false));
+  }
+
+  @Test
   public void redisMigration()
   {
     when(descriptor.getType()).thenReturn(IndexerType.REDIS);
