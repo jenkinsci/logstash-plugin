@@ -7,7 +7,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import hudson.util.FormValidation;
 import hudson.util.Secret;
+import jenkins.plugins.logstash.persistence.ElasticSearchDao;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,6 +80,58 @@ public class ElasticSearchTest
   {
     indexer.setSocketTimeout(120);
     assertThat(indexer.equals(indexer2), is(false));
+  }
+
+  @Test
+  public void connectTimeoutAffectsHashCode()
+  {
+    indexer.setConnectTimeout(30);
+    assertThat(indexer.hashCode() == indexer2.hashCode(), is(false));
+  }
+
+  @Test
+  public void socketTimeoutAffectsHashCode()
+  {
+    indexer.setSocketTimeout(120);
+    assertThat(indexer.hashCode() == indexer2.hashCode(), is(false));
+  }
+
+  @Test
+  public void createIndexerInstanceUsesTimeouts()
+  {
+    indexer.setConnectTimeout(30);
+    indexer.setSocketTimeout(120);
+    ElasticSearchDao dao = indexer.createIndexerInstance();
+    assertThat(dao.getConnectTimeout(), is(30));
+    assertThat(dao.getSocketTimeout(), is(120));
+  }
+
+  @Test
+  public void doCheckConnectTimeoutRejectsNonPositive()
+  {
+    ElasticSearch.ElasticSearchDescriptor d = j.jenkins.getDescriptorByType(ElasticSearch.ElasticSearchDescriptor.class);
+    assertThat(d.doCheckConnectTimeout(0).kind, is(FormValidation.Kind.ERROR));
+  }
+
+  @Test
+  public void doCheckConnectTimeoutAcceptsPositive()
+  {
+    ElasticSearch.ElasticSearchDescriptor d = j.jenkins.getDescriptorByType(ElasticSearch.ElasticSearchDescriptor.class);
+    assertThat(d.doCheckConnectTimeout(10).kind, is(FormValidation.Kind.OK));
+  }
+
+  @Test
+  public void doCheckSocketTimeoutRejectsNonPositive()
+  {
+    ElasticSearch.ElasticSearchDescriptor d = j.jenkins.getDescriptorByType(ElasticSearch.ElasticSearchDescriptor.class);
+    assertThat(d.doCheckSocketTimeout(0).kind, is(FormValidation.Kind.ERROR));
+  }
+
+  @Test
+  public void doCheckSocketTimeoutAcceptsPositive()
+  {
+    ElasticSearch.ElasticSearchDescriptor d = j.jenkins.getDescriptorByType(ElasticSearch.ElasticSearchDescriptor.class);
+    assertThat(d.doCheckSocketTimeout(60).kind, is(FormValidation.Kind.OK));
   }
 
 }
