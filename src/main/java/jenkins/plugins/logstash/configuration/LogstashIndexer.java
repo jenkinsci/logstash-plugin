@@ -2,7 +2,7 @@ package jenkins.plugins.logstash.configuration;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 

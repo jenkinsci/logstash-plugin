@@ -8,7 +8,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Date;
 
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;

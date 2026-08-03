@@ -15,7 +15,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.syslog.MessageFormat;
 
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.http.client.utils.URIBuilder;
 import hudson.Extension;
 import hudson.init.InitMilestone;
