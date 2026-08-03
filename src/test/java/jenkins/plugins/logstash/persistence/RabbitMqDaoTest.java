@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

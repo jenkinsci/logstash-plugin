@@ -26,7 +26,7 @@ package jenkins.plugins.logstash.persistence;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import redis.clients.jedis.Jedis;

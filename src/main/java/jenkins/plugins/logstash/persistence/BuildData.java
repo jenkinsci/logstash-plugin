@@ -52,7 +52,7 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import net.sf.json.JSONObject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

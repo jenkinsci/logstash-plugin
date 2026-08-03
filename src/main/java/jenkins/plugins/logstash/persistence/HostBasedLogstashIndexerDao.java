@@ -23,7 +23,7 @@
 package jenkins.plugins.logstash.persistence;
 
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Abstract data access object for Logstash indexers.

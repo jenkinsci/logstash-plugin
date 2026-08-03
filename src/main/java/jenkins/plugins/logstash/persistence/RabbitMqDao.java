@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
