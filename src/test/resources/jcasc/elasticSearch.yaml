@@ -17,7 +17,9 @@ unclassified:
     enabled: true
     logstashIndexer:
         elasticSearch:
+            connectTimeout: 30
             mimeType: "application/json"
+            socketTimeout: 120
             uri: "http://localhost:9200/jenkins/test"
             username: "es"
     milliSecondTimestamps: true

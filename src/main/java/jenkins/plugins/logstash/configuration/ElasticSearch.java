@@ -52,6 +52,8 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
   private URI uri;
   private String mimeType;
   private String customServerCertificateId;
+  private int connectTimeout = 10;
+  private int socketTimeout = 60;
 
   @DataBoundConstructor
   public ElasticSearch()
@@ -124,6 +126,28 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     return customServerCertificateId;
   }
 
+  public int getConnectTimeout()
+  {
+    return connectTimeout;
+  }
+
+  @DataBoundSetter
+  public void setConnectTimeout(int connectTimeout)
+  {
+    this.connectTimeout = connectTimeout;
+  }
+
+  public int getSocketTimeout()
+  {
+    return socketTimeout;
+  }
+
+  @DataBoundSetter
+  public void setSocketTimeout(int socketTimeout)
+  {
+    this.socketTimeout = socketTimeout;
+  }
+
   @Override
   public boolean equals(Object obj)
   {
@@ -161,6 +185,15 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       return false;
     }
 
+    if (this.connectTimeout != other.connectTimeout)
+    {
+      return false;
+    }
+    if (this.socketTimeout != other.socketTimeout)
+    {
+      return false;
+    }
+
     if (this.customServerCertificateId == null)
     {
       if (other.customServerCertificateId != null)
@@ -181,6 +214,8 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     result = prime * result + ((uri == null) ? 0 : uri.hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
     result = prime * result + Secret.toString(password).hashCode();
+    result = prime * result + connectTimeout;
+    result = prime * result + socketTimeout;
     return result;
   }
 
@@ -190,6 +225,8 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
     ElasticSearchDao esDao = new ElasticSearchDao(getUri(), username, Secret.toString(password));
 
     esDao.setMimeType(getMimeType());
+    esDao.setConnectTimeout(connectTimeout);
+    esDao.setSocketTimeout(socketTimeout);
     if (!StringUtils.isBlank(customServerCertificateId)) {
       try {
           StandardCertificateCredentials certificateCredentials = getCredentials(customServerCertificateId);
@@ -274,6 +311,20 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       }
       return FormValidation.ok();
     }
+    public FormValidation doCheckConnectTimeout(@QueryParameter int value) {
+      if (value <= 0) {
+        return FormValidation.error(Messages.ValueIsInt());
+      }
+      return FormValidation.ok();
+    }
+
+    public FormValidation doCheckSocketTimeout(@QueryParameter int value) {
+      if (value <= 0) {
+        return FormValidation.error(Messages.ValueIsInt());
+      }
+      return FormValidation.ok();
+    }
+
     public FormValidation doCheckMimeType(@QueryParameter("value") String value) {
       if (StringUtils.isBlank(value)) {
         return FormValidation.error(Messages.ValueIsRequired());
