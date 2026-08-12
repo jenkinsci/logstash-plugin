@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.After;
 import org.junit.Before;
@@ -61,7 +62,7 @@ public class LogstashOutputStreamTest {
 
     // Verify results
     assertEquals("Results don't match", msg, buffer.toString());
-    verify(mockWriter).isConnectionBroken();
+    verify(mockWriter, times(2)).isConnectionBroken();
     verify(mockWriter).write(msg);
     verify(mockWriter).getCharset();
   }
@@ -104,14 +105,14 @@ public class LogstashOutputStreamTest {
 
     //Verify calls were made to the dao logging twice, not three times.
     verify(mockWriter, times(2)).write(msg);
-    verify(mockWriter, times(3)).isConnectionBroken();
+    verify(mockWriter, times(6)).isConnectionBroken();
     verify(mockWriter, times(2)).getCharset();
   }
 
   @Test
   public void eolSuccessNoDao() throws Exception {
     when(mockWriter.isConnectionBroken()).thenReturn(true);
-    LogstashOutputStream los = new LogstashOutputStream(buffer, mockWriter);
+    LogstashOutputStream los = new LogstashOutputStream(buffer, mockWriter, new AtomicBoolean(false),"");
     String msg = "test";
     buffer.reset();
 
@@ -120,6 +121,6 @@ public class LogstashOutputStreamTest {
 
     // Verify results
     assertEquals("Results don't match", msg, buffer.toString());
-    verify(mockWriter).isConnectionBroken();
+    verify(mockWriter, times(2)).isConnectionBroken();
   }
 }
