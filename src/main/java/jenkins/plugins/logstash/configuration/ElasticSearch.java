@@ -311,16 +311,26 @@ public class ElasticSearch extends LogstashIndexer<ElasticSearchDao>
       }
       return FormValidation.ok();
     }
-    public FormValidation doCheckConnectTimeout(@QueryParameter int value) {
+    public FormValidation doCheckConnectTimeout(
+        @AncestorInPath Item item,
+        @QueryParameter int value) {
+      if (item != null) {
+        item.checkPermission(Item.CONFIGURE);
+      }
       if (value <= 0) {
-        return FormValidation.error(Messages.ValueIsInt());
+        return FormValidation.error(Messages.ValueMustBePositive());
       }
       return FormValidation.ok();
     }
 
-    public FormValidation doCheckSocketTimeout(@QueryParameter int value) {
+    public FormValidation doCheckSocketTimeout(
+        @AncestorInPath Item item,
+        @QueryParameter int value) {
+      if (item != null) {
+        item.checkPermission(Item.CONFIGURE);
+      }
       if (value <= 0) {
-        return FormValidation.error(Messages.ValueIsInt());
+        return FormValidation.error(Messages.ValueMustBePositive());
       }
       return FormValidation.ok();
     }
